@@ -136,10 +136,16 @@ every level of its production: errors in the CICFlowMeter feature extractor
 and in the labels themselves \cite{engelen2021troubleshooting}, an error
 prevalence material enough to change reported performance
 \cite{liu2022error}, and further labelling mistakes whose correction
-significantly alters detection results \cite{lanvin2022errors}. The lesson
-is not that testbed corpora are useless; it is that their first years of use
-fix the community's reference numbers, so the audit of a new corpus is most
-valuable \emph{before} a literature accumulates on it. GeNIS
+significantly alters detection results \cite{lanvin2022errors}. Meanwhile, the
+most-cited benchmark on that corpus \cite{maseer2021benchmarking} ---
+ten supervised and unsupervised algorithms compared on accuracy, F1 and
+training/testing time --- predates the shortcut-learning literature and
+evaluates under random splits without a leakage or temporal audit, so its
+reference numbers inherit whatever artefacts the corpus carries. The lesson
+is not that testbed corpora or model-zoo benchmarks are useless; it is that
+a corpus's first years of use fix the community's reference numbers, so the
+audit of a new corpus is most valuable \emph{before} a literature
+accumulates on it. GeNIS
 \cite{silva2025genis} is exactly at that stage: captured in February 2025 on
 an Airbus CyberRange simulation of a small and medium-sized enterprise
 network, exported at four aggregation intervals with the HERA tool
@@ -222,6 +228,7 @@ independently audited corpus.}
  & New & Shortcut & Chrono. & Calib- & Natural & Infer. & Multi-\\
  & corpus & audit & split & ration & distrib. & cost & interval\\
 \midrule
+Maseer et al.\ \cite{maseer2021benchmarking} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & $\pm$ & $\pm$ & \ding{55}\\
 Silva et al.\ \cite{silva2025binary} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & $\pm$ & $\pm$ & \ding{55}\\
 D'hooge et al.\ \cite{dhooge2022metadata} & \ding{55} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55}\\
 TESSERACT \cite{pendlebury2019tesseract} & \ding{55} & $\pm$ & \ding{51} & \ding{55} & \ding{51} & \ding{55} & \ding{55}\\
