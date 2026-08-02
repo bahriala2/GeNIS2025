@@ -5,6 +5,7 @@
 
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
+\usepackage{pifont}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{xcolor}
@@ -124,13 +125,111 @@ intervals.
 % =====================================================================
 \section{Related work}
 \label{sec:related}
-\todo{Four blocks: (1) IDS benchmark corpora and their documented flaws
-(CICIDS2017 critique line); (2) shortcut learning / leakage in ML evaluation
-(general ML + security-specific: TESSERACT, temporal splits in malware);
-(3) calibration and selective classification in NIDS; (4) GeNIS-specific work:
-Silva et al. dataset + FPS baseline, XGBoost-Forget (unlearning, orthogonal).
-Positioning table at the end: rows = related works, columns = audit /
-calibration / natural distribution / cost / multi-interval.}
+
+\subsection{Benchmark corpora and their documented flaws}
+Doubts about how faithfully laboratory corpora measure intrusion detection
+predate deep learning: Sommer and Paxson's classic analysis already warned
+that closed-world evaluations reward properties of the data rather than of
+the detector \cite{sommer2010closed}. The subsequent decade validated the
+warning on the field's main reference. CICIDS2017 \cite{sharafaldin2018cicids} became the de facto benchmark, and was then shown to carry defects at
+every level of its production: errors in the CICFlowMeter feature extractor
+and in the labels themselves \cite{engelen2021troubleshooting}, an error
+prevalence material enough to change reported performance
+\cite{liu2022error}, and further labelling mistakes whose correction
+significantly alters detection results \cite{lanvin2022errors}. The lesson
+is not that testbed corpora are useless; it is that their first years of use
+fix the community's reference numbers, so the audit of a new corpus is most
+valuable \emph{before} a literature accumulates on it. GeNIS
+\cite{silva2025genis} is exactly at that stage: captured in February 2025 on
+an Airbus CyberRange simulation of a small and medium-sized enterprise
+network, exported at four aggregation intervals with the HERA tool
+\cite{pinto2024hera}, built on the Argus flow exporter, and released with
+raw packets so that alternative feature extractions remain possible --- a
+design choice motivated by the observation that the exporter itself
+materially affects downstream model performance \cite{pinto2025exporter}.
+Its authors' companion study \cite{silva2025binary} validates binary and
+multiclass classification with five feature-selection methods over tree
+ensembles and deep networks, and stands as the official baseline this paper
+is anchored to.
+
+\subsection{Shortcut learning and evaluation bias in learned security}
+That near-perfect benchmark scores can rest on features unrelated to the
+phenomenon of interest is now recognised across machine learning as
+\emph{shortcut learning} \cite{geirhos2020shortcut}, and security is a
+domain where the stakes of the confusion are highest. Arp et al.\ catalogue
+the recurring pitfalls of security ML --- sampling bias, spurious
+correlations, data snooping --- and find them endemic in published work
+\cite{arp2022dodo}. Two lines are directly upstream of ours. TESSERACT
+demonstrated that ignoring temporal structure inflates malware-classification
+results, and argued for chronologically consistent splits as a validity
+requirement rather than a robustness extra \cite{pendlebury2019tesseract}.
+Closer to network flows, D'hooge et al.\ established the contaminating
+effect of metadata features in NIDS models: the destination port alone
+separates ten state-of-the-art IDS datasets at 70--100\% accuracy, so any
+model given that feature learns a dataset artefact rather than traffic
+behaviour \cite{dhooge2022metadata}. Our audit extends this programme along
+three axes: from metadata to \emph{positional} features (capture timestamps
+and exporter sequence counters, which on GeNIS predict the class at
+$\approx$99\% against an 11\% chance level \todo{confirm E3 figure}); from a
+single split convention to a stratified-versus-chronological comparison that
+measures how much of the ranking survives; and from the CICIDS family to a
+new-generation corpus whose reference numbers are not yet fixed. The
+per-interval feature blacklist we release is the practical form of
+D'hooge et al.'s countermeasure argument, instantiated for GeNIS.
+
+\subsection{Calibration, imbalance, and the cost of a verdict}
+A benchmark meant to inform deployment must report more than a ranking.
+Modern neural networks are systematically over-confident
+\cite{guo2017calibration}, and a detector whose confidence is dishonest
+cannot drive thresholded automation; temperature scaling
+\cite{guo2017calibration} and selective classification with a reject option
+\cite{geifman2017selective,hendrickx2024reject} are the standard correctives,
+and uncertainty quantification is increasingly argued to be a first-class
+requirement for trustworthy NIDS \cite{talpini2024uncertainty}. Class
+imbalance interacts with all of this: under the natural distribution of
+GeNIS (7.4\% benign traffic at the 60-second interval), accuracy is close to
+vacuous and metrics such as macro-F1 and the Matthews correlation
+coefficient are the informative ones \cite{chicco2020mcc}. Finally, the
+tabular-learning literature gives strong prior reason to include tree
+ensembles alongside deep detectors: gradient-boosted trees remain
+consistently competitive or superior on tabular data
+\cite{grinsztajn2022trees,shwartzziv2022tabular}, with attention-based
+architectures such as the FT-Transformer as the strongest deep contenders
+\cite{gorishniy2021ftt}. No published GeNIS evaluation reports calibration,
+selective operating points, or per-model inference cost; this paper measures
+all three under one protocol.
+
+\subsection{Prior work on GeNIS and positioning}
+At the time of writing, the published record on GeNIS consists of the
+dataset descriptor \cite{silva2025genis}, its authors' classification
+baseline \cite{silva2025binary}, and one external study that uses the corpus
+for machine unlearning \cite{magalhaes2026unlearning}, a goal orthogonal to
+benchmarking. Table~\ref{tab:positioning} situates this paper against the
+closest related work: no prior study combines a shortcut audit, a
+chronological split, calibration, natural-distribution metrics, inference
+cost, and the cross-interval dimension on this corpus --- or, to our
+knowledge, on any corpus of its generation.
+
+\begin{table}[t]
+\centering
+\caption{Positioning against the closest related work. \ding{51} covered,
+$\pm$ partial, \ding{55} absent. ``New corpus'' means a post-2024,
+independently audited corpus.}
+\label{tab:positioning}
+\small
+\begin{tabular}{lccccccc}
+\toprule
+ & New & Shortcut & Chrono. & Calib- & Natural & Infer. & Multi-\\
+ & corpus & audit & split & ration & distrib. & cost & interval\\
+\midrule
+Silva et al.\ \cite{silva2025binary} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & $\pm$ & $\pm$ & \ding{55}\\
+D'hooge et al.\ \cite{dhooge2022metadata} & \ding{55} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55}\\
+TESSERACT \cite{pendlebury2019tesseract} & \ding{55} & $\pm$ & \ding{51} & \ding{55} & \ding{51} & \ding{55} & \ding{55}\\
+Uncertainty-aware NIDS \cite{talpini2024uncertainty} & \ding{55} & \ding{55} & \ding{55} & \ding{51} & $\pm$ & \ding{55} & \ding{55}\\
+\textbf{This work} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51}\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % =====================================================================
 \section{The GeNIS corpus and its natural distribution}
