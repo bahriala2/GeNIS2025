@@ -1,0 +1,200 @@
+% Article 1 — Leakage-audited benchmark on GeNIS 2025
+% Target: Journal of Information Security and Applications (elsarticle)
+% Build: pdflatex main && bibtex main && pdflatex main && pdflatex main
+\documentclass[review,12pt]{elsarticle}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+% Working notes to co-authors: \todo{...} prints in red; remove before submission.
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\journal{Journal of Information Security and Applications}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{A Leakage-Audited Benchmark of Deep and Ensemble Detectors on the
+GeNIS 2025 Corpus: Calibration, Cost, and Class Imbalance under the
+Natural Distribution}
+
+\author[1]{Ala Bahri}
+\author[1]{Farah Jemili}
+\author[2]{Mohamed Mosbah}
+\affiliation[1]{organization={\todo{affiliation 1}}}
+\affiliation[2]{organization={\todo{affiliation 2}}}
+
+\begin{abstract}
+\todo{Write last. Structure to follow: (1) modern corpora are needed but must be
+audited before they become reference numbers; (2) we benchmark 9 detector
+families on GeNIS 2025 under a clean, natural-distribution protocol;
+(3) headline finding: the shortcut audit --- a timestamp-only classifier
+reaches 99.3\% (chance 11\%), and the model ranking changes materially once
+positional and quasi-identifying features are excluded and a chronological
+split is imposed; (4) interval study: how 5/10/30/60\,s aggregation changes
+per-family detectability and cost; (5) deliverables: per-interval feature
+blacklist, calibrated operating points, CPU inference cost, full artefact.}
+\end{abstract}
+
+\begin{keyword}
+intrusion detection \sep GeNIS \sep benchmark \sep data leakage \sep
+shortcut learning \sep model calibration \sep class imbalance \sep
+inference cost
+\end{keyword}
+
+\end{frontmatter}
+
+% =====================================================================
+\section{Introduction}
+\label{sec:intro}
+
+Learning-based network intrusion detection is evaluated, almost universally,
+on a small set of shared corpora, and the field has learned the hard way that
+the corpus shapes the conclusions. CICIDS2017, the de facto reference for
+nearly a decade, was later shown to carry feature-extraction and labelling
+errors that materially change reported performance \todo{cite Engelen 2021,
+Liu 2022, Lanvin 2022}; systems tuned to its idiosyncrasies aged with it. As
+the community moves to a new generation of corpora, the question is not only
+\emph{which detectors perform best}, but \emph{whether the first published
+numbers on a new corpus measure traffic patterns or artefacts of its
+generation}. History suggests the audit should come before the leaderboard,
+not a decade after.
+
+GeNIS \todo{cite Silva DIB 2025} is one of the most promising corpora of this
+new generation: captured in February 2025 by an independent laboratory (GECAD,
+Polytechnic of Porto) on an Airbus CyberRange simulation of a small and
+medium-sized enterprise network, exported with the HERA flow exporter at four
+aggregation intervals (5, 10, 30 and 60 seconds, 2.8 million flows in total),
+and publicly archived. The companion study by its authors \todo{cite Silva
+FPS 2025} validates binary and multiclass classification with five feature
+selection methods over tree ensembles and deep networks, and constitutes the
+official baseline. What no published work provides, to our knowledge, is an
+\emph{independent} evaluation that asks the auditing questions: which features
+carry shortcuts, what happens under a chronological split, how calibrated the
+resulting confidences are, what the detectors cost at inference time, and how
+the choice of aggregation interval changes the task.
+
+This paper provides that evaluation. Its starting observation, which motivates
+everything downstream, is that on the 60-second slice of GeNIS \emph{a
+classifier given only the capture timestamp reaches 99.3\% nine-class
+accuracy, against a chance level of 11\%}: attack windows are narrow and
+mutually disjoint in capture time, so any feature correlated with position in
+the capture is a shortcut, and any random-split evaluation is at risk of
+rewarding memorisation of the capture schedule rather than recognition of
+traffic behaviour. \todo{Verify the 99.3\% figure against the E3 re-run on
+this paper's frozen protocol before submission.}
+
+We therefore benchmark nine model families --- three deep detectors (RNN, 1D
+CNN, DNN), three boosted-tree and forest ensembles (Random Forest, XGBoost,
+LightGBM), a modern tabular transformer (FT-Transformer), an
+unsupervised autoencoder evaluated separately as an unknown-attack detector,
+and trivial baselines --- under a frozen, leakage-audited protocol: scaler
+fitted on the training split only, natural class distribution preserved (7.4\%
+benign traffic in the 60-second test partition), five seeds, and paired
+statistical tests. On top of this common protocol we run the audit
+(permutation importance, stratified-versus-chronological comparison, feature
+exclusion), measure calibration before and after temperature scaling, meter
+CPU inference cost, and repeat the study across the four aggregation
+intervals.
+
+\paragraph{Contributions}
+\begin{enumerate}
+  \item \textbf{A shortcut and leakage audit of GeNIS}, quantifying how much
+  of the near-perfect random-split performance is attributable to positional
+  and quasi-identifying features, and delivering a per-interval feature
+  blacklist as a reusable artefact for any future evaluation on this corpus.
+  \item \textbf{The first calibrated, cost-aware, imbalance-aware benchmark}
+  of deep and ensemble detectors on GeNIS under the natural distribution,
+  with macro-F1, MCC, PR-AUC, operational FPR, ECE and reliability
+  diagrams, and CPU throughput/latency for every model.
+  \item \textbf{The first cross-interval study} of the corpus, measuring how
+  5/10/30/60-second flow aggregation shifts per-family detectability and
+  inference cost.
+  \item \textbf{A public, single-command-per-experiment artefact} (code,
+  configurations, seeds, blacklist, checkpoints) intended as the reference
+  protocol for subsequent work on GeNIS.
+\end{enumerate}
+
+\todo{Closing paragraph: paper organisation, once section numbering is stable.}
+
+% =====================================================================
+\section{Related work}
+\label{sec:related}
+\todo{Four blocks: (1) IDS benchmark corpora and their documented flaws
+(CICIDS2017 critique line); (2) shortcut learning / leakage in ML evaluation
+(general ML + security-specific: TESSERACT, temporal splits in malware);
+(3) calibration and selective classification in NIDS; (4) GeNIS-specific work:
+Silva et al. dataset + FPS baseline, XGBoost-Forget (unlearning, orthogonal).
+Positioning table at the end: rows = related works, columns = audit /
+calibration / natural distribution / cost / multi-interval.}
+
+% =====================================================================
+\section{The GeNIS corpus and its natural distribution}
+\label{sec:corpus}
+\todo{Corpus description; per-interval statistics table (flow counts, benign
+share per interval --- recompute, 7.4\% holds for 60s only); the 9-class
+taxonomy after merging benign variants; capture chronology figure (attack
+windows over the 6--12 February 2025 capture).}
+
+% =====================================================================
+\section{Evaluation protocol}
+\label{sec:protocol}
+\todo{4.1 Clean stratified protocol (scaler on train only, 60/20/20, 5 seeds,
+natural distribution). 4.2 Chronological protocol. 4.3 The audit procedure:
+timestamp-only probe, permutation importance, exclusion rule, blacklist
+construction --- three feature categories: positional/timestamp,
+quasi-identifiers, behavioural-but-collapsing. 4.4 Hyperparameter budget:
+$\sim$30 random-search trials AND equal compute ceiling per model, both
+stated. 4.5 Metrics and statistics: macro-F1, MCC, PR-AUC, operational
+FPR/FNR, ECE (15 bins); McNemar + Holm, bootstrap 95\% CIs (10k).}
+
+% =====================================================================
+\section{Models}
+\label{sec:models}
+\todo{Table of the 9 families with exact architectures/search spaces. Deep
+detectors reuse the GeNIS architectures of the companion system paper
+(Table 3 there). Autoencoder gets its own subsection stating the separate
+evaluation regime (AUROC on reconstruction error; optional
+leave-one-family-out).}
+
+% =====================================================================
+\section{Experiments and results}
+\label{sec:results}
+\todo{6.1 E1 anchored comparison with Silva et al. (state deviations).
+6.2 E2 main benchmark, 60s stratified --- expect saturation; present as
+anchor, not headline. 6.3 E3 audit: ranking before/after (headline figure).
+6.4 E4 intervals: per-family detectability vs 5/10/30/60s + cost.
+6.5 E5 calibration. 6.6 E6 CPU cost bench. 6.7 (optional) E7 top-k ablation.}
+
+% =====================================================================
+\section{Discussion}
+\label{sec:discussion}
+\todo{What the audit implies for future GeNIS papers; recommendation of an
+operating model for SME deployment (RQ4); relation to the companion
+architecture paper (these checkpoints are its provenance).}
+
+% =====================================================================
+\section{Threats to validity}
+\label{sec:threats}
+\todo{Internal: residual leakage; temporal split as designed result.
+External: CyberRange testbed, SME profile, volumetric floods, coarse FPR
+granularity at low benign share. Construction: finite budget; AE evaluated
+apart.}
+
+% =====================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+\todo{Write last.}
+
+\section*{Data and code availability}
+\todo{Repository URL + Zenodo DOI of the artefact; GeNIS is public
+(doi:10.5281/zenodo.14919237).}
+
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
+
+\end{document}
