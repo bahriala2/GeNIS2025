@@ -13,13 +13,13 @@ pour les détecteurs GeNIS de BAg-IDS.
 | `paper/main.tex` | Squelette LaTeX (elsarticle) — introduction rédigée, sections annotées |
 | `paper/references.bib` | Références de base vérifiées |
 | `experiments/README.md` | Plan du pipeline E1–E7 (une commande par expérience) |
-| `colab/03_article1_pipeline.ipynb` | **Notebook Colab définitif** : pipeline complet EDA → prétraitement → modèles → entraînement → figures/tables, reprise automatique |
+| `colab/article1_pipeline.ipynb` | **Notebook Colab de production** : pipeline complet (EDA → prétraitement → 12 modèles → réglage d'hyperparamètres → évaluation), 8 figures article + 15 figures d'annexe, 4 tables LaTeX, sauvegarde des modèles, reprise automatique |
 
 ## État (2026-08-02)
 
 - [x] Proposition vérifiée et validée (avec corrections)
 - [x] Squelette du papier + brouillon d'introduction + Related Work
-- [x] Notebook pipeline définitif (v3 : split temporel par classe, correctif XGBoost) — en attente des résultats
+- [x] Notebook de production (split temporel par classe, recherche d'hyperparamètres à budget déclaré, persistance des modèles) — exécution en cours
 - [ ] Semaine 1 : pipeline de données 4 intervalles, splits gelés, E1
 - [ ] E2–E6, puis rédaction complète
 
