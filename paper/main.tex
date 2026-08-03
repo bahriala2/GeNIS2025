@@ -201,39 +201,69 @@ ensembles alongside deep detectors: gradient-boosted trees remain
 consistently competitive or superior on tabular data
 \cite{grinsztajn2022trees,shwartzziv2022tabular}, with attention-based
 architectures such as the FT-Transformer as the strongest deep contenders
-\cite{gorishniy2021ftt}. No published GeNIS evaluation reports calibration,
-selective operating points, or per-model inference cost; this paper measures
-all three under one protocol.
+\cite{gorishniy2021ftt}. Inference cost is one dimension the GeNIS baseline
+already reports \cite{silva2025binary}; calibration, selective operating
+points, and confidence-bearing comparison are not, and this paper adds them
+to the same protocol.
 
 \subsection{Prior work on GeNIS and positioning}
 At the time of writing, the published record on GeNIS consists of the
 dataset descriptor \cite{silva2025genis}, its authors' classification
 baseline \cite{silva2025binary}, and one external study that uses the corpus
 for machine unlearning \cite{magalhaes2026unlearning}, a goal orthogonal to
-benchmarking. Table~\ref{tab:positioning} situates this paper against the
-closest related work: no prior study combines a shortcut audit, a
-chronological split, calibration, natural-distribution metrics, inference
-cost, and the cross-interval dimension on this corpus --- or, to our
-knowledge, on any corpus of its generation.
+benchmarking.
+
+The authors' baseline deserves a precise description, because this paper
+builds on it rather than competing with it, and several of its choices are
+already careful ones. Silva et al.\ combine five feature-selection methods
+(information gain, chi-squared, recursive feature elimination, mean absolute
+deviation, dispersion ratio) into a single ranking, retain the 16
+highest-scoring features, and train three tree ensembles (RF, XGB, LGBM) and
+two neural networks (LSTM, MLP) with grid-searched hyperparameters under
+5-fold cross-validation. They evaluate under the natural class distribution
+(7.37\% benign), report training, per-epoch and inference times alongside
+detection metrics, deliberately exclude topology-bound features --- IP, MAC
+and VLAN identifiers, and the HERA-specific \texttt{Ssaddr}/\texttt{Sdaddr}
+counters --- and use SHAP to check which feature families drive predictions.
+They close by flagging a concern they do not pursue: the models show an
+``overreliance on traffic volume or packet counts''.
+
+Four properties of that study define the space this paper occupies. First,
+its multiclass task uses the coarse \texttt{CategoryLabel} taxonomy --- four
+classes (benign, DoS, reconnaissance, brute force) --- whereas we evaluate
+the nine-class \texttt{SubCategoryLabel} task, which requires separating five
+denial-of-service families from one another rather than pooling them.
+Second, evaluation rests on a single stratified split with no repetition, so
+no confidence interval or significance test accompanies the reported
+differences. Third, only the 60-second interval is used, leaving the effect
+of flow aggregation unmeasured. Fourth, and most consequentially for a corpus
+whose attack windows are disjoint in capture time
+(Section~\ref{sec:chronology}), the protocol is a random split with no
+temporal evaluation and no test for whether retained features encode capture
+position rather than traffic behaviour --- the audit that this paper
+supplies, and which turns their own SHAP-based concern into a measurement.
+Table~\ref{tab:positioning} situates these dimensions.
 
 \begin{table}[t]
 \centering
 \caption{Positioning against the closest related work. \ding{51} covered,
-$\pm$ partial, \ding{55} absent. ``New corpus'' means a post-2024,
-independently audited corpus.}
+$\pm$ partial, \ding{55} absent. ``New corpus'': a post-2024 corpus.
+``Repeated'': multiple seeds with dispersion or significance testing.
+``Cost'': measured training and inference time.}
 \label{tab:positioning}
 \small
-\begin{tabular}{lccccccc}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccccc}
 \toprule
- & New & Shortcut & Chrono. & Calib- & Natural & Infer. & Multi-\\
- & corpus & audit & split & ration & distrib. & cost & interval\\
+ & New & Shortcut & Temporal & Calib- & Natural & Repea- & Cost & Multi-\\
+ & corpus & audit & protocol & ration & distrib. & ted & & interval\\
 \midrule
-Maseer et al.\ \cite{maseer2021benchmarking} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & $\pm$ & $\pm$ & \ding{55}\\
-Silva et al.\ \cite{silva2025binary} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & $\pm$ & $\pm$ & \ding{55}\\
-D'hooge et al.\ \cite{dhooge2022metadata} & \ding{55} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55}\\
-TESSERACT \cite{pendlebury2019tesseract} & \ding{55} & $\pm$ & \ding{51} & \ding{55} & \ding{51} & \ding{55} & \ding{55}\\
-Uncertainty-aware NIDS \cite{talpini2024uncertainty} & \ding{55} & \ding{55} & \ding{55} & \ding{51} & $\pm$ & \ding{55} & \ding{55}\\
-\textbf{This work} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51}\\
+Maseer et al.\ \cite{maseer2021benchmarking} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & $\pm$ & \ding{55} & \ding{51} & \ding{55}\\
+Silva et al.\ \cite{silva2025binary} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & \ding{51} & \ding{55} & \ding{51} & \ding{55}\\
+D'hooge et al.\ \cite{dhooge2022metadata} & \ding{55} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & $\pm$ & \ding{55} & \ding{55}\\
+TESSERACT \cite{pendlebury2019tesseract} & \ding{55} & $\pm$ & \ding{51} & \ding{55} & \ding{51} & \ding{51} & \ding{55} & \ding{55}\\
+Uncertainty-aware NIDS \cite{talpini2024uncertainty} & \ding{55} & \ding{55} & \ding{55} & \ding{51} & $\pm$ & $\pm$ & \ding{55} & \ding{55}\\
+\textbf{This work} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -277,11 +307,22 @@ traffic rather than separate detection targets; we merge them into a single
 \texttt{benign} class, yielding the nine-class task evaluated throughout
 (benign, \texttt{bruteforce-\{ftp,smb,ssh\}},
 \texttt{dos-\{hulk,icmp,pshack,slowloris,udp\}}).
-\todo{Report our recomputed per-interval statistics table here (Table 1
-from the notebook run). Note and resolve the discrepancy with the
-descriptor's Table 12 (e.g.\ benign-background: 10,286 reported vs.\ 8,283
-loaded at 60\,s) --- recount from the released files and state which
-figures this paper uses.}
+
+These choices place our task strictly between the two published
+alternatives, and the difference is worth stating precisely because it
+governs comparability. The corpus baseline \cite{silva2025binary} evaluates
+the four-class \texttt{CategoryLabel} task on 368{,}556 sixty-second flows,
+a count that includes reconnaissance; the \texttt{2-flows} module we use
+yields 338{,}820. The 29{,}736-flow gap is fully accounted for by two
+independent causes, which we report because neither is documented: the
+absence of the reconnaissance captures (\texttt{recon-nmap}, 27{,}713 flows;
+\texttt{recon-dns}, 20) from this module, and a 2{,}003-flow shortfall in
+\texttt{benign-background} relative to the descriptor's Table 12
+(8{,}283 released versus 10{,}286 reported). All figures in this paper are
+recounted from the released files, and we state the released counts rather
+than the documented ones wherever the two disagree.
+\todo{Insert the recomputed per-interval statistics table (Table 1 from the
+notebook run) and confirm the two counts above against it.}
 
 \subsection{Capture chronology and its consequences}
 \label{sec:chronology}
