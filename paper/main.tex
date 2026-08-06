@@ -10,6 +10,9 @@
 \usepackage{hyperref}
 \usepackage{xcolor}
 
+% Rotated column header, used in the positioning table.
+\newcommand{\rh}[1]{\rotatebox{90}{#1\;}}
+
 % Working notes to co-authors: \todo{...} prints in red; remove before submission.
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 
@@ -33,9 +36,9 @@ Natural Distribution}
 Network intrusion detection is benchmarked on shared corpora, and the first numbers
 published on a new corpus tend to become its reference numbers. GeNIS, released in 2025
 from an independent CyberRange capture, is at that stage. We audit and benchmark it with
-eleven supervised detectors and one unsupervised detector, under three feature
-conditions, two evaluation protocols and five seeds --- 154 training runs with paired
-significance testing. Three findings generalise beyond the corpus. First, a shortcut audit cannot be
+eleven supervised detectors and one unsupervised detector, across three feature
+conditions, two evaluation protocols and five seeds on the primary condition --- 154
+training runs with paired significance testing. Three findings generalise beyond the corpus. First, a shortcut audit cannot be
 built on feature-attribution scores: all eight behavioural shortcuts we identify have
 permutation importance below $10^{-4}$ because they are mutually redundant, and six of
 them are numerically identical columns; only evaluating each feature in isolation under
@@ -85,28 +88,28 @@ with the HERA flow exporter \cite{pinto2024hera} at four aggregation intervals, 
 publicly archived. Its authors' companion study \cite{silva2025binary} validates binary
 and four-class classification with five feature-selection methods over tree ensembles and
 deep networks, and constitutes the official baseline. It is a careful study, and it
-closes on a concern it does not pursue: the models show an ``overreliance on traffic
-volume or packet counts''. This paper takes up that concern and answers it.
+closes with a concern it does not pursue: the models show an ``overreliance on traffic
+volume or packet counts''. This paper takes that concern up and answers it.
 
 The starting observation is that on the 60-second slice, \emph{a classifier given only
 the capture timestamp separates the nine classes at 99.70\% accuracy, against a
 majority-class rate of 19.42\%}. Attack families occupy narrow, mutually disjoint windows
 of the capture, so position in time is very nearly a label. Two consequences drive the
-paper. Any feature correlated with capture position is a shortcut --- and, as we show,
-the standard tools for finding shortcuts cannot see the ones GeNIS contains. And the
-standard remedy, chronological evaluation, turns out to be insufficient here for a
-structural reason: because the windows are disjoint, a per-class temporal split still
-leaves the timestamp probe at 98.6\%.
+paper. First, any feature correlated with capture position is a shortcut, and the
+standard tools for finding shortcuts cannot see the ones GeNIS contains. Second, the
+standard remedy --- chronological evaluation --- is insufficient here for a structural
+reason: because the windows are disjoint, a per-class temporal split still leaves the
+timestamp probe at 98.6\%.
 
 We therefore benchmark eleven supervised detectors --- a majority baseline, logistic
 regression, Gaussian naive Bayes, $k$-NN, random forest, XGBoost, LightGBM, the RNN, CNN
-and DNN architectures whose provenance this paper also records, and an FT-Transformer
+and DNN architectures of our earlier comparative study \cite{bahri2023comparative}, whose
+provenance on this corpus the present paper records, and an FT-Transformer
 --- together with a benign-trained autoencoder, under a frozen protocol: scaler fitted on
 the training split only, natural class distribution preserved (7.42\% benign traffic),
 five seeds, a declared hyperparameter budget with a tuned second arm, and paired
-significance testing. On that common basis we run the shortcut audit, measure calibration,
-meter single-core inference cost, and repeat the study across all four aggregation
-intervals.
+significance testing. On that common basis we run the shortcut audit, measure calibration and
+single-core inference cost, and repeat the study across all four aggregation intervals.
 
 \paragraph{Contributions}
 \begin{enumerate}
@@ -118,8 +121,8 @@ intervals.
   \item \textbf{Evidence that temporal splitting is necessary but not sufficient} on
   corpora whose attack windows are disjoint, quantified by a timestamp probe that
   survives a per-class temporal protocol at 98.6\%.
-  \item \textbf{A calibrated, cost-aware, statistically tested benchmark} of twelve
-  detectors under the natural distribution, showing that the stratified task is saturated
+  \item \textbf{A calibrated, cost-aware, statistically tested benchmark} of eleven
+  supervised detectors under the natural distribution, showing that the stratified task is saturated
   --- eleven model pairs are not significantly different --- and that the ranking is
   interpretable only under temporal evaluation.
   \item \textbf{A negative result on reconstruction-based anomaly detection}: AUROC
@@ -266,17 +269,17 @@ $\pm$ partial, \ding{55} absent. ``New corpus'': a post-2024 corpus.
 ``Cost'': measured training and inference time.}
 \label{tab:positioning}
 \small
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{5pt}
 \begin{tabular}{lcccccccc}
 \toprule
- & New & Shortcut & Temporal & Calib- & Natural & Repea- & Cost & Multi-\\
- & corpus & audit & protocol & ration & distrib. & ted & & interval\\
+ & \rh{new corpus} & \rh{shortcut audit} & \rh{temporal protocol} & \rh{calibration}
+ & \rh{natural distrib.} & \rh{repeated} & \rh{cost} & \rh{multi-interval}\\
 \midrule
 Maseer et al.\ \cite{maseer2021benchmarking} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & $\pm$ & \ding{55} & \ding{51} & \ding{55}\\
 Silva et al.\ \cite{silva2025binary} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & \ding{51} & \ding{55} & \ding{51} & \ding{55}\\
 D'hooge et al.\ \cite{dhooge2022metadata} & \ding{55} & \ding{51} & \ding{55} & \ding{55} & \ding{55} & $\pm$ & \ding{55} & \ding{55}\\
 TESSERACT \cite{pendlebury2019tesseract} & \ding{55} & $\pm$ & \ding{51} & \ding{55} & \ding{51} & \ding{51} & \ding{55} & \ding{55}\\
-Uncertainty-aware NIDS \cite{talpini2024uncertainty} & \ding{55} & \ding{55} & \ding{55} & \ding{51} & $\pm$ & $\pm$ & \ding{55} & \ding{55}\\
+Talpini et al.\ \cite{talpini2024uncertainty} & \ding{55} & \ding{55} & \ding{55} & \ding{51} & $\pm$ & $\pm$ & \ding{55} & \ding{55}\\
 \textbf{This work} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51} & \ding{51}\\
 \bottomrule
 \end{tabular}
@@ -535,15 +538,16 @@ traffic.}
 \begin{table}[t]
 \centering
 \caption{Nine-class benchmark on the 60-second slice. Macro-F1 under three feature
-conditions; the audited column averages five seeds. MCC and FPR are for the audited
-condition, seed~1. FPR resolution is 0.0199 points (one benign flow).}
+conditions; the audited column gives the five-seed mean with the standard deviation as a
+subscript. MCC and FPR are for the audited condition, seed~1. FPR resolution is 0.0199
+points (one benign flow), so 0.0000 means no false positive at all.}
 \label{tab:main}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lcccccc c}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccccccc}
 \toprule
-& \multicolumn{3}{c}{stratified} & tuned & temporal & & \\
-\cmidrule(lr){2-4}
+& \multicolumn{3}{c}{stratified, default} & tuned & temporal & \multicolumn{2}{c}{audited, seed 1}\\
+\cmidrule(lr){2-4}\cmidrule(lr){7-8}
 Model & full & clean & audited & audited & audited & MCC & FPR (\%)\\
 \midrule
 \input{tables/t2_main.tex}
@@ -562,16 +566,17 @@ $0.1942$. The same probe reaches $0.9991$, $0.9988$ and $0.9983$ at the 5-, 10- 
 corpus, not of one aggregation choice.
 
 \paragraph{Temporal splitting does not remove it.}
-The result we did not anticipate is that the per-class temporal protocol barely dents the
-shortcut: the same timestamp probe still reaches $0.9862$. The reason is structural.
+The result we did not anticipate is that the per-class temporal protocol barely reduces
+the shortcut: the same timestamp probe still reaches $0.9862$. The reason is structural.
 Because each class occupies narrow, mutually disjoint windows
 (Figure~\ref{fig:timeline}), the capture interval immediately following a class's
 training window still belongs to that class, so a tree extrapolating from the training
 range continues to predict correctly. \emph{No time-based split can neutralise a shortcut
 whose classes are temporally disjoint.} This matters beyond GeNIS: the standard advice to
 adopt chronological evaluation \cite{pendlebury2019tesseract} is necessary but, on
-corpora generated one attack at a time, not sufficient. Feature exclusion is the only
-effective remedy, which is what makes the blacklist an artefact rather than a formality.
+corpora generated one attack at a time, not sufficient. Excluding the offending features
+is what does the work here, which is what makes the blacklist an artefact rather than a
+formality.
 
 \paragraph{All eight behavioural shortcuts have zero attribution importance.}
 The audit scans all 63 behavioural features and excludes eight
@@ -622,15 +627,18 @@ discussed in Section~\ref{sec:threats}.}
 
 \begin{table}[t]
 \centering
-\caption{The published blacklist: 12 of 67 features. Positional columns are excluded by
-construction; behavioural columns are excluded by the transferability rule of
-Section~\ref{sec:audit-protocol}. Note that all eight behavioural shortcuts have
+\caption{The published blacklist: 12 of 67 features. Positional columns (\emph{pos.}) are
+excluded by construction and therefore carry no audit statistics; behavioural columns
+(\emph{behav.}) are excluded by the transferability rule of
+Section~\ref{sec:audit-protocol}. $a_{\mathrm{strat}}$ and $a_{\mathrm{temp}}$ are the
+single-feature accuracies under the two protocols. All eight behavioural shortcuts have
 permutation importance below $10^{-4}$.}
 \label{tab:blacklist}
-\small
+\footnotesize
+\setlength{\tabcolsep}{5pt}
 \begin{tabular}{llcccc}
 \toprule
-Feature & Category & Perm.\ imp. & $acc_{\text{strat}}$ & $acc_{\text{temp}}$ & $\tau$\\
+Feature & Cat. & Perm.\ imp. & $a_{\mathrm{strat}}$ & $a_{\mathrm{temp}}$ & $\tau$\\
 \midrule
 \input{tables/t3_blacklist.tex}
 \bottomrule
@@ -732,10 +740,10 @@ Interval & Flows & Benign flows & Benign (\%) & Timestamp probe\\
 
 \begin{table}[t]
 \centering
-\caption{Macro-F1 by aggregation interval, audited condition (three seeds at 5/10/30\,s,
-five at 60\,s).}
+\caption{Macro-F1 by aggregation interval, audited condition, with the standard deviation
+as a subscript (three seeds at 5/10/30\,s, five at 60\,s).}
 \label{tab:intervals-models}
-\small
+\footnotesize
 \begin{tabular}{lrccc}
 \toprule
 Interval & Benign (\%) & LightGBM & XGBoost & DNN\\
@@ -776,14 +784,17 @@ exists to answer: the ordering is not an artefact of default settings.
 
 \begin{table}[t]
 \centering
-\caption{Calibration (audited, seed 1) and hyperparameter search. $T$: fitted
-temperature. Trials: random-search trials actually completed under the 900\,s cap.
-$\Delta$: validation macro-F1 gain from tuning.}
+\caption{Calibration (audited, seed 1) and hyperparameter search. $T$: fitted temperature;
+ECE$_{\mathrm{raw}}$ and ECE$_{\mathrm{cal}}$: expected calibration error before and after
+temperature scaling. Trials: random-search trials actually completed under the 900\,s cap.
+$\Delta_{\mathrm{val}}$: validation macro-F1 gain from tuning --- Section~\ref{sec:calib}
+notes where it fails to transfer to the test partition.}
 \label{tab:calib}
-\small
+\footnotesize
+\setlength{\tabcolsep}{5pt}
 \begin{tabular}{lccccrr}
 \toprule
-Model & $T$ & ECE before & ECE after & Trials & Time (s) & $\Delta$\\
+Model & $T$ & ECE$_{\mathrm{raw}}$ & ECE$_{\mathrm{cal}}$ & Trials & Time (s) & $\Delta_{\mathrm{val}}$\\
 \midrule
 \input{tables/t5_calib_hpo.tex}
 \bottomrule
@@ -857,7 +868,8 @@ throughput budget allows it.
 \caption{Single-core CPU inference cost, audited condition. Latency measured at batch
 size 1 over 200 samples; throughput at batch size 512.}
 \label{tab:cost}
-\small
+\footnotesize
+\setlength{\tabcolsep}{5pt}
 \begin{tabular}{lrrrrc}
 \toprule
 Model & $p_{50}$ (ms) & $p_{99}$ (ms) & Flows/s & Size (MB) & macro-F1\\
@@ -926,7 +938,7 @@ threshold of $0.7$ would additionally exclude seven features
 (\texttt{SrcLoad}, \texttt{SrcRate}, \texttt{DstLoad}, \texttt{Rate}, \texttt{Load},
 \texttt{DstRate}, \texttt{SIntPktIdl}). We publish the full spectrum
 (Figure~\ref{fig:spectrum}) precisely so that this choice is inspectable and revisable;
-we do not claim the boundary is a natural kind.
+we do not claim the boundary is intrinsic to the data.
 
 \paragraph{Measurement resolution.}
 With 5\,029 benign test flows, the FPR resolution is 0.0199 points and macro-F1
