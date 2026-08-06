@@ -1,13 +1,9 @@
-# LaTeX
-paper/*.aux
-paper/*.log
-paper/*.out
-paper/*.blg
-paper/main_word.tex
-
-# Word / rendu de verification
+# rendu de verification du Word
 paper/GeNIS_benchmark_article.pdf
 paper/page-*.jpg
 
-# Node (docx-js)
-paper/node_modules/
+# LaTeX archivé : fichiers intermédiaires
+paper/legacy-latex/*.aux
+paper/legacy-latex/*.log
+paper/legacy-latex/*.out
+paper/legacy-latex/*.blg
