@@ -145,4 +145,17 @@ M.~Shafi, A.~H. Lashkari, V.~Rodriguez, R.~Nevo, Toward generating a new
 \newblock \href {https://doi.org/10.3390/info15040195}
   {\path{doi:10.3390/info15040195}}.
 
+\bibitem{strobl2008conditional}
+C.~Strobl, A.-L. Boulesteix, T.~Kneib, T.~Augustin, A.~Zeileis, Conditional
+  variable importance for random forests, BMC Bioinformatics 9~(307) (2008).
+\newblock \href {https://doi.org/10.1186/1471-2105-9-307}
+  {\path{doi:10.1186/1471-2105-9-307}}.
+
+\bibitem{hooker2021unrestricted}
+G.~Hooker, L.~Mentch, S.~Zhou, Unrestricted permutation forces extrapolation:
+  variable importance requires at least one more model, or there is no free
+  variable importance, Statistics and Computing 31~(82) (2021).
+\newblock \href {https://doi.org/10.1007/s11222-021-10057-z}
+  {\path{doi:10.1007/s11222-021-10057-z}}.
+
 \end{thebibliography}
