@@ -81,13 +81,12 @@ R.~Geirhos, J.-H. Jacobsen, C.~Michaelis, R.~Zemel, W.~Brendel, M.~Bethge,
 \bibitem{arp2022dodo}
 D.~Arp, E.~Quiring, F.~Pendlebury, A.~Warnecke, F.~Pierazzi, C.~Wressnegger,
   L.~Cavallaro, K.~Rieck, Dos and don'ts of machine learning in computer
-  security, USENIX Security SymposiumLeakage/shortcut taxonomy for security ML
-  — verify venue formatting (2022).
+  security, USENIX Security Symposium (2022).
 
 \bibitem{pendlebury2019tesseract}
 F.~Pendlebury, F.~Pierazzi, R.~Jordaney, J.~Kinder, L.~Cavallaro, {TESSERACT}:
   Eliminating experimental bias in malware classification across space and
-  time, in: USENIX Security Symposium, 2019, tODO: verify pages.
+  time, in: USENIX Security Symposium, 2019.
 
 \bibitem{dhooge2022metadata}
 L.~D'hooge, M.~Verkerken, B.~Volckaert, T.~Wauters, F.~De~Turck, Establishing
@@ -137,14 +136,12 @@ Y.~Gorishniy, I.~Rubachev, V.~Khrulkov, A.~Babenko, Revisiting deep learning
 
 \bibitem{magalhaes2026unlearning}
 D.~Magalh{\~a}es, et~al., Machine unlearning for the {XGBoost} model with
-  network intrusion datasets, arXiv:2606.19220. Uses GeNIS; orthogonal to this
-  benchmark (unlearning). TODO: complete author list (2026).
+  network intrusion datasets, arXiv:2606.19220 (2026).
 
 \bibitem{shafi2024bup}
 M.~Shafi, A.~H. Lashkari, V.~Rodriguez, R.~Nevo, Toward generating a new
   cloud-based distributed denial of service ({DDoS}) dataset and cloud
-  intrusion traffic characterization, Information 15~(4) (2024) 195, source of
-  the Benign User Profiler (BUP) tool used to generate GeNIS benign traffic.
+  intrusion traffic characterization, Information 15~(4) (2024) 195.
 \newblock \href {https://doi.org/10.3390/info15040195}
   {\path{doi:10.3390/info15040195}}.
 

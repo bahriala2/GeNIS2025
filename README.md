@@ -13,8 +13,9 @@ pour les détecteurs GeNIS de BAg-IDS.
 | `paper/main.tex` | **Article complet** (~6 900 mots) : abstract, intro, related work, corpus, protocole, modèles, résultats, discussion, threats, conclusion |
 | `paper/figures/`, `paper/tables/` | 10 figures (PDF+PNG) et 7 tables LaTeX générées depuis les résultats |
 | `paper/main.pdf` | **PDF compilé** (40 pages, format elsarticle review) |
-| `paper/GeNIS_benchmark_article.docx` | **Version Word** éditable (figures et tables incluses) |
-| `paper/Makefile` | `make pdf` · `make docx` · `make check` |
+| `paper/GeNIS_benchmark_article.docx` | **Version Word native** (20 pages) : titres hiérarchiques, tableaux Word réels, figures légendées, références numérotées — construite directement en OOXML, **sans conversion pandoc** |
+| `paper/tex2struct.py` · `paper/build_docx.js` | Chaîne Word : extraction de la structure (`content.json`) puis écriture native via docx-js |
+| `paper/Makefile` | `make pdf` · `make docx` · `make preview` · `make check` |
 | `paper/regenerate_{figures,tables}.py` | Régénèrent figures et tables depuis `article1_results.json` |
 | `paper/article1_results.json` | Résultats de la campagne (154 runs) |
 | `paper/references.bib` | Références de base vérifiées |

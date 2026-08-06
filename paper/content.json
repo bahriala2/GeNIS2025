@@ -1,0 +1,6676 @@
+{
+ "title": "A Leakage-Audited Benchmark of Deep and Ensemble Detectors on the GeNIS 2025 Corpus: Calibration, Cost, and Class Imbalance under the Natural Distribution",
+ "authors": [
+  "Ala Bahri",
+  "Farah Jemili",
+  "Mohamed Mosbah"
+ ],
+ "abstract": [
+  {
+   "t": "Network intrusion detection is benchmarked on shared corpora, and the first numbers published on a new corpus tend to become its reference numbers. GeNIS, released in 2025 from an independent CyberRange capture, is at that stage. We audit and benchmark it with eleven supervised detectors and one unsupervised detector, across three feature conditions, two evaluation protocols and five seeds on the primary condition — 154 training runs with paired significance testing. Three findings generalise beyond the corpus. First, a shortcut audit cannot be built on feature-attribution scores: all eight behavioural shortcuts we identify have permutation importance below "
+  },
+  {
+   "t": "10⁻⁴"
+  },
+  {
+   "t": " because they are mutually redundant, and six of them are numerically identical columns; only evaluating each feature in isolation under two protocols exposes them. Second, chronological evaluation does not neutralise a capture-schedule shortcut when attack windows are disjoint — a timestamp-only classifier still reaches 98.6% nine-class accuracy under our per-class temporal protocol, against 99.7% under a random split and a 19.4% majority-class rate — so feature exclusion, not temporal ordering, is the operative remedy. Third, a benign-trained autoencoder is anti-correlated with volumetric floods, reaching AUROC 0.0000 against PSH-ACK floods, because flood traffic reconstructs more easily than legitimate traffic. For the corpus itself, the nine-class task is saturated under a random split, where eleven model pairs are statistically indistinguishable and the leaderboard is uninterpretable; the ranking becomes meaningful only under temporal evaluation, where the FT-Transformer leads at macro-F1 0.9966 and the gradient-boosted trees that dominate the random split fall to mid-table. We release a twelve-feature blacklist, frozen splits, calibrated operating points, single-core inference cost for every detector, and the trained models, so that subsequent work on GeNIS starts from an audited protocol."
+  }
+ ],
+ "keywords": "intrusion detection · GeNIS · benchmark · shortcut learning · data leakage · temporal evaluation · model calibration · inference cost",
+ "items": [
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "Introduction"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Learning-based network intrusion detection is evaluated, almost universally, on a small set of shared corpora, and the field has learned the hard way that the corpus shapes the conclusions. CICIDS2017, the de facto reference for nearly a decade, was later shown to carry feature-extraction and labelling errors that materially change reported performance [1, 2, 3]; systems tuned to its idiosyncrasies aged with it. As the community moves to a new generation of corpora, the question is not only "
+    },
+    {
+     "t": "which detectors perform best",
+     "i": true
+    },
+    {
+     "t": ", but "
+    },
+    {
+     "t": "whether the first published numbers on a new corpus measure traffic patterns or artefacts of its generation",
+     "i": true
+    },
+    {
+     "t": ". History suggests the audit should come before the leaderboard, not a decade after."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "GeNIS [4] is one of the most promising corpora of this new generation: captured in February 2025 by an independent laboratory (GECAD, Polytechnic of Porto) on an Airbus CyberRange simulation of a small and medium-sized enterprise network, exported with the HERA flow exporter [5] at four aggregation intervals, and publicly archived. Its authors' companion study [6] validates binary and four-class classification with five feature-selection methods over tree ensembles and deep networks, and constitutes the official baseline. It is a careful study, and it closes with a concern it does not pursue: the models show an “overreliance on traffic volume or packet counts”. This paper takes that concern up and answers it."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The starting observation is that on the 60-second slice, "
+    },
+    {
+     "t": "a classifier given only the capture timestamp separates the nine classes at 99.70% accuracy, against a majority-class rate of 19.42%",
+     "i": true
+    },
+    {
+     "t": ". Attack families occupy narrow, mutually disjoint windows of the capture, so position in time is very nearly a label. Two consequences drive the paper. First, any feature correlated with capture position is a shortcut, and the standard tools for finding shortcuts cannot see the ones GeNIS contains. Second, the standard remedy — chronological evaluation — is insufficient here for a structural reason: because the windows are disjoint, a per-class temporal split still leaves the timestamp probe at 98.6%."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "We therefore benchmark eleven supervised detectors — a majority baseline, logistic regression, Gaussian naive Bayes, "
+    },
+    {
+     "t": "k"
+    },
+    {
+     "t": "-NN, random forest, XGBoost, LightGBM, the RNN, CNN and DNN architectures of our earlier comparative study [7], whose provenance on this corpus the present paper records, and an FT-Transformer — together with a benign-trained autoencoder, under a frozen protocol: scaler fitted on the training split only, natural class distribution preserved (7.42% benign traffic), five seeds, a declared hyperparameter budget with a tuned second arm, and paired significance testing. On that common basis we run the shortcut audit, measure calibration and single-core inference cost, and repeat the study across all four aggregation intervals."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Contributions",
+   "runs": []
+  },
+  {
+   "type": "li",
+   "ord": true,
+   "runs": [
+    {
+     "t": "A transferability-based shortcut audit",
+     "b": true
+    },
+    {
+     "t": ", and the demonstration that attribution-based auditing cannot substitute for it: the eight behavioural shortcuts it finds all have permutation importance below "
+    },
+    {
+     "t": "10⁻⁴"
+    },
+    {
+     "t": ", and six of them are numerically identical columns in the released files. We publish the resulting twelve-feature blacklist and the full transferability spectrum."
+    }
+   ]
+  },
+  {
+   "type": "li",
+   "ord": true,
+   "runs": [
+    {
+     "t": "Evidence that temporal splitting is necessary but not sufficient",
+     "b": true
+    },
+    {
+     "t": " on corpora whose attack windows are disjoint, quantified by a timestamp probe that survives a per-class temporal protocol at 98.6%."
+    }
+   ]
+  },
+  {
+   "type": "li",
+   "ord": true,
+   "runs": [
+    {
+     "t": "A calibrated, cost-aware, statistically tested benchmark",
+     "b": true
+    },
+    {
+     "t": " of eleven supervised detectors under the natural distribution, showing that the stratified task is saturated — eleven model pairs are not significantly different — and that the ranking is interpretable only under temporal evaluation."
+    }
+   ]
+  },
+  {
+   "type": "li",
+   "ord": true,
+   "runs": [
+    {
+     "t": "A negative result on reconstruction-based anomaly detection",
+     "b": true
+    },
+    {
+     "t": ": AUROC 0.4164 overall and 0.0000 against PSH-ACK floods, because volumetric attacks reconstruct better than legitimate traffic."
+    }
+   ]
+  },
+  {
+   "type": "li",
+   "ord": true,
+   "runs": [
+    {
+     "t": "A released artefact",
+     "b": true
+    },
+    {
+     "t": " — blacklist, frozen splits, hyperparameter configurations, trained models, and the scripts regenerating every figure and table — intended as the reference protocol for subsequent work on GeNIS."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Section 2 positions the work, Section 3 describes the corpus and its capture chronology, Section 4 specifies the protocol and the audit procedure, Section 5 the detectors, Section 6 reports the results, and Sections 7–8 discuss their scope and limits."
+    }
+   ]
+  },
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "Related work"
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Benchmark corpora and their documented flaws"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Doubts about how faithfully laboratory corpora measure intrusion detection predate deep learning: Sommer and Paxson's classic analysis already warned that closed-world evaluations reward properties of the data rather than of the detector [8]. The subsequent decade validated the warning on the field's main reference. CICIDS2017 [9] became the de facto benchmark, and was then shown to carry defects at every level of its production: errors in the CICFlowMeter feature extractor and in the labels themselves [1], an error prevalence material enough to change reported performance [2], and further labelling mistakes whose correction significantly alters detection results [3]. Meanwhile, the most-cited benchmark on that corpus [10] — ten supervised and unsupervised algorithms compared on accuracy, F1 and training/testing time — predates the shortcut-learning literature and evaluates under random splits without a leakage or temporal audit, so its reference numbers inherit whatever artefacts the corpus carries. The lesson is not that testbed corpora or model-zoo benchmarks are useless; it is that a corpus's first years of use fix the community's reference numbers, so the audit of a new corpus is most valuable "
+    },
+    {
+     "t": "before",
+     "i": true
+    },
+    {
+     "t": " a literature accumulates on it. GeNIS [4] is exactly at that stage: captured in February 2025 on an Airbus CyberRange simulation of a small and medium-sized enterprise network, exported at four aggregation intervals with the HERA tool [5], built on the Argus flow exporter, and released with raw packets so that alternative feature extractions remain possible — a design choice motivated by the observation that the exporter itself materially affects downstream model performance [11]. Its authors' companion study [6] validates binary and multiclass classification with five feature-selection methods over tree ensembles and deep networks, and stands as the official baseline this paper is anchored to."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Shortcut learning and evaluation bias in learned security"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "That near-perfect benchmark scores can rest on features unrelated to the phenomenon of interest is now recognised across machine learning as "
+    },
+    {
+     "t": "shortcut learning",
+     "i": true
+    },
+    {
+     "t": " [12], and security is a domain where the stakes of the confusion are highest. Arp et al. catalogue the recurring pitfalls of security ML — sampling bias, spurious correlations, data snooping — and find them endemic in published work [13]. Two lines are directly upstream of ours. TESSERACT demonstrated that ignoring temporal structure inflates malware-classification results, and argued for chronologically consistent splits as a validity requirement rather than a robustness extra [14]. Closer to network flows, D'hooge et al. established the contaminating effect of metadata features in NIDS models: the destination port alone separates ten state-of-the-art IDS datasets at 70–100% accuracy, so any model given that feature learns a dataset artefact rather than traffic behaviour [15]. Our audit extends this programme along three axes: from metadata to "
+    },
+    {
+     "t": "positional",
+     "i": true
+    },
+    {
+     "t": " features (capture timestamps and exporter sequence counters, which on GeNIS predict the class at 99.70% against a 19.42% majority-class rate); from a single split convention to a stratified-versus-chronological comparison that measures how much of the ranking survives; and from the CICIDS family to a new-generation corpus whose reference numbers are not yet fixed. The per-interval feature blacklist we release is the practical form of D'hooge et al.'s countermeasure argument, instantiated for GeNIS."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Calibration, imbalance, and the cost of a verdict"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "A benchmark meant to inform deployment must report more than a ranking. Modern neural networks are systematically over-confident [16], and a detector whose confidence is dishonest cannot drive thresholded automation; temperature scaling [16] and selective classification with a reject option [17, 18] are the standard correctives, and uncertainty quantification is increasingly argued to be a first-class requirement for trustworthy NIDS [19]. Class imbalance interacts with all of this: under the natural distribution of GeNIS (7.4% benign traffic at the 60-second interval), accuracy is close to vacuous and metrics such as macro-F1 and the Matthews correlation coefficient are the informative ones [20]. Finally, the tabular-learning literature gives strong prior reason to include tree ensembles alongside deep detectors: gradient-boosted trees remain consistently competitive or superior on tabular data [21, 22], with attention-based architectures such as the FT-Transformer as the strongest deep contenders [23]. Inference cost is one dimension the GeNIS baseline already reports [6]; calibration, selective operating points, and confidence-bearing comparison are not, and this paper adds them to the same protocol."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Prior work on GeNIS and positioning"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "At the time of writing, the published record on GeNIS consists of the dataset descriptor [4], its authors' classification baseline [6], and one external study that uses the corpus for machine unlearning [24], a goal orthogonal to benchmarking."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The authors' baseline deserves a precise description, because this paper builds on it rather than competing with it, and several of its choices are already careful ones. Silva et al. combine five feature-selection methods (information gain, chi-squared, recursive feature elimination, mean absolute deviation, dispersion ratio) into a single ranking, retain the 16 highest-scoring features, and train three tree ensembles (RF, XGB, LGBM) and two neural networks (LSTM, MLP) with grid-searched hyperparameters under 5-fold cross-validation. They evaluate under the natural class distribution (7.37% benign), report training, per-epoch and inference times alongside detection metrics, deliberately exclude topology-bound features — IP, MAC and VLAN identifiers, and the HERA-specific "
+    },
+    {
+     "t": "Ssaddr",
+     "code": true
+    },
+    {
+     "t": "/"
+    },
+    {
+     "t": "Sdaddr",
+     "code": true
+    },
+    {
+     "t": " counters — and use SHAP to check which feature families drive predictions. They close by flagging a concern they do not pursue: the models show an “overreliance on traffic volume or packet counts”."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Four properties of that study define the space this paper occupies. First, its multiclass task uses the coarse "
+    },
+    {
+     "t": "CategoryLabel",
+     "code": true
+    },
+    {
+     "t": " taxonomy — four classes (benign, DoS, reconnaissance, brute force) — whereas we evaluate the nine-class "
+    },
+    {
+     "t": "SubCategoryLabel",
+     "code": true
+    },
+    {
+     "t": " task, which requires separating five denial-of-service families from one another rather than pooling them. Second, evaluation rests on a single stratified split with no repetition, so no confidence interval or significance test accompanies the reported differences. Third, only the 60-second interval is used, leaving the effect of flow aggregation unmeasured. Fourth, and most consequentially for a corpus whose attack windows are disjoint in capture time (Section 3.1), the protocol is a random split with no temporal evaluation and no test for whether retained features encode capture position rather than traffic behaviour — the audit that this paper supplies, and which turns their own SHAP-based concern into a measurement. Table 1 situates these dimensions."
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "label": "tab:positioning",
+   "num": 1,
+   "caption": [
+    {
+     "t": "Positioning against the closest related work. ✓ covered, "
+    },
+    {
+     "t": "±"
+    },
+    {
+     "t": " partial, ✗ absent. “New corpus”: a post-2024 corpus. “Repeated”: multiple seeds with dispersion or significance testing. “Cost”: measured training and inference time."
+    }
+   ],
+   "align": [
+    "left",
+    "center",
+    "center",
+    "center",
+    "center",
+    "center",
+    "center",
+    "center",
+    "center"
+   ],
+   "head": [
+    [
+     {
+      "runs": [],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "new corpus"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "shortcut audit"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "temporal protocol"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "calibration"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "natural distrib."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "repeated"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "cost"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "multi-interval"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ],
+   "body": [
+    [
+     {
+      "runs": [
+       {
+        "t": "Maseer et al. [10]"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "±"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Silva et al. [6]"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "D'hooge et al. [15]"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "±"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "TESSERACT [14]"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "±"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Talpini et al. [19]"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "±"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "±"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✗"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "This work",
+        "b": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "✓"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ]
+  },
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "The GeNIS corpus and its natural distribution"
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Origin and generation"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "GeNIS (GECAD Network Intrusion Scenarios) [4] was recorded between 6 and 12 February 2025 on the Airbus CyberRange platform, configured as a digital twin of a small and medium-sized enterprise network: six segmented LANs (administration, users, internal servers, a DMZ hosting public-facing web/FTP/mail services, remote VPN users, and the attacker hosts), with port mirroring feeding an isolated capture machine running "
+    },
+    {
+     "t": "dumpcap",
+     "code": true
+    },
+    {
+     "t": ". Benign traffic was generated by the Benign User Profiler [25] under three profiles — office-user activity, system administration, and passive background traffic — while the malicious traffic realises eight sequential attack scenarios, each following the same kill-chain skeleton (DNS resolution, Nmap scanning, then the terminal action): five denial-of-service floods against the DMZ web server (Hulk, Slowloris via Metasploit, and UDP/ICMP/PSH-ACK floods via "
+    },
+    {
+     "t": "hping3",
+     "code": true
+    },
+    {
+     "t": ") and three credential brute-force attacks (SMB, SSH, and combined SSH+FTP) using Hydra with a 10,000-password dictionary. The raw packets (37.7 million) were aggregated into labelled flows by the HERA exporter [5], built on Argus, at four flow intervals — 5, 10, 30 and 60 seconds — yielding from 338,820 flows at the coarsest interval to 2.77 million at the finest, each carrying hierarchical labels (binary, category, subcategory)."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "The slice used in this study"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The corpus is released in a modular layout; this benchmark uses the "
+    },
+    {
+     "t": "2-flows",
+     "code": true
+    },
+    {
+     "t": " module, which provides per-subcategory CSV files at all four intervals. Two taxonomic points must be fixed before any comparison. First, the reconnaissance subcategories ("
+    },
+    {
+     "t": "recon-nmap",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "recon-dns",
+     "code": true
+    },
+    {
+     "t": ") listed in the corpus descriptor do not appear as standalone files in "
+    },
+    {
+     "t": "2-flows",
+     "code": true
+    },
+    {
+     "t": "; they exist only inside the "
+    },
+    {
+     "t": "3-scenarios",
+     "code": true
+    },
+    {
+     "t": " recompositions, so the classification task supported by this module comprises "
+    },
+    {
+     "t": "eight attack families",
+     "b": true
+    },
+    {
+     "t": ". Second, the three benign profiles (user, administrator, background) are variants of normal traffic rather than separate detection targets; we merge them into a single "
+    },
+    {
+     "t": "benign",
+     "code": true
+    },
+    {
+     "t": " class, yielding the nine-class task evaluated throughout (benign, "
+    },
+    {
+     "t": "bruteforce-{ftp,smb,ssh}",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "dos-{hulk,icmp,pshack,slowloris,udp}",
+     "code": true
+    },
+    {
+     "t": ")."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "These choices place our task strictly between the two published alternatives, and the difference is worth stating precisely because it governs comparability. The corpus baseline [6] evaluates the four-class "
+    },
+    {
+     "t": "CategoryLabel",
+     "code": true
+    },
+    {
+     "t": " task on 368,556 sixty-second flows, a count that includes reconnaissance; the "
+    },
+    {
+     "t": "2-flows",
+     "code": true
+    },
+    {
+     "t": " module we use yields 338,820. The 29,736-flow gap is fully accounted for by two independent causes, which we report because neither is documented: the absence of the reconnaissance captures ("
+    },
+    {
+     "t": "recon-nmap",
+     "code": true
+    },
+    {
+     "t": ", 27,713 flows; "
+    },
+    {
+     "t": "recon-dns",
+     "code": true
+    },
+    {
+     "t": ", 20) from this module, and a 2,003-flow shortfall in "
+    },
+    {
+     "t": "benign-background",
+     "code": true
+    },
+    {
+     "t": " relative to the descriptor's Table 12 (8,283 released versus 10,286 reported). The same discrepancy is present at every interval — 32,590 flows at 5 s, 32,051 at 10 s and 30,481 at 30 s — of which the constant 27,733 reconnaissance flows are the larger part. Table 4 reports our recounts. All figures in this paper come from the released files, and we state the released counts rather than the documented ones wherever the two disagree."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Capture chronology and its consequences"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The capture schedule matters as much as the volumes: benign user and administrator activity was recorded on Thursday 6 and Friday 7 February, background traffic over the weekend of 8 February, and "
+    },
+    {
+     "t": "all",
+     "i": true
+    },
+    {
+     "t": " attacks during the following week, 10–12 February. Benign and malicious traffic are therefore "
+    },
+    {
+     "t": "completely segregated in capture time",
+     "b": true
+    },
+    {
+     "t": ", and each attack family occupies narrow, mutually disjoint windows within the attack days (Figure 1). Three consequences structure the rest of this paper. (i) Any feature correlated with position in the capture — timestamps, but also exporter counters — is a class-revealing shortcut, which motivates the audit of Section 6. (ii) A "
+    },
+    {
+     "t": "global",
+     "i": true
+    },
+    {
+     "t": " chronological split is degenerate: the final portion of the capture contains only attack blocks never seen in training, so every model scores near zero — a measurement of the schedule, not of generalisation (we report it as such). (iii) Temporal evaluation must therefore be "
+    },
+    {
+     "t": "per class",
+     "i": true
+    },
+    {
+     "t": ": our temporal protocol orders each class's flows in time and tests on its later flows, keeping every family represented while guaranteeing that every test flow postdates every training flow of its class (Section 4)."
+    }
+   ]
+  },
+  {
+   "type": "figure",
+   "label": "fig:timeline",
+   "num": 1,
+   "src": "figures/fig1_timeline.png",
+   "width": 1.0,
+   "caption": [
+    {
+     "t": "Capture windows per class. Benign traffic (green) is confined to the first 56 hours; every attack family (red) falls between hours 96 and 152, separated from the benign traffic by 40 hours with no labelled traffic. Several floods deliver more than 65 000 flows in under two minutes of wall-clock activity, so class membership is very nearly a function of position in the capture."
+    }
+   ]
+  },
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "Evaluation protocol"
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Clean stratified protocol"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Every experiment fits the feature scaler ("
+    },
+    {
+     "t": "RobustScaler",
+     "code": true
+    },
+    {
+     "t": ", median/IQR) on the training partition alone, preserves the natural class distribution end to end, and never rebalances the test partition. The corpus is split 60/20/20 into training, validation and test, stratified by class, and the split is repeated under "
+    },
+    {
+     "t": "five seeds",
+     "b": true
+    },
+    {
+     "t": "; the validation partition is used for hyperparameter selection and calibration only. Class imbalance is compensated at training time via balanced class weights for the neural models, which changes the loss but not the evaluation distribution. The split index arrays are generated once, frozen to disk, and reused by every model, so all reported differences are within-split differences."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Temporal protocol"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "A "
+    },
+    {
+     "t": "global",
+     "i": true
+    },
+    {
+     "t": " chronological split is degenerate on GeNIS: because benign traffic was captured on 6–8 February and every attack on 10–12 February, the last 20% of the capture contains only attack families absent from the first 60%, and every model scores near zero. We report that table as a property of the corpus, not as a protocol."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The protocol we do evaluate is a "
+    },
+    {
+     "t": "per-class temporal split",
+     "b": true
+    },
+    {
+     "t": ": within each class, flows are ordered by capture time and divided 60/20/20, so every test flow postdates every training flow "
+    },
+    {
+     "t": "of its own class",
+     "i": true
+    },
+    {
+     "t": " while all nine classes remain represented in all three partitions. This is the strictest temporal evaluation the corpus supports without emptying classes, and we verify the ordering invariant explicitly."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "The shortcut audit"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Columns are categorised by explicit name lists rather than string patterns. Twenty-three "
+    },
+    {
+     "t": "identifier",
+     "b": true
+    },
+    {
+     "t": " columns (addresses, MAC, ports, flow and record identifiers, AS and VLAN numbers, and the topology-bound "
+    },
+    {
+     "t": "Ssaddr",
+     "code": true
+    },
+    {
+     "t": " /  counters) are excluded from every condition. Four "
+    },
+    {
+     "t": "positional",
+     "b": true
+    },
+    {
+     "t": " columns ("
+    },
+    {
+     "t": "StartTime",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "LastTime",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "Rank",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "Seq",
+     "code": true
+    },
+    {
+     "t": ") encode position in the capture and define the contrast between our first two conditions. The remaining columns are "
+    },
+    {
+     "t": "behavioural",
+     "b": true
+    },
+    {
+     "t": " candidates, and the audit decides their fate."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "For each behavioural feature "
+    },
+    {
+     "t": "f"
+    },
+    {
+     "t": " we train a decision tree on "
+    },
+    {
+     "t": "f"
+    },
+    {
+     "t": " "
+    },
+    {
+     "t": "alone",
+     "i": true
+    },
+    {
+     "t": " under both protocols and define its "
+    },
+    {
+     "t": "transferability",
+     "b": true
+    }
+   ]
+  },
+  {
+   "type": "math",
+   "runs": [
+    {
+     "t": "τ(f)  =  acc"
+    },
+    {
+     "t": "temporal",
+     "sub": true
+    },
+    {
+     "t": "(f)  /  acc"
+    },
+    {
+     "t": "stratified",
+     "sub": true
+    },
+    {
+     "t": "(f)."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "A feature is excluded when it is individually predictive ("
+    },
+    {
+     "t": "acc"
+    },
+    {
+     "t": "stratified",
+     "sub": true
+    },
+    {
+     "t": " > 3×"
+    },
+    {
+     "t": " the majority-class rate) "
+    },
+    {
+     "t": "and",
+     "i": true
+    },
+    {
+     "t": " "
+    },
+    {
+     "t": "τ(f) < 0.5"
+    },
+    {
+     "t": ": it carries substantial class information that does not survive a change of evaluation protocol, which is the operational definition of a shortcut. The audit is run over "
+    },
+    {
+     "t": "all",
+     "i": true
+    },
+    {
+     "t": " behavioural features, not a shortlist — Section 6.2 shows why any shortlist derived from attribution scores would have been empty."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Three feature conditions follow: "
+    },
+    {
+     "t": "full",
+     "code": true
+    },
+    {
+     "t": " (behavioural "
+    },
+    {
+     "t": "+"
+    },
+    {
+     "t": " positional), "
+    },
+    {
+     "t": "clean",
+     "code": true
+    },
+    {
+     "t": " (behavioural only), and "
+    },
+    {
+     "t": "audited",
+     "code": true
+    },
+    {
+     "t": " (behavioural minus the blacklist)."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Hyperparameter budget"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Each model is evaluated in two arms. The "
+    },
+    {
+     "t": "default",
+     "b": true
+    },
+    {
+     "t": " arm uses the published BAg-IDS architectures for the neural trio and standard library settings elsewhere. The "
+    },
+    {
+     "t": "tuned",
+     "b": true
+    },
+    {
+     "t": " arm runs a random search selected on validation macro-F1, on the "
+    },
+    {
+     "t": "audited",
+     "code": true
+    },
+    {
+     "t": " condition and seed 1, with the winning configuration retrained on the full training partition across all five seeds and the temporal split. Trial 0 is always the default configuration, so the search cannot degrade a model "
+    },
+    {
+     "t": "on the validation metric it optimises",
+     "i": true
+    },
+    {
+     "t": "; Section 6.5 shows that this guarantee does not carry over to the test partition. The budget is a "
+    },
+    {
+     "t": "declared time cap of 900 s per model",
+     "i": true
+    },
+    {
+     "t": " plus a trial ceiling (20 for classical models, 10 for neural ones), whichever binds first; because the cap is checked between trials, one long trial can overrun it. Table 6 reports the trials actually completed per model, which range from 1 (FT-Transformer, whose single trial took 5 836 s) to 20. We state this asymmetry rather than claim an equal search everywhere."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "k"
+    },
+    {
+     "t": "-nearest neighbours is fitted on a stratified subsample of at most 50 000 training flows, a declared memory budget; its inference cost is measured in full."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Metrics and statistical treatment"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Accuracy is reported but never used for conclusions. The headline metric is "
+    },
+    {
+     "t": "macro-F1",
+     "b": true
+    },
+    {
+     "t": " over the nine classes, complemented by the Matthews correlation coefficient, per-class F1, and the operational binary view (benign versus attack) with its false-positive rate, PR-AUC and ROC-AUC. Calibration is measured by expected calibration error over 15 bins, before and after temperature scaling fitted on validation. Pairwise model differences on the shared test partition are tested with McNemar's test under Holm correction, and macro-F1 carries 95% bootstrap confidence intervals over 1 000 resamples."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "One resolution limit governs how these numbers may be read. The 60-second test partition holds "
+    },
+    {
+     "t": "5 029 benign flows",
+     "b": true
+    },
+    {
+     "t": ", so a single false positive is 0.0199 percentage points: every FPR we report is an integer multiple of that step, and differences below it are not measurable."
+    }
+   ]
+  },
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "Models"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Eleven supervised detectors and one unsupervised detector are evaluated under the identical protocol of Section 4."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Classical and tree ensembles.",
+     "b": true
+    },
+    {
+     "t": " A majority-class baseline; multinomial logistic regression; Gaussian naive Bayes; "
+    },
+    {
+     "t": "k"
+    },
+    {
+     "t": "-nearest neighbours; random forest (200 trees); XGBoost (300 trees, depth 8, histogram splits); LightGBM (300 trees, 63 leaves)."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Neural detectors.",
+     "b": true
+    },
+    {
+     "t": " The recurrent, convolutional and dense trio is reproduced "
+    },
+    {
+     "t": "exactly",
+     "i": true
+    },
+    {
+     "t": " as published in our prior comparative study [7] and reused in the companion system paper — SimpleRNN(64) "
+    },
+    {
+     "t": "→"
+    },
+    {
+     "t": " Dense(64); Conv1D(64,3) "
+    },
+    {
+     "t": "→"
+    },
+    {
+     "t": "  Conv1D(32,3) "
+    },
+    {
+     "t": "→"
+    },
+    {
+     "t": "  Dense(64); and Dense(128) "
+    },
+    {
+     "t": "→"
+    },
+    {
+     "t": " Dense(64) — so that this benchmark also serves as the provenance record for those detectors. To these we add an "
+    },
+    {
+     "t": "FT-Transformer",
+     "b": true
+    },
+    {
+     "t": " (feature tokeniser, CLS token, three attention blocks, "
+    },
+    {
+     "t": "d=64"
+    },
+    {
+     "t": ", eight heads), the strongest current deep architecture for tabular data [23]. All are trained with Adam for at most 30 epochs with early stopping (patience 5) and balanced class weights."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Unsupervised detector.",
+     "b": true
+    },
+    {
+     "t": " A symmetric autoencoder (64-32-16-32-64) trained on "
+    },
+    {
+     "t": "benign flows only",
+     "i": true
+    },
+    {
+     "t": "; a flow is scored by its reconstruction error. It is evaluated separately, by AUROC, since it solves a different problem."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Declared exclusions.",
+     "b": true
+    },
+    {
+     "t": " Kernel SVM is excluded: its "
+    },
+    {
+     "t": "O(n²)"
+    },
+    {
+     "t": " training is infeasible on 203 292 training flows within an equal budget, and logistic regression covers the linear family. The "
+    },
+    {
+     "t": "k"
+    },
+    {
+     "t": "-means/EM/SOM trio used by earlier benchmarks [10] is replaced by the autoencoder as a modern representative of reconstruction-based anomaly detection."
+    }
+   ]
+  },
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "Results"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "All results below are measured on the released GeNIS "
+    },
+    {
+     "t": "2-flows",
+     "code": true
+    },
+    {
+     "t": " module. The full campaign comprises 154 training runs; every number is reproducible from the released artefact."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "The corpus is saturated under the stratified protocol"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Table 2 reports the nine-class benchmark. Under the stratified protocol the task is essentially solved: XGBoost and LightGBM reach macro-F1 "
+    },
+    {
+     "t": "1.0000 ± 0.0000"
+    },
+    {
+     "t": " across five seeds, random forest and the FT-Transformer "
+    },
+    {
+     "t": "0.9999"
+    },
+    {
+     "t": ", and nine of the eleven detectors exceed "
+    },
+    {
+     "t": "0.99"
+    },
+    {
+     "t": ". McNemar tests with Holm correction confirm what the point estimates suggest: of the 45 model pairs, 11 are "
+    },
+    {
+     "t": "not",
+     "i": true
+    },
+    {
+     "t": " significantly different at "
+    },
+    {
+     "t": "α = 0.05"
+    },
+    {
+     "t": ", and these include every pair among {XGBoost, LightGBM, random forest, FT-Transformer} as well as logistic regression against the FT-Transformer, the CNN and the DNN. The bootstrap intervals (Figure 6) overlap accordingly."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Two consequences follow. First, a leaderboard computed on this corpus under a random split carries almost no information: the top group is statistically indistinguishable, and reporting a winner would be reporting noise. Second, the discriminating power of the benchmark must come from somewhere other than the stratified accuracy — which is what the remaining subsections supply."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The benchmark does still separate weak from strong: Gaussian naive Bayes reaches macro-F1 "
+    },
+    {
+     "t": "0.5492"
+    },
+    {
+     "t": " with a 61.4% false-positive rate (3 089 of 5 029 benign flows misclassified), confirming that the near-perfect scores are a property of the corpus and the strong models, not of the metric. Figure 2 shows where the residual difficulty sits: for every strong detector the per-class F1 is above "
+    },
+    {
+     "t": "0.99"
+    },
+    {
+     "t": " on all nine classes, and naive Bayes is the only model with a class-level failure, collapsing on the benign class itself."
+    }
+   ]
+  },
+  {
+   "type": "figure",
+   "label": "fig:perclass",
+   "num": 2,
+   "src": "figures/fig6_per_class_f1.png",
+   "width": 1.0,
+   "caption": [
+    {
+     "t": "Per-class F1 under the audited condition. Ten of the eleven detectors are uniformly strong across all nine classes; only naive Bayes fails, and it fails on benign traffic."
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "label": "tab:main",
+   "num": 2,
+   "caption": [
+    {
+     "t": "Nine-class benchmark on the 60-second slice. Macro-F1 under three feature conditions; the audited column gives the five-seed mean, with the standard deviation following the "
+    },
+    {
+     "t": "±"
+    },
+    {
+     "t": " sign. MCC and FPR are for the audited condition, seed 1. FPR resolution is 0.0199 points (one benign flow), so 0.0000 means no false positive at all."
+    }
+   ],
+   "align": [
+    "left",
+    "center",
+    "center",
+    "center",
+    "center",
+    "center",
+    "center",
+    "center"
+   ],
+   "head": [
+    [
+     {
+      "runs": [],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "stratified, default"
+       }
+      ],
+      "span": 3
+     },
+     {
+      "runs": [
+       {
+        "t": "tuned"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "temporal"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "audited, seed 1"
+       }
+      ],
+      "span": 2
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Model"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "full"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "clean"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "audited"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "audited"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "audited"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "MCC"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "FPR (%)"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ],
+   "body": [
+    [
+     {
+      "runs": [
+       {
+        "t": "XGBoost"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9888"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "LightGBM"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9897"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Random forest"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999 ± 0.0001"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9775"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "FT-Transformer"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999 ± 0.0001"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9966"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0994"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Logistic reg."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9994"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9996"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9990 ± 0.0004"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9992"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9944"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9997"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.1392"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "RNN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9957"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9935"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9964 ± 0.0031"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9977"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9901"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9991"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.1590"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "1D CNN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9981"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9877"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9972 ± 0.0007"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9905"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9949"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9994"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "DNN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9959"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9990"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9968 ± 0.0027"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9925"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9730"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9995"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0795"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "k"
+       },
+       {
+        "t": "-NN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9976"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9976"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9958 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9974"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9839"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9985"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0596"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Naive Bayes"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.5348"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.5347"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.5492 ± 0.0189"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.7160"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.4994"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.6667"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "61.4314"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Majority class"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0361"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0361"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0361 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0361"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "100.0000"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "The audit: shortcuts that attribution methods cannot see"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "The timestamp alone predicts the class",
+   "runs": [
+    {
+     "t": "A decision tree given only "
+    },
+    {
+     "t": "StartTime",
+     "code": true
+    },
+    {
+     "t": " classifies the nine classes at "
+    },
+    {
+     "t": "0.9970 ± 0.0002"
+    },
+    {
+     "t": " under the stratified protocol, against a majority-class rate of "
+    },
+    {
+     "t": "0.1942"
+    },
+    {
+     "t": ". The same probe reaches "
+    },
+    {
+     "t": "0.9991"
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "0.9988"
+    },
+    {
+     "t": " and "
+    },
+    {
+     "t": "0.9983"
+    },
+    {
+     "t": " at the 5-, 10- and 30-second intervals (Table 4): the shortcut is a property of the corpus, not of one aggregation choice."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Temporal splitting does not remove it",
+   "runs": [
+    {
+     "t": "The result we did not anticipate is that the per-class temporal protocol barely reduces the shortcut: the same timestamp probe still reaches "
+    },
+    {
+     "t": "0.9862"
+    },
+    {
+     "t": ". The reason is structural. Because each class occupies narrow, mutually disjoint windows (Figure 1), the capture interval immediately following a class's training window still belongs to that class, so a tree extrapolating from the training range continues to predict correctly. "
+    },
+    {
+     "t": "No time-based split can neutralise a shortcut whose classes are temporally disjoint.",
+     "i": true
+    },
+    {
+     "t": " This matters beyond GeNIS: the standard advice to adopt chronological evaluation [14] is necessary but, on corpora generated one attack at a time, not sufficient. Excluding the offending features is what does the work here, which is what makes the blacklist an artefact rather than a formality."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "All eight behavioural shortcuts have zero attribution importance",
+   "runs": [
+    {
+     "t": "The audit scans all 63 behavioural features and excludes eight (Table 3). Every one of them has a permutation importance indistinguishable from zero ("
+    },
+    {
+     "t": "<10⁻⁴"
+    },
+    {
+     "t": "), while individually predicting the class at "
+    },
+    {
+     "t": "0.922"
+    },
+    {
+     "t": " to "
+    },
+    {
+     "t": "0.963"
+    },
+    {
+     "t": " — a range that overlaps the most predictive "
+    },
+    {
+     "t": "retained",
+     "i": true
+    },
+    {
+     "t": " feature ("
+    },
+    {
+     "t": "DstBytes",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "0.961"
+    },
+    {
+     "t": "), so standalone predictive power alone does not separate shortcuts from legitimate signal; only its behaviour across protocols does. Permutation importance, and by the same mechanism SHAP, is blind to them because they are "
+    },
+    {
+     "t": "mutually redundant",
+     "b": true
+    },
+    {
+     "t": ": permuting one costs nothing when the others carry the same information. The duplicate check makes this concrete: "
+    },
+    {
+     "t": "Dur",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "RunTime",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "Mean",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "Sum",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "Min",
+     "code": true
+    },
+    {
+     "t": " and "
+    },
+    {
+     "t": "Max",
+     "code": true
+    },
+    {
+     "t": " are "
+    },
+    {
+     "t": "numerically identical columns",
+     "i": true
+    },
+    {
+     "t": " (all 15 pairs), an undocumented redundancy in the released files that we report to the corpus authors."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "This is the central methodological finding of the paper. A shortcut audit built on attribution scores — the natural design, and the one the corpus baseline's SHAP analysis approximates [6] — would have found "
+    },
+    {
+     "t": "none",
+     "i": true
+    },
+    {
+     "t": " of these eight features. Only evaluating each feature in isolation, under two protocols, exposes them. It also explains why that baseline could flag an “overreliance on traffic volume or packet counts” without being able to localise it."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Figure 3 makes the redundancy visible: the six identical columns collapse onto a single point, and the two remaining exclusions ("
+    },
+    {
+     "t": "SIntPkt",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "SIntPktMax",
+     "code": true
+    },
+    {
+     "t": ") are interval statistics of the same inter-packet quantity. Every excluded feature is therefore one of a family of near-duplicates, which is precisely the configuration that defeats attribution."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "The threshold sits in a gap",
+   "runs": [
+    {
+     "t": "Figure 4 shows the sorted transferability spectrum. The excluded features have "
+    },
+    {
+     "t": "τ ∈ {0.33, 0.43, 0.49}"
+    },
+    {
+     "t": " and the lowest retained value is "
+    },
+    {
+     "t": "0.54"
+    },
+    {
+     "t": " ("
+    },
+    {
+     "t": "SrcLoad",
+     "code": true
+    },
+    {
+     "t": "), so the 0.50 threshold falls in an empty region rather than cutting through a continuum. The interval "
+    },
+    {
+     "t": "τ ∈ [0.54, 0.65]"
+    },
+    {
+     "t": " — "
+    },
+    {
+     "t": "SrcLoad",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "SrcRate",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "DstLoad",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "Rate",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "Load",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "DstRate",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "SIntPktIdl",
+     "code": true
+    },
+    {
+     "t": " — is a grey zone in which features lose roughly a third of their standalone power across protocols without meeting the exclusion rule; Section 8 treats the sensitivity of our conclusions to that choice."
+    }
+   ]
+  },
+  {
+   "type": "figure",
+   "label": "fig:transfer",
+   "num": 3,
+   "src": "figures/fig8_transferability.png",
+   "width": 0.75,
+   "caption": [
+    {
+     "t": "Single-feature accuracy under the two protocols. Points on the diagonal transfer perfectly; the eight red points fall below the exclusion threshold. The six numerically identical duration columns occupy a single point. The shaded band is the grey zone discussed in Section 8."
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "label": "tab:blacklist",
+   "num": 3,
+   "caption": [
+    {
+     "t": "The published blacklist: 12 of 67 features. Positional columns ("
+    },
+    {
+     "t": "pos.",
+     "i": true
+    },
+    {
+     "t": ") are excluded by construction and therefore carry no audit statistics; behavioural columns ("
+    },
+    {
+     "t": "behav.",
+     "i": true
+    },
+    {
+     "t": ") are excluded by the transferability rule of Section 4.2. "
+    },
+    {
+     "t": "a"
+    },
+    {
+     "t": "strat",
+     "sub": true
+    },
+    {
+     "t": " and "
+    },
+    {
+     "t": "a"
+    },
+    {
+     "t": "temp",
+     "sub": true
+    },
+    {
+     "t": " are the single-feature accuracies under the two protocols. All eight behavioural shortcuts have permutation importance below "
+    },
+    {
+     "t": "10⁻⁴"
+    },
+    {
+     "t": "."
+    }
+   ],
+   "align": [
+    "left",
+    "left",
+    "center",
+    "center",
+    "center",
+    "center"
+   ],
+   "head": [
+    [
+     {
+      "runs": [
+       {
+        "t": "Feature"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Cat."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Perm. imp."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "a"
+       },
+       {
+        "t": "strat",
+        "sub": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "a"
+       },
+       {
+        "t": "temp",
+        "sub": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "τ"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ],
+   "body": [
+    [
+     {
+      "runs": [
+       {
+        "t": "StartTime",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "pos."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "LastTime",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "pos."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Rank",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "pos."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Seq",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "pos."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "–"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Dur",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "behav."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.922"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.304"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.33"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "RunTime",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "behav."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.922"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.304"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.33"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Mean",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "behav."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.922"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.304"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.33"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Sum",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "behav."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.922"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.304"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.33"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Min",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "behav."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.922"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.304"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.33"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Max",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "behav."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.922"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.304"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.33"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "SIntPktMax",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "behav."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.963"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.412"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.43"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "SIntPkt",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "behav."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.957"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.468"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.49"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ]
+  },
+  {
+   "type": "figure",
+   "label": "fig:spectrum",
+   "num": 4,
+   "src": "figures/fig9_transferability_spectrum.png",
+   "width": 1.0,
+   "caption": [
+    {
+     "t": "Single-feature transferability "
+    },
+    {
+     "t": "τ"
+    },
+    {
+     "t": " over all 63 behavioural features, sorted. Red bars are excluded. The gap between "
+    },
+    {
+     "t": "τ = 0.49"
+    },
+    {
+     "t": " and "
+    },
+    {
+     "t": "τ = 0.54"
+    },
+    {
+     "t": " places the threshold in an empty region."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "What the audit and the temporal protocol change"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Excluding the twelve blacklisted features costs almost nothing under the stratified protocol: XGBoost, LightGBM and random forest are unchanged to four decimals, and the largest loss among the eleven detectors is "
+    },
+    {
+     "t": "0.0018"
+    },
+    {
+     "t": " ("
+    },
+    {
+     "t": "k"
+    },
+    {
+     "t": "-NN). The recurrent and convolutional models in fact "
+    },
+    {
+     "t": "improve",
+     "i": true
+    },
+    {
+     "t": " ("
+    },
+    {
+     "t": "+0.0054"
+    },
+    {
+     "t": " and "
+    },
+    {
+     "t": "+0.0103"
+    },
+    {
+     "t": "), although the "
+    },
+    {
+     "t": "clean",
+     "code": true
+    },
+    {
+     "t": " condition is measured on a single seed and their seed dispersion is of the same order, so we do not read that as a reliable gain. The shortcuts were redundant with legitimate behavioural signal, so removing them does not remove the ability to classify — it removes the ability to classify "
+    },
+    {
+     "t": "for the wrong reason",
+     "i": true
+    },
+    {
+     "t": "."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The temporal protocol is where the ranking moves (Figure 5). The FT-Transformer leads at "
+    },
+    {
+     "t": "0.9966"
+    },
+    {
+     "t": ", followed by the CNN ("
+    },
+    {
+     "t": "0.9949"
+    },
+    {
+     "t": ") and logistic regression ("
+    },
+    {
+     "t": "0.9944"
+    },
+    {
+     "t": "); LightGBM and XGBoost fall to "
+    },
+    {
+     "t": "0.9897"
+    },
+    {
+     "t": " and "
+    },
+    {
+     "t": "0.9888"
+    },
+    {
+     "t": ", and random forest and the DNN to "
+    },
+    {
+     "t": "0.9775"
+    },
+    {
+     "t": " and "
+    },
+    {
+     "t": "0.9730"
+    },
+    {
+     "t": ". The gradient-boosted models that are unbeatable under a random split are mid-table once evaluation respects time, and a linear model outranks them. Because the stratified top group is statistically indistinguishable (Section 6.1), the temporal column is the only part of Table 2 that supports a ranking at all."
+    }
+   ]
+  },
+  {
+   "type": "figure",
+   "label": "fig:ranking-shift",
+   "num": 5,
+   "src": "figures/fig2_before_after.png",
+   "width": 1.0,
+   "caption": [
+    {
+     "t": "Macro-F1 across feature conditions and protocols. Panel (a) zooms on the supervised detectors; the reordering happens entirely inside a 3-point band that a 0–1 axis would hide. Panel (b) shows the weak baselines at true scale."
+    }
+   ]
+  },
+  {
+   "type": "figure",
+   "label": "fig:ranking",
+   "num": 6,
+   "src": "figures/fig7_ranking_ci.png",
+   "width": 0.78,
+   "caption": [
+    {
+     "t": "Bootstrap confidence intervals under the stratified protocol. The intervals of the leading group overlap, matching the 11 non-significant McNemar pairs."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Aggregation interval: the deep detectors need it, the trees do not"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The benign share falls monotonically as the aggregation window shrinks — 7.42% at 60 s, 5.16% at 30 s, 2.38% at 10 s, 1.45% at 5 s — while the flow count grows from 338 820 to 2 773 578 (Table 4). Accuracy is therefore not comparable across intervals, and neither are false-positive rates."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Table 5 gives the effect on detection. The boosted trees are essentially interval-invariant: XGBoost holds "
+    },
+    {
+     "t": "1.0000"
+    },
+    {
+     "t": " at 5, 10 and 60 s and "
+    },
+    {
+     "t": "0.9999"
+    },
+    {
+     "t": " at 30 s, and LightGBM holds "
+    },
+    {
+     "t": "≥ 0.9999"
+    },
+    {
+     "t": " except at 10 s where one seed degrades sharply ("
+    },
+    {
+     "t": "0.9458 ± 0.0766"
+    },
+    {
+     "t": ", driven by "
+    },
+    {
+     "t": "bruteforce-ftp",
+     "code": true
+    },
+    {
+     "t": " at F1 "
+    },
+    {
+     "t": "0.685"
+    },
+    {
+     "t": "). The DNN, by contrast, collapses as the window shrinks: "
+    },
+    {
+     "t": "0.9968"
+    },
+    {
+     "t": " at 60 s, "
+    },
+    {
+     "t": "0.8478"
+    },
+    {
+     "t": " at 30 s, "
+    },
+    {
+     "t": "0.5120"
+    },
+    {
+     "t": " at 10 s and "
+    },
+    {
+     "t": "0.5291"
+    },
+    {
+     "t": " at 5 s, with false-positive rates of 34% and 39% at the two shortest intervals. Aggregation is doing work that the dense network cannot do for itself, and an evaluation conducted only at 60 s — as in the corpus baseline — would report the neural and tree families as equivalent when they are not."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Figure 7 resolves this by family. Detectability is uniformly high for the five denial-of-service families at every interval; the cost of shortening the window falls almost entirely on "
+    },
+    {
+     "t": "bruteforce-ftp",
+     "code": true
+    },
+    {
+     "t": ", whose F1 drops to "
+    },
+    {
+     "t": "0.685"
+    },
+    {
+     "t": " at 10 s. Brute-force traffic is low-rate and bursty, so shorter windows fragment the very pattern that distinguishes it, whereas floods remain volumetrically obvious at any aggregation."
+    }
+   ]
+  },
+  {
+   "type": "figure",
+   "label": "fig:interval-heat",
+   "num": 7,
+   "src": "figures/fig3_interval_heatmap.png",
+   "width": 0.68,
+   "caption": [
+    {
+     "t": "Per-class F1 across aggregation intervals (LightGBM, audited). Only the low-rate brute-force families are sensitive to the window length."
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "label": "tab:intervals",
+   "num": 4,
+   "caption": [
+    {
+     "t": "Per-interval statistics recounted from the released "
+    },
+    {
+     "t": "2-flows",
+     "code": true
+    },
+    {
+     "t": " files, with the timestamp-only probe at each interval (majority-class rate "
+    },
+    {
+     "t": "0.1942"
+    },
+    {
+     "t": ")."
+    }
+   ],
+   "align": [
+    "left",
+    "right",
+    "right",
+    "right",
+    "right"
+   ],
+   "head": [
+    [
+     {
+      "runs": [
+       {
+        "t": "Interval"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Flows"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Benign flows"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Benign (%)"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Timestamp probe"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ],
+   "body": [
+    [
+     {
+      "runs": [
+       {
+        "t": "5 s"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "2 773 578"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "40 259"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.45"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9991"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "10 s"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1 472 133"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "35 006"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "2.38"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9988"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "30 s"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "577 452"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "29 786"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "5.16"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9983"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "60 s"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "338 820"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "25 147"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "7.42"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9970"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ]
+  },
+  {
+   "type": "table",
+   "label": "tab:intervals-models",
+   "num": 5,
+   "caption": [
+    {
+     "t": "Macro-F1 by aggregation interval, audited condition, with the standard deviation following the "
+    },
+    {
+     "t": "±"
+    },
+    {
+     "t": " sign (three seeds at 5/10/30 s, five at 60 s)."
+    }
+   ],
+   "align": [
+    "left",
+    "right",
+    "center",
+    "center",
+    "center"
+   ],
+   "head": [
+    [
+     {
+      "runs": [
+       {
+        "t": "Interval"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Benign (%)"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "LightGBM"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "XGBoost"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "DNN"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ],
+   "body": [
+    [
+     {
+      "runs": [
+       {
+        "t": "5 s"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.45"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.5291 ± 0.0194"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "10 s"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "2.38"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9458 ± 0.0766"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.5120 ± 0.0021"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "30 s"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "5.16"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.8478 ± 0.0034"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "60 s"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "7.42"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000 ± 0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9968 ± 0.0027"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Calibration is already solved, and tuning changes almost nothing"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Table 6 reports both. Expected calibration error is at most "
+    },
+    {
+     "t": "0.0009"
+    },
+    {
+     "t": " for every model except naive Bayes, and for those models temperature scaling moves it by less than "
+    },
+    {
+     "t": "0.001"
+    },
+    {
+     "t": " in either direction. Naive Bayes is the exception in both respects: it starts at "
+    },
+    {
+     "t": "0.1880"
+    },
+    {
+     "t": " and temperature scaling makes it "
+    },
+    {
+     "t": "worse",
+     "i": true
+    },
+    {
+     "t": " ("
+    },
+    {
+     "t": "0.2435"
+    },
+    {
+     "t": "), the familiar failure of a single-parameter correction applied to a model whose errors are not a uniform over-confidence. On a task this saturated the confidences are already well ordered, and calibration has nothing left to repair — a negative result worth recording, since calibration is routinely recommended without checking whether it is needed. The fitted temperatures for the tree ensembles are far below one ("
+    },
+    {
+     "t": "0.05"
+    },
+    {
+     "t": "–"
+    },
+    {
+     "t": "0.09"
+    },
+    {
+     "t": "), the signature of near-deterministic posteriors rather than of miscalibration."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Hyperparameter tuning is similarly inert where it matters. On the test partition it leaves XGBoost, LightGBM, random forest and the FT-Transformer unchanged to four decimals, and moves logistic regression, "
+    },
+    {
+     "t": "k"
+    },
+    {
+     "t": "-NN and the RNN by at most "
+    },
+    {
+     "t": "+0.0016"
+    },
+    {
+     "t": ". It transforms only the model that was badly configured to begin with: naive Bayes gains "
+    },
+    {
+     "t": "+0.1668"
+    },
+    {
+     "t": " (from "
+    },
+    {
+     "t": "0.5492"
+    },
+    {
+     "t": " to "
+    },
+    {
+     "t": "0.7160"
+    },
+    {
+     "t": "), and still finishes last by a wide margin."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Two observations qualify this. First, a validation gain does not guarantee a test gain: the DNN improves by "
+    },
+    {
+     "t": "+0.0313"
+    },
+    {
+     "t": " on validation yet "
+    },
+    {
+     "t": "loses",
+     "i": true
+    },
+    {
+     "t": " "
+    },
+    {
+     "t": "0.0043"
+    },
+    {
+     "t": " on the test partition, and the CNN loses "
+    },
+    {
+     "t": "0.0067"
+    },
+    {
+     "t": " despite no validation gain at all. Selecting on a single validation split, then retraining across five seeds, is enough to invert the sign of a small effect — a reminder that the guarantee “trial 0 is the default configuration” holds only for the quantity being optimised. Second, and despite this, the ranking of Table 2 is unchanged by tuning, which is the question a tuned arm exists to answer: the ordering is not an artefact of default settings."
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "label": "tab:calib",
+   "num": 6,
+   "caption": [
+    {
+     "t": "Calibration (audited, seed 1) and hyperparameter search. "
+    },
+    {
+     "t": "T"
+    },
+    {
+     "t": ": fitted temperature; ECE"
+    },
+    {
+     "t": "raw",
+     "sub": true
+    },
+    {
+     "t": " and ECE"
+    },
+    {
+     "t": "cal",
+     "sub": true
+    },
+    {
+     "t": ": expected calibration error before and after temperature scaling. Trials: random-search trials actually completed under the 900 s cap. "
+    },
+    {
+     "t": "Δ"
+    },
+    {
+     "t": "val",
+     "sub": true
+    },
+    {
+     "t": ": validation macro-F1 gain from tuning — Section 6.5 notes where it fails to transfer to the test partition."
+    }
+   ],
+   "align": [
+    "left",
+    "center",
+    "center",
+    "center",
+    "center",
+    "right",
+    "right"
+   ],
+   "head": [
+    [
+     {
+      "runs": [
+       {
+        "t": "Model"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "T"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "ECE"
+       },
+       {
+        "t": "raw",
+        "sub": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "ECE"
+       },
+       {
+        "t": "cal",
+        "sub": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Trials"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Time (s)"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Δ"
+       },
+       {
+        "t": "val",
+        "sub": true
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ],
+   "body": [
+    [
+     {
+      "runs": [
+       {
+        "t": "XGBoost"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.091"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "20"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "676"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "LightGBM"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.050"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "20"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "849"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Random forest"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.094"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0001"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "20"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "358"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "FT-Transformer"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.995"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0001"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "5836"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Logistic reg."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.697"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0004"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0002"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "7"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "901"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.0005"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "RNN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.940"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0006"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0005"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "9"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "929"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "1D CNN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.132"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0004"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0005"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "10"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "919"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "DNN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.694"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0009"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0002"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "10"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "217"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.0313"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "k"
+       },
+       {
+        "t": "-NN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "2.835"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0005"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0004"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "17"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "930"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.0017"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Naive Bayes"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "5.821"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.1880"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.2435"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "20"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "12"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "+0.1376"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Reconstruction-based anomaly detection fails, and fails informatively"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The benign-trained autoencoder reaches a global AUROC of "
+    },
+    {
+     "t": "0.4164 ± 0.0230"
+    },
+    {
+     "t": ": it is "
+    },
+    {
+     "t": "worse than chance",
+     "i": true
+    },
+    {
+     "t": ". The per-family breakdown (Table 7, Figure 8) explains why and is more interesting than the headline. Against "
+    },
+    {
+     "t": "dos-pushack",
+     "code": true
+    },
+    {
+     "t": " the AUROC is "
+    },
+    {
+     "t": "0.0000"
+    },
+    {
+     "t": " — every flood flow reconstructs better than every benign flow — and it is "
+    },
+    {
+     "t": "0.0111"
+    },
+    {
+     "t": " for "
+    },
+    {
+     "t": "dos-udp",
+     "code": true
+    },
+    {
+     "t": " and "
+    },
+    {
+     "t": "0.0303"
+    },
+    {
+     "t": " for "
+    },
+    {
+     "t": "bruteforce-ftp",
+     "code": true
+    },
+    {
+     "t": ". Only "
+    },
+    {
+     "t": "bruteforce-smb",
+     "code": true
+    },
+    {
+     "t": " ("
+    },
+    {
+     "t": "0.8969"
+    },
+    {
+     "t": ") and "
+    },
+    {
+     "t": "dos-icmp",
+     "code": true
+    },
+    {
+     "t": " ("
+    },
+    {
+     "t": "0.8700"
+    },
+    {
+     "t": ") behave as the anomaly-detection premise expects."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "The mechanism is that volumetric floods are "
+    },
+    {
+     "t": "structurally simpler",
+     "i": true
+    },
+    {
+     "t": " than legitimate traffic: a saturating stream of near-identical packets is easy to reconstruct, whereas benign office traffic is diverse. Reconstruction error therefore ranks the most damaging attacks as the most normal. The information is present — an AUROC of "
+    },
+    {
+     "t": "0.0000"
+    },
+    {
+     "t": " is a perfect detector with the sign reversed — but the standard decision rule “high reconstruction error implies anomaly” has the wrong polarity for this threat class. An operator deploying such a detector on flood traffic would be systematically misled, and no threshold choice would repair it."
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "label": "tab:ae",
+   "num": 7,
+   "caption": [
+    {
+     "t": "Benign-trained autoencoder, AUROC per attack family against benign (five seeds, audited condition). Values below 0.5 mean attacks reconstruct "
+    },
+    {
+     "t": "better",
+     "i": true
+    },
+    {
+     "t": " than benign traffic."
+    }
+   ],
+   "align": [
+    "left",
+    "center",
+    "center"
+   ],
+   "head": [
+    [
+     {
+      "runs": [
+       {
+        "t": "Attack family"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "AUROC"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "s.d."
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ],
+   "body": [
+    [
+     {
+      "runs": [
+       {
+        "t": "dos-pushack",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "dos-udp",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0111"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0108"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "bruteforce-ftp",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0303"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0028"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "bruteforce-ssh",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.3136"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.1069"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "dos-slowloris",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.5851"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0403"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "dos-hulk",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.6817"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0756"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "dos-icmp",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.8700"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0146"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "bruteforce-smb",
+        "code": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.8969"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0167"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "all attacks",
+        "b": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.4164",
+        "b": true
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0230"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ]
+  },
+  {
+   "type": "figure",
+   "label": "fig:ae",
+   "num": 8,
+   "src": "figures/fig10_autoencoder.png",
+   "width": 0.8,
+   "caption": [
+    {
+     "t": "Per-family AUROC of the benign-trained autoencoder. Red bars fall below chance: the reconstruction error is anti-correlated with the presence of those attacks."
+    }
+   ]
+  },
+  {
+   "type": "h2",
+   "runs": [
+    {
+     "t": "Inference cost separates what accuracy cannot"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Since the leading models are statistically indistinguishable in accuracy, cost is the operative criterion. Table 8 and Figure 9 give single-core CPU measurements. XGBoost delivers the joint-best macro-F1 at 46 317 flows/s with a 1.12 ms median latency and a 2.13 MB model — seven times faster than LightGBM (6 281 flows/s) at identical accuracy, and a hundred times faster than the FT-Transformer (430 flows/s), which leads only under the temporal protocol. Random forest pays 55 ms of median latency for accuracy it does not win, and "
+    },
+    {
+     "t": "k"
+    },
+    {
+     "t": "-NN is the worst of both worlds (1 875 flows/s, 11.4 MB). Logistic regression, at 1.14 M flows/s and "
+    },
+    {
+     "t": "0.9990"
+    },
+    {
+     "t": " macro-F1, is the natural choice when throughput dominates."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Recommendation.",
+     "b": true
+    },
+    {
+     "t": " For a line-rate deployment on this corpus, XGBoost on the audited feature set is the defensible default: joint-best accuracy, highest throughput among the accurate models, smallest latency tail among the tree ensembles. Where the deployment must survive drift in attack timing, the FT-Transformer's temporal-protocol margin ("
+    },
+    {
+     "t": "0.9966"
+    },
+    {
+     "t": " versus "
+    },
+    {
+     "t": "0.9888"
+    },
+    {
+     "t": ") is worth its 100"
+    },
+    {
+     "t": "×"
+    },
+    {
+     "t": " cost only if the certified throughput budget allows it."
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "label": "tab:cost",
+   "num": 8,
+   "caption": [
+    {
+     "t": "Single-core CPU inference cost, audited condition. Latency measured at batch size 1 over 200 samples; throughput at batch size 512."
+    }
+   ],
+   "align": [
+    "left",
+    "right",
+    "right",
+    "right",
+    "right",
+    "center"
+   ],
+   "head": [
+    [
+     {
+      "runs": [
+       {
+        "t": "Model"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "p₅₀"
+       },
+       {
+        "t": " (ms)"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "p₉₉"
+       },
+       {
+        "t": " (ms)"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Flows/s"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "Size (MB)"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "macro-F1"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ],
+   "body": [
+    [
+     {
+      "runs": [
+       {
+        "t": "XGBoost"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.12"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "4.66"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "46 317"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "2.13"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "LightGBM"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.12"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.42"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "6 281"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "4.90"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.0000"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Random forest"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "55.02"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "58.27"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "7 738"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "3.34"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "FT-Transformer"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "80.86"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "151.15"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "430"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1.49"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9999"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Logistic reg."
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.17"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.27"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1 139 252"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.00"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9990"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "RNN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "78.48"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "150.82"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "3 803"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.14"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9964"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "1D CNN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "77.88"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "148.19"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "3 134"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.79"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9972"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "DNN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "77.36"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "154.86"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "5 269"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.22"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9968"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "k"
+       },
+       {
+        "t": "-NN"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "7.06"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "10.37"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "1 875"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "11.40"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.9958"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Naive Bayes"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.54"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.88"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "228 377"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.01"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.5492"
+       }
+      ],
+      "span": 1
+     }
+    ],
+    [
+     {
+      "runs": [
+       {
+        "t": "Majority class"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.03"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.05"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "16 007 604"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.00"
+       }
+      ],
+      "span": 1
+     },
+     {
+      "runs": [
+       {
+        "t": "0.0361"
+       }
+      ],
+      "span": 1
+     }
+    ]
+   ]
+  },
+  {
+   "type": "figure",
+   "label": "fig:cost",
+   "num": 9,
+   "src": "figures/fig5_cost.png",
+   "width": 0.72,
+   "caption": [
+    {
+     "t": "Inference cost against detection quality. Accuracy differences inside the leading group are not statistically significant; throughput differs by three orders of magnitude."
+    }
+   ]
+  },
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "Discussion"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "What a benchmark on a saturated corpus can and cannot say",
+   "runs": [
+    {
+     "t": "Eleven supervised detectors, five seeds and paired significance tests converge on the conclusion that the nine-class GeNIS task is solved under a random split, and that the resulting leaderboard is not interpretable. This is not a defect of the corpus, which was built to be a reliable and modern reference; it is a property of testbed traffic in which attacks are executed one family at a time against a small enterprise topology. The productive response is to change what the benchmark measures — protocol robustness, calibration, cost, interval sensitivity — rather than to keep reporting fourth decimals."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Auditing must not be delegated to attribution",
+   "runs": [
+    {
+     "t": "Our strongest transferable result is negative and methodological: the eight behavioural shortcuts we identify are exactly the features that attribution methods score at zero. Any pipeline that selects candidate shortcuts using importance ranking, SHAP, or recursive elimination will, by construction, retain redundant shortcuts. Only an isolated, two-protocol evaluation of each feature exposes them. We expect this to generalise to any corpus produced by an exporter that emits several statistics of the same underlying quantity, which is the norm rather than the exception."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Temporal evaluation is necessary but not sufficient",
+   "runs": [
+    {
+     "t": "The finding that the timestamp probe survives a per-class temporal split at "
+    },
+    {
+     "t": "0.9862"
+    },
+    {
+     "t": " sharpens the standard methodological advice. Chronological evaluation defends against learning "
+    },
+    {
+     "t": "future",
+     "i": true
+    },
+    {
+     "t": " information; it does not defend against learning "
+    },
+    {
+     "t": "which window belongs to which class",
+     "i": true
+    },
+    {
+     "t": " when the windows are disjoint by construction. Corpora generated by sequential attack scenarios — which includes most CyberRange-produced datasets — need feature exclusion in addition to temporal splitting, and the two remedies are not interchangeable."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Consequences for future work on GeNIS",
+   "runs": [
+    {
+     "t": "We release the blacklist, the frozen splits, the scaler parameters and the trained models so that subsequent studies can adopt the audited feature set directly. Our concrete recommendation to anyone benchmarking on this corpus: report macro-F1 under the audited condition and the temporal protocol; state the FPR resolution; and, if the study concerns detection quality alone, do not use the 60-second stratified split as the primary evidence."
+    }
+   ]
+  },
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "Threats to validity"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "The exclusion threshold",
+   "runs": [
+    {
+     "t": "The blacklist depends on a rule with two constants. The transferability gap between "
+    },
+    {
+     "t": "0.49"
+    },
+    {
+     "t": " and "
+    },
+    {
+     "t": "0.54"
+    },
+    {
+     "t": " means small perturbations of the "
+    },
+    {
+     "t": "0.5"
+    },
+    {
+     "t": " threshold change nothing, but a threshold of "
+    },
+    {
+     "t": "0.7"
+    },
+    {
+     "t": " would additionally exclude seven features ("
+    },
+    {
+     "t": "SrcLoad",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "SrcRate",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "DstLoad",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "Rate",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "Load",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "DstRate",
+     "code": true
+    },
+    {
+     "t": ", "
+    },
+    {
+     "t": "SIntPktIdl",
+     "code": true
+    },
+    {
+     "t": "). We publish the full spectrum (Figure 4) precisely so that this choice is inspectable and revisable; we do not claim the boundary is intrinsic to the data."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Measurement resolution",
+   "runs": [
+    {
+     "t": "With 5 029 benign test flows, the FPR resolution is 0.0199 points and macro-F1 differences below roughly "
+    },
+    {
+     "t": "10⁻⁴"
+    },
+    {
+     "t": " are not meaningful. Several of our reported ties are ties at the resolution limit, not demonstrated equalities."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Unequal search budgets",
+   "runs": [
+    {
+     "t": "The time cap binds unequally: the FT-Transformer completed one trial and naive Bayes twenty. Its temporal-protocol lead is therefore obtained with an essentially untuned configuration — which strengthens rather than weakens that particular finding, but means the tuned arm does not establish an equal-effort comparison for the deep models."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Scope of the corpus module",
+   "runs": [
+    {
+     "t": "We evaluate the "
+    },
+    {
+     "t": "2-flows",
+     "code": true
+    },
+    {
+     "t": " module, which lacks standalone reconnaissance captures; our task therefore covers eight attack families rather than the ten in the corpus descriptor. We also recount 29 736 fewer 60-second flows than the descriptor reports, attributable to the absent reconnaissance captures and a 2 003-flow shortfall in "
+    },
+    {
+     "t": "benign-background",
+     "code": true
+    },
+    {
+     "t": ". Comparisons with studies using the "
+    },
+    {
+     "t": "4-preprocessed",
+     "code": true
+    },
+    {
+     "t": " module are therefore indicative, not controlled."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Calibration is measured under one protocol only",
+   "runs": [
+    {
+     "t": "Expected calibration error is computed on the stratified seed-1 partition. Since that partition is saturated, the finding “calibration has nothing to repair” may not extend to the temporal protocol, where accuracy is lower and confidences may be less reliable. Measuring calibration under temporal evaluation is the natural next step."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "lead": "Testbed generalisation",
+   "runs": [
+    {
+     "t": "GeNIS is CyberRange-generated traffic representing a small enterprise, dominated by volumetrically separable floods, and its benign traffic is synthesised by a profiler rather than observed. Our conclusions about protocol and audit methodology are corpus-independent by construction; our conclusions about which detector wins are not."
+    }
+   ]
+  },
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "Conclusion"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "We have audited and benchmarked the GeNIS 2025 corpus with eleven supervised detectors, one unsupervised detector, five seeds, two feature conditions beyond the raw one, two evaluation protocols, and paired significance testing — 154 training runs in total."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "Three results carry beyond this corpus. First, a shortcut audit cannot be built on attribution scores: all eight behavioural shortcuts we identify have permutation importance below "
+    },
+    {
+     "t": "10⁻⁴"
+    },
+    {
+     "t": ", because they are mutually redundant — six of them are numerically identical columns. Isolated two-protocol evaluation of each feature is required, and we give the procedure and the resulting spectrum. Second, temporal splitting does not neutralise a capture-schedule shortcut when attack windows are disjoint: a timestamp-only probe still reaches "
+    },
+    {
+     "t": "0.9862"
+    },
+    {
+     "t": " under our per-class temporal protocol, against "
+    },
+    {
+     "t": "0.9970"
+    },
+    {
+     "t": " under a random one. Feature exclusion is the operative remedy, not chronological ordering. Third, reconstruction-error anomaly detection is anti-correlated with volumetric floods — AUROC "
+    },
+    {
+     "t": "0.0000"
+    },
+    {
+     "t": " against "
+    },
+    {
+     "t": "dos-pushack",
+     "code": true
+    },
+    {
+     "t": " — because floods are simpler to reconstruct than legitimate traffic."
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "For the corpus itself, we report that the nine-class task is saturated under a random split, with eleven pairs of models statistically indistinguishable, and that the ranking only becomes interpretable under the temporal protocol, where the FT-Transformer leads and the boosted trees that dominate the random split fall to mid-table. We publish a twelve-feature blacklist, the frozen splits, the calibrated operating points, the CPU cost of every detector, and the trained models, so that future work on GeNIS can start from an audited protocol rather than reconstruct one."
+    }
+   ]
+  },
+  {
+   "type": "h1",
+   "runs": [
+    {
+     "t": "Data and code availability"
+    }
+   ]
+  },
+  {
+   "type": "p",
+   "runs": [
+    {
+     "t": "GeNIS is publicly archived at "
+    },
+    {
+     "t": "doi:10.5281/zenodo.14919237",
+     "code": true
+    },
+    {
+     "t": ". Our artefact — pipeline, frozen split indices, feature blacklist, hyperparameter configurations, trained models, and the scripts that regenerate every figure and table — is released at "
+    },
+    {
+     "t": "[A COMPLETER : repository URL and archival DOI]",
+     "warn": true,
+     "b": true
+    },
+    {
+     "t": "."
+    }
+   ]
+  }
+ ],
+ "refs": [
+  "G. Engelen, V. Rimmer, W. Joosen, Troubleshooting an intrusion detection dataset: the CICIDS2017 case study, in: IEEE Security and Privacy Workshops (SPW), 2021, pp. 7–12.",
+  "L. Liu, G. Engelen, T. Lynar, D. Essam, W. Joosen, Error prevalence in NIDS datasets: A case study on CIC-IDS2017 and CSE-CIC-IDS-2018, in: IEEE Conference on Communications and Network Security (CNS), 2022, pp. 254–262.",
+  "M. Lanvin, P.-F. Gimenez, Y. Han, F. Majorczyk, L. Mé, E. Totel, Errors in the CICIDS2017 dataset and the significant differences in detection performances it makes, in: International Conference on Risks and Security of Internet and Systems (CRiSIS), Springer, 2022, pp. 18–33.",
+  "M. Silva, D. Pinto, J. Vitorino, J. Gonçalves, E. Maia, I. Praça, GeNIS: A modular dataset for network intrusion detection and classification, Data in Brief 60 (2025) 111487, dataset: doi:10.5281/zenodo.14919237. https://doi.org/10.1016/j.dib.2025.111487.",
+  "D. Pinto, I. Amorim, E. Maia, I. Praça, A novel approach to network traffic analysis: the HERA tool, in: IEEE 23rd International Conference on Trust, Security and Privacy in Computing and Communications (TrustCom), 2024, arXiv:2501.07475.",
+  "M. Silva, D. Pinto, J. Vitorino, E. Maia, I. Praça, I. Amorim, M. J. Viamonte, Binary and multiclass cyberattack classification on the GeNIS dataset, in: Foundations and Practice of Security (FPS 2025), Springer, 2025, arXiv:2511.08660. https://doi.org/10.1007/978-3-032-20018-1_18.",
+  "M. A. E. Bahri, F. Jemili, O. Korbaa, Comparative study between ML approaches in intrusion detection context, in: 2023 IEEE Afro-Mediterranean Conference on Artificial Intelligence (AMCAI), 2023, pp. 1–6. https://doi.org/10.1109/AMCAI59331.2023.10431511.",
+  "R. Sommer, V. Paxson, Outside the closed world: On using machine learning for network intrusion detection, in: IEEE Symposium on Security and Privacy (S&P), 2010, pp. 305–316.",
+  "I. Sharafaldin, A. H. Lashkari, A. A. Ghorbani, Toward generating a new intrusion detection dataset and intrusion traffic characterization, in: 4th International Conference on Information Systems Security and Privacy (ICISSP), 2018, pp. 108–116.",
+  "Z. K. Maseer, R. Yusof, N. Bahaman, S. A. Mostafa, C. F. M. Foozy, Benchmarking of machine learning for anomaly based intrusion detection systems in the CICIDS2017 dataset, IEEE Access 9 (2021) 22351–22370. https://doi.org/10.1109/ACCESS.2021.3056614.",
+  "D. Pinto, J. Vitorino, E. Maia, I. Amorim, I. Praça, Flow exporter impact on intelligent intrusion detection systems, in: 11th International Conference on Information Systems Security and Privacy (ICISSP), 2025, arXiv:2412.14021.",
+  "R. Geirhos, J.-H. Jacobsen, C. Michaelis, R. Zemel, W. Brendel, M. Bethge, F. A. Wichmann, Shortcut learning in deep neural networks, Nature Machine Intelligence 2 (2020) 665–673.",
+  "D. Arp, E. Quiring, F. Pendlebury, A. Warnecke, F. Pierazzi, C. Wressnegger, L. Cavallaro, K. Rieck, Dos and don'ts of machine learning in computer security, USENIX Security Symposium (2022).",
+  "F. Pendlebury, F. Pierazzi, R. Jordaney, J. Kinder, L. Cavallaro, TESSERACT: Eliminating experimental bias in malware classification across space and time, in: USENIX Security Symposium, 2019.",
+  "L. D'hooge, M. Verkerken, B. Volckaert, T. Wauters, F. De Turck, Establishing the contaminating effect of metadata feature inclusion in machine-learned network intrusion detection models, in: Detection of Intrusions and Malware, and Vulnerability Assessment (DIMVA), Springer, 2022. https://doi.org/10.1007/978-3-031-09484-2_2.",
+  "C. Guo, G. Pleiss, Y. Sun, K. Q. Weinberger, On calibration of modern neural networks, in: International Conference on Machine Learning (ICML), 2017, pp. 1321–1330.",
+  "Y. Geifman, R. El-Yaniv, Selective classification for deep neural networks, in: Advances in Neural Information Processing Systems (NeurIPS), 2017.",
+  "K. Hendrickx, L. Perini, D. Van der Plas, W. Meert, J. Davis, Machine learning with a reject option: A survey, Machine Learning 113 (2024) 3073–3110.",
+  "J. Talpini, F. Sartori, M. Savi, Enhancing trustworthiness in ML-based network intrusion detection with uncertainty quantification, Journal of Reliable Intelligent Environments 10 (2024) 501–520.",
+  "D. Chicco, G. Jurman, The advantages of the Matthews correlation coefficient (MCC) over F1 score and accuracy in binary classification evaluation, BMC Genomics 21 (6) (2020).",
+  "L. Grinsztajn, E. Oyallon, G. Varoquaux, Why do tree-based models still outperform deep learning on typical tabular data?, in: Advances in Neural Information Processing Systems (NeurIPS), Datasets and Benchmarks Track, 2022.",
+  "R. Shwartz-Ziv, A. Armon, Tabular data: Deep learning is not all you need, Information Fusion 81 (2022) 84–90.",
+  "Y. Gorishniy, I. Rubachev, V. Khrulkov, A. Babenko, Revisiting deep learning models for tabular data, in: Advances in Neural Information Processing Systems (NeurIPS), 2021.",
+  "D. Magalhães, et al., Machine unlearning for the XGBoost model with network intrusion datasets, arXiv:2606.19220 (2026).",
+  "M. Shafi, A. H. Lashkari, V. Rodriguez, R. Nevo, Toward generating a new cloud-based distributed denial of service (DDoS) dataset and cloud intrusion traffic characterization, Information 15 (4) (2024) 195. https://doi.org/10.3390/info15040195."
+ ]
+}
