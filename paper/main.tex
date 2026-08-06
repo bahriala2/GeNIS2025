@@ -33,9 +33,9 @@ Natural Distribution}
 Network intrusion detection is benchmarked on shared corpora, and the first numbers
 published on a new corpus tend to become its reference numbers. GeNIS, released in 2025
 from an independent CyberRange capture, is at that stage. We audit and benchmark it with
-eleven supervised detectors and one unsupervised detector, under two feature conditions,
-two evaluation protocols and five seeds --- 154 training runs with paired significance
-testing. Three findings generalise beyond the corpus. First, a shortcut audit cannot be
+eleven supervised detectors and one unsupervised detector, under three feature
+conditions, two evaluation protocols and five seeds --- 154 training runs with paired
+significance testing. Three findings generalise beyond the corpus. First, a shortcut audit cannot be
 built on feature-attribution scores: all eight behavioural shortcuts we identify have
 permutation importance below $10^{-4}$ because they are mutually redundant, and six of
 them are numerically identical columns; only evaluating each feature in isolation under
@@ -304,8 +304,9 @@ Slowloris via Metasploit, and UDP/ICMP/PSH-ACK floods via
 combined SSH+FTP) using Hydra with a 10,000-password dictionary. The raw
 packets (37.7 million) were aggregated into labelled flows by the HERA
 exporter \cite{pinto2024hera}, built on Argus, at four flow intervals ---
-5, 10, 30 and 60 seconds --- for a total of 2.8 million flows carrying
-hierarchical labels (binary, category, subcategory).
+5, 10, 30 and 60 seconds --- yielding from 338{,}820 flows at the coarsest interval to
+2.77 million at the finest, each carrying hierarchical labels (binary, category,
+subcategory).
 
 \subsection{The slice used in this study}
 The corpus is released in a modular layout; this benchmark uses the
@@ -332,11 +333,12 @@ independent causes, which we report because neither is documented: the
 absence of the reconnaissance captures (\texttt{recon-nmap}, 27{,}713 flows;
 \texttt{recon-dns}, 20) from this module, and a 2{,}003-flow shortfall in
 \texttt{benign-background} relative to the descriptor's Table 12
-(8{,}283 released versus 10{,}286 reported). All figures in this paper are
-recounted from the released files, and we state the released counts rather
-than the documented ones wherever the two disagree.
-Table~\ref{tab:intervals} reports the counts recomputed from the released files,
-which confirm both figures.
+(8{,}283 released versus 10{,}286 reported). The same discrepancy is present at every
+interval --- 32{,}590 flows at 5\,s, 32{,}051 at 10\,s and 30{,}481 at 30\,s --- of which
+the constant 27{,}733 reconnaissance flows are the larger part.
+Table~\ref{tab:intervals} reports our recounts. All figures in this paper come from the
+released files, and we state the released counts rather than the documented ones wherever
+the two disagree.
 
 \subsection{Capture chronology and its consequences}
 \label{sec:chronology}
@@ -362,9 +364,11 @@ class (Section~\ref{sec:protocol}).
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/fig1_timeline.pdf}
-\caption{Activity windows per class over the 6--12 February 2025 capture.
-Benign traffic (green) is confined to the first days; each attack family
-(red) occupies narrow, disjoint windows in the attack days.}
+\caption{Capture windows per class. Benign traffic (green) is confined to the first
+56 hours; every attack family (red) falls between hours 96 and 152, separated from the
+benign traffic by 40 hours with no labelled traffic. Several floods deliver more than
+65\,000 flows in under two minutes of wall-clock activity, so class membership is very
+nearly a function of position in the capture.}
 \label{fig:timeline}
 \end{figure}
 
@@ -427,7 +431,9 @@ architectures for the neural trio and standard library settings elsewhere. The
 \textbf{tuned} arm runs a random search selected on validation macro-F1, on the
 \texttt{audited} condition and seed 1, with the winning configuration retrained on the
 full training partition across all five seeds and the temporal split. Trial~0 is always
-the default configuration, so tuning cannot degrade a model. The budget is a
+the default configuration, so the search cannot degrade a model \emph{on the validation
+metric it optimises}; Section~\ref{sec:calib} shows that this guarantee does not carry
+over to the test partition. The budget is a
 \emph{declared time cap of 900\,s per model} plus a trial ceiling (20 for classical
 models, 10 for neural ones), whichever binds first; because the cap is checked between
 trials, one long trial can overrun it. Table~\ref{tab:calib} reports the trials actually
@@ -495,8 +501,8 @@ artefact.
 \label{sec:saturation}
 Table~\ref{tab:main} reports the nine-class benchmark. Under the stratified protocol the
 task is essentially solved: XGBoost and LightGBM reach macro-F1 $1.0000 \pm 0.0000$
-across five seeds, random forest and the FT-Transformer $0.9999$, and six of the eleven
-detectors exceed $0.999$. McNemar tests with Holm correction confirm what the point
+across five seeds, random forest and the FT-Transformer $0.9999$, and nine of the eleven
+detectors exceed $0.99$. McNemar tests with Holm correction confirm what the point
 estimates suggest: of the 45 model pairs, 11 are \emph{not} significantly different at
 $\alpha = 0.05$, and these include every pair among
 \{XGBoost, LightGBM, random forest, FT-Transformer\} as well as logistic regression
@@ -512,7 +518,19 @@ the remaining subsections supply.
 The benchmark does still separate weak from strong: Gaussian naive Bayes reaches
 macro-F1 $0.5492$ with a 61.4\% false-positive rate (3\,089 of 5\,029 benign flows
 misclassified), confirming that the near-perfect scores are a property of the corpus and
-the strong models, not of the metric.
+the strong models, not of the metric. Figure~\ref{fig:perclass} shows where the residual
+difficulty sits: for every strong detector the per-class F1 is above $0.99$ on all nine
+classes, and naive Bayes is the only model with a class-level failure, collapsing on the
+benign class itself.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig6_per_class_f1.pdf}
+\caption{Per-class F1 under the audited condition. Ten of the eleven detectors are
+uniformly strong across all nine classes; only naive Bayes fails, and it fails on benign
+traffic.}
+\label{fig:perclass}
+\end{figure}
 
 \begin{table}[t]
 \centering
@@ -559,7 +577,9 @@ effective remedy, which is what makes the blacklist an artefact rather than a fo
 The audit scans all 63 behavioural features and excludes eight
 (Table~\ref{tab:blacklist}). Every one of them has a permutation importance
 indistinguishable from zero ($<10^{-4}$), while individually predicting the class at
-$0.907$ to $0.963$ --- above every legitimately transferring feature. Permutation
+$0.922$ to $0.963$ --- a range that overlaps the most predictive \emph{retained} feature
+(\texttt{DstBytes}, $0.961$), so standalone predictive power alone does not separate
+shortcuts from legitimate signal; only its behaviour across protocols does. Permutation
 importance, and by the same mechanism SHAP, is blind to them because they are
 \textbf{mutually redundant}: permuting one costs nothing when the others carry the same
 information. The duplicate check makes this concrete: \texttt{Dur}, \texttt{RunTime},
@@ -574,15 +594,31 @@ features. Only evaluating each feature in isolation, under two protocols, expose
 It also explains why that baseline could flag an ``overreliance on traffic volume or
 packet counts'' without being able to localise it.
 
+Figure~\ref{fig:transfer} makes the redundancy visible: the six identical columns
+collapse onto a single point, and the two remaining exclusions
+(\texttt{SIntPkt}, \texttt{SIntPktMax}) are interval statistics of the same inter-packet
+quantity. Every excluded feature is therefore one of a family of near-duplicates, which is
+precisely the configuration that defeats attribution.
+
 \paragraph{The threshold sits in a gap.}
 Figure~\ref{fig:spectrum} shows the sorted transferability spectrum. The excluded
 features have $\tau \in \{0.33, 0.43, 0.49\}$ and the lowest retained value is $0.54$
 (\texttt{SrcLoad}), so the 0.50 threshold falls in an empty region rather than cutting
 through a continuum. The interval $\tau \in [0.54, 0.65]$ --- \texttt{SrcLoad},
 \texttt{SrcRate}, \texttt{DstLoad}, \texttt{Rate}, \texttt{Load}, \texttt{DstRate},
-\texttt{SIntPktIdl} --- is a grey zone these features lose a third of their standalone
-power across protocols without meeting the exclusion rule; Section~\ref{sec:threats}
-treats the sensitivity of our conclusions to that choice.
+\texttt{SIntPktIdl} --- is a grey zone in which features lose roughly a third of their
+standalone power across protocols without meeting the exclusion rule;
+Section~\ref{sec:threats} treats the sensitivity of our conclusions to that choice.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=.75\linewidth]{figures/fig8_transferability.pdf}
+\caption{Single-feature accuracy under the two protocols. Points on the diagonal transfer
+perfectly; the eight red points fall below the exclusion threshold. The six numerically
+identical duration columns occupy a single point. The shaded band is the grey zone
+discussed in Section~\ref{sec:threats}.}
+\label{fig:transfer}
+\end{figure}
 
 \begin{table}[t]
 \centering
@@ -613,10 +649,13 @@ threshold in an empty region.}
 \subsection{What the audit and the temporal protocol change}
 \label{sec:before-after}
 Excluding the twelve blacklisted features costs almost nothing under the stratified
-protocol: XGBoost and LightGBM remain at $1.0000$, and the largest drop across the eleven
-detectors is 0.0007. The shortcuts were redundant with legitimate behavioural signal, so
-removing them does not remove the ability to classify --- it removes the ability to
-classify \emph{for the wrong reason}.
+protocol: XGBoost, LightGBM and random forest are unchanged to four decimals, and the
+largest loss among the eleven detectors is $0.0018$ ($k$-NN). The recurrent and
+convolutional models in fact \emph{improve} ($+0.0054$ and $+0.0103$), although the
+\texttt{clean} condition is measured on a single seed and their seed dispersion is of the
+same order, so we do not read that as a reliable gain. The shortcuts were redundant with
+legitimate behavioural signal, so removing them does not remove the ability to classify
+--- it removes the ability to classify \emph{for the wrong reason}.
 
 The temporal protocol is where the ranking moves (Figure~\ref{fig:ranking-shift}). The
 FT-Transformer leads at $0.9966$, followed by the CNN ($0.9949$) and logistic regression
@@ -652,14 +691,29 @@ from 338\,820 to 2\,773\,578 (Table~\ref{tab:intervals}). Accuracy is therefore 
 comparable across intervals, and neither are false-positive rates.
 
 Table~\ref{tab:intervals-models} gives the effect on detection. The boosted trees are
-essentially interval-invariant: XGBoost holds $1.0000$ at every interval, LightGBM holds
-$\geq 0.9999$ except at 10\,s where one seed degrades sharply
+essentially interval-invariant: XGBoost holds $1.0000$ at 5, 10 and 60\,s and $0.9999$
+at 30\,s, and LightGBM holds $\geq 0.9999$ except at 10\,s where one seed degrades sharply
 ($0.9458 \pm 0.0766$, driven by \texttt{bruteforce-ftp} at F1 $0.685$). The DNN, by
 contrast, collapses as the window shrinks: $0.9968$ at 60\,s, $0.8478$ at 30\,s,
 $0.5120$ at 10\,s and $0.5291$ at 5\,s, with false-positive rates of 34\% and 39\% at the
 two shortest intervals. Aggregation is doing work that the dense network cannot do for
 itself, and an evaluation conducted only at 60\,s --- as in the corpus baseline --- would
 report the neural and tree families as equivalent when they are not.
+
+Figure~\ref{fig:interval-heat} resolves this by family. Detectability is uniformly high
+for the five denial-of-service families at every interval; the cost of shortening the
+window falls almost entirely on \texttt{bruteforce-ftp}, whose F1 drops to $0.685$ at
+10\,s. Brute-force traffic is low-rate and bursty, so shorter windows fragment the very
+pattern that distinguishes it, whereas floods remain volumetrically obvious at any
+aggregation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=.68\linewidth]{figures/fig3_interval_heatmap.pdf}
+\caption{Per-class F1 across aggregation intervals (LightGBM, audited). Only the
+low-rate brute-force families are sensitive to the window length.}
+\label{fig:interval-heat}
+\end{figure}
 
 \begin{table}[t]
 \centering
@@ -694,20 +748,31 @@ Interval & Benign (\%) & LightGBM & XGBoost & DNN\\
 \subsection{Calibration is already solved, and tuning changes almost nothing}
 \label{sec:calib}
 Table~\ref{tab:calib} reports both. Expected calibration error is at most $0.0009$ for
-every model except naive Bayes ($0.1880$), and temperature scaling moves it by less than
-$0.001$ in either direction. On a task this saturated the confidences are already
+every model except naive Bayes, and for those models temperature scaling moves it by less
+than $0.001$ in either direction. Naive Bayes is the exception in both respects: it starts
+at $0.1880$ and temperature scaling makes it \emph{worse} ($0.2435$), the familiar failure
+of a single-parameter correction applied to a model whose errors are not a uniform
+over-confidence. On a task this saturated the confidences are already
 well ordered, and calibration has nothing left to repair --- a negative result worth
 recording, since calibration is routinely recommended without checking whether it is
 needed. The fitted temperatures for the tree ensembles are far below one
 ($0.05$--$0.09$), the signature of near-deterministic posteriors rather than of
 miscalibration.
 
-Hyperparameter tuning is similarly inert where it matters: the search moves macro-F1 by
-less than $0.002$ for every strong model, and by exactly zero for XGBoost, LightGBM,
-random forest, the RNN, the CNN and the FT-Transformer. It matters only for the two
-models that were badly configured to begin with --- naive Bayes ($+0.1376$) and the DNN
-($+0.0313$). The ranking of Table~\ref{tab:main} is therefore \emph{not} an artefact of
-default settings, which is the question a tuned arm exists to answer.
+Hyperparameter tuning is similarly inert where it matters. On the test partition it
+leaves XGBoost, LightGBM, random forest and the FT-Transformer unchanged to four decimals,
+and moves logistic regression, $k$-NN and the RNN by at most $+0.0016$. It transforms only
+the model that was badly configured to begin with: naive Bayes gains $+0.1668$
+($0.5492 \rightarrow 0.7160$), and still finishes last by a wide margin.
+
+Two observations qualify this. First, a validation gain does not guarantee a test gain:
+the DNN improves by $+0.0313$ on validation yet \emph{loses} $0.0043$ on the test
+partition, and the CNN loses $0.0067$ despite no validation gain at all. Selecting on a
+single validation split, then retraining across five seeds, is enough to invert the sign
+of a small effect --- a reminder that the guarantee ``trial 0 is the default
+configuration'' holds only for the quantity being optimised. Second, and despite this, the
+ranking of Table~\ref{tab:main} is unchanged by tuning, which is the question a tuned arm
+exists to answer: the ordering is not an artefact of default settings.
 
 \begin{table}[t]
 \centering
@@ -773,8 +838,8 @@ the reconstruction error is anti-correlated with the presence of those attacks.}
 Since the leading models are statistically indistinguishable in accuracy, cost is the
 operative criterion. Table~\ref{tab:cost} and Figure~\ref{fig:cost} give single-core CPU
 measurements. XGBoost delivers the joint-best macro-F1 at 46\,317 flows/s with a 1.12\,ms
-median latency and a 2.13\,MB model --- an order of magnitude faster than LightGBM
-(6\,281 flows/s) at identical accuracy, and two orders faster than the FT-Transformer
+median latency and a 2.13\,MB model --- seven times faster than LightGBM
+(6\,281 flows/s) at identical accuracy, and a hundred times faster than the FT-Transformer
 (430 flows/s), which leads only under the temporal protocol. Random forest pays 55\,ms of
 median latency for accuracy it does not win, and $k$-NN is the worst of both worlds
 (1\,875 flows/s, 11.4\,MB). Logistic regression, at 1.14\,M flows/s and $0.9990$ macro-F1,
@@ -816,7 +881,7 @@ magnitude.}
 \label{sec:discussion}
 
 \paragraph{What a benchmark on a saturated corpus can and cannot say.}
-Eleven detectors, five seeds and paired significance tests converge on the conclusion
+Eleven supervised detectors, five seeds and paired significance tests converge on the conclusion
 that the nine-class GeNIS task is solved under a random split, and that the resulting
 leaderboard is not interpretable. This is not a defect of the corpus, which was built to
 be a reliable and modern reference; it is a property of testbed traffic in which attacks
