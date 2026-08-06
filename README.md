@@ -10,7 +10,10 @@ pour les détecteurs GeNIS de BAg-IDS.
 |---|---|
 | `docs/verification_proposition.md` | Vérification de la proposition initiale (2026-08-02) : faits confirmés, fenêtre de nouveauté, corrections C1–C6 |
 | `docs/plan_v2.md` | Plan expérimental révisé (v2), protocole gelé |
-| `paper/main.tex` | Squelette LaTeX (elsarticle) — introduction rédigée, sections annotées |
+| `paper/main.tex` | **Article complet** (~6 900 mots) : abstract, intro, related work, corpus, protocole, modèles, résultats, discussion, threats, conclusion |
+| `paper/figures/`, `paper/tables/` | 10 figures (PDF+PNG) et 7 tables LaTeX générées depuis les résultats |
+| `paper/regenerate_{figures,tables}.py` | Régénèrent figures et tables depuis `article1_results.json` |
+| `paper/article1_results.json` | Résultats de la campagne (154 runs) |
 | `paper/references.bib` | Références de base vérifiées |
 | `experiments/README.md` | Plan du pipeline E1–E7 (une commande par expérience) |
 | `colab/article1_pipeline.ipynb` | **Notebook Colab de production** : pipeline complet (EDA → prétraitement → 12 modèles → réglage d'hyperparamètres → évaluation), 8 figures article + 15 figures d'annexe, 4 tables LaTeX, sauvegarde des modèles, reprise automatique |
@@ -19,9 +22,10 @@ pour les détecteurs GeNIS de BAg-IDS.
 
 - [x] Proposition vérifiée et validée (avec corrections)
 - [x] Squelette du papier + brouillon d'introduction + Related Work
-- [x] Notebook de production (split temporel par classe, recherche d'hyperparamètres à budget déclaré, persistance des modèles) — exécution en cours
-- [ ] Semaine 1 : pipeline de données 4 intervalles, splits gelés, E1
-- [ ] E2–E6, puis rédaction complète
+- [x] Notebook de production — **campagne terminée : 154/154 runs**
+- [x] **Article rédigé de bout en bout** avec les chiffres réels
+- [ ] Affiliations, URL du dépôt, relecture Pr Jemili
+- [ ] Compilation LaTeX et soumission
 
 ## Références clés
 
