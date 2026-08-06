@@ -1,0 +1,151 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{engelen2021troubleshooting}
+G.~Engelen, V.~Rimmer, W.~Joosen, Troubleshooting an intrusion detection
+  dataset: the {CICIDS2017} case study, in: IEEE Security and Privacy Workshops
+  (SPW), 2021, pp. 7--12.
+
+\bibitem{liu2022error}
+L.~Liu, G.~Engelen, T.~Lynar, D.~Essam, W.~Joosen, Error prevalence in {NIDS}
+  datasets: A case study on {CIC-IDS2017} and {CSE-CIC-IDS-2018}, in: IEEE
+  Conference on Communications and Network Security (CNS), 2022, pp. 254--262.
+
+\bibitem{lanvin2022errors}
+M.~Lanvin, P.-F. Gimenez, Y.~Han, F.~Majorczyk, L.~M{\'e}, E.~Totel, Errors in
+  the {CICIDS2017} dataset and the significant differences in detection
+  performances it makes, in: International Conference on Risks and Security of
+  Internet and Systems (CRiSIS), Springer, 2022, pp. 18--33.
+
+\bibitem{silva2025genis}
+M.~Silva, D.~Pinto, J.~Vitorino, J.~Gon{\c c}alves, E.~Maia, I.~Pra{\c c}a,
+  {GeNIS}: A modular dataset for network intrusion detection and
+  classification, Data in Brief 60 (2025) 111487, dataset:
+  doi:10.5281/zenodo.14919237.
+\newblock \href {https://doi.org/10.1016/j.dib.2025.111487}
+  {\path{doi:10.1016/j.dib.2025.111487}}.
+
+\bibitem{pinto2024hera}
+D.~Pinto, I.~Amorim, E.~Maia, I.~Pra{\c c}a, A novel approach to network
+  traffic analysis: the {HERA} tool, in: IEEE 23rd International Conference on
+  Trust, Security and Privacy in Computing and Communications (TrustCom), 2024,
+  arXiv:2501.07475.
+
+\bibitem{silva2025binary}
+M.~Silva, D.~Pinto, J.~Vitorino, E.~Maia, I.~Pra{\c c}a, I.~Amorim, M.~J.
+  Viamonte, Binary and multiclass cyberattack classification on the {GeNIS}
+  dataset, in: Foundations and Practice of Security (FPS 2025), Springer, 2025,
+  arXiv:2511.08660.
+\newblock \href {https://doi.org/10.1007/978-3-032-20018-1_18}
+  {\path{doi:10.1007/978-3-032-20018-1_18}}.
+
+\bibitem{bahri2023comparative}
+M.~A.~E. Bahri, F.~Jemili, O.~Korbaa, Comparative study between {ML} approaches
+  in intrusion detection context, in: 2023 IEEE Afro-Mediterranean Conference
+  on Artificial Intelligence (AMCAI), 2023, pp. 1--6.
+\newblock \href {https://doi.org/10.1109/AMCAI59331.2023.10431511}
+  {\path{doi:10.1109/AMCAI59331.2023.10431511}}.
+
+\bibitem{sommer2010closed}
+R.~Sommer, V.~Paxson, Outside the closed world: On using machine learning for
+  network intrusion detection, in: IEEE Symposium on Security and Privacy
+  (S\&P), 2010, pp. 305--316.
+
+\bibitem{sharafaldin2018cicids}
+I.~Sharafaldin, A.~H. Lashkari, A.~A. Ghorbani, Toward generating a new
+  intrusion detection dataset and intrusion traffic characterization, in: 4th
+  International Conference on Information Systems Security and Privacy
+  (ICISSP), 2018, pp. 108--116.
+
+\bibitem{maseer2021benchmarking}
+Z.~K. Maseer, R.~Yusof, N.~Bahaman, S.~A. Mostafa, C.~F.~M. Foozy, Benchmarking
+  of machine learning for anomaly based intrusion detection systems in the
+  {CICIDS2017} dataset, IEEE Access 9 (2021) 22351--22370.
+\newblock \href {https://doi.org/10.1109/ACCESS.2021.3056614}
+  {\path{doi:10.1109/ACCESS.2021.3056614}}.
+
+\bibitem{pinto2025exporter}
+D.~Pinto, J.~Vitorino, E.~Maia, I.~Amorim, I.~Pra{\c c}a, Flow exporter impact
+  on intelligent intrusion detection systems, in: 11th International Conference
+  on Information Systems Security and Privacy (ICISSP), 2025, arXiv:2412.14021.
+
+\bibitem{geirhos2020shortcut}
+R.~Geirhos, J.-H. Jacobsen, C.~Michaelis, R.~Zemel, W.~Brendel, M.~Bethge,
+  F.~A. Wichmann, Shortcut learning in deep neural networks, Nature Machine
+  Intelligence 2 (2020) 665--673.
+
+\bibitem{arp2022dodo}
+D.~Arp, E.~Quiring, F.~Pendlebury, A.~Warnecke, F.~Pierazzi, C.~Wressnegger,
+  L.~Cavallaro, K.~Rieck, Dos and don'ts of machine learning in computer
+  security, USENIX Security SymposiumLeakage/shortcut taxonomy for security ML
+  — verify venue formatting (2022).
+
+\bibitem{pendlebury2019tesseract}
+F.~Pendlebury, F.~Pierazzi, R.~Jordaney, J.~Kinder, L.~Cavallaro, {TESSERACT}:
+  Eliminating experimental bias in malware classification across space and
+  time, in: USENIX Security Symposium, 2019, tODO: verify pages.
+
+\bibitem{dhooge2022metadata}
+L.~D'hooge, M.~Verkerken, B.~Volckaert, T.~Wauters, F.~De~Turck, Establishing
+  the contaminating effect of metadata feature inclusion in machine-learned
+  network intrusion detection models, in: Detection of Intrusions and Malware,
+  and Vulnerability Assessment (DIMVA), Springer, 2022.
+\newblock \href {https://doi.org/10.1007/978-3-031-09484-2_2}
+  {\path{doi:10.1007/978-3-031-09484-2_2}}.
+
+\bibitem{guo2017calibration}
+C.~Guo, G.~Pleiss, Y.~Sun, K.~Q. Weinberger, On calibration of modern neural
+  networks, in: International Conference on Machine Learning (ICML), 2017, pp.
+  1321--1330.
+
+\bibitem{geifman2017selective}
+Y.~Geifman, R.~El-Yaniv, Selective classification for deep neural networks, in:
+  Advances in Neural Information Processing Systems (NeurIPS), 2017.
+
+\bibitem{hendrickx2024reject}
+K.~Hendrickx, L.~Perini, D.~Van~der Plas, W.~Meert, J.~Davis, Machine learning
+  with a reject option: A survey, Machine Learning 113 (2024) 3073--3110.
+
+\bibitem{talpini2024uncertainty}
+J.~Talpini, F.~Sartori, M.~Savi, Enhancing trustworthiness in {ML}-based
+  network intrusion detection with uncertainty quantification, Journal of
+  Reliable Intelligent Environments 10 (2024) 501--520.
+
+\bibitem{chicco2020mcc}
+D.~Chicco, G.~Jurman, The advantages of the {Matthews} correlation coefficient
+  ({MCC}) over {F1} score and accuracy in binary classification evaluation, BMC
+  Genomics 21~(6) (2020).
+
+\bibitem{grinsztajn2022trees}
+L.~Grinsztajn, E.~Oyallon, G.~Varoquaux, Why do tree-based models still
+  outperform deep learning on typical tabular data?, in: Advances in Neural
+  Information Processing Systems (NeurIPS), Datasets and Benchmarks Track,
+  2022.
+
+\bibitem{shwartzziv2022tabular}
+R.~Shwartz-Ziv, A.~Armon, Tabular data: Deep learning is not all you need,
+  Information Fusion 81 (2022) 84--90.
+
+\bibitem{gorishniy2021ftt}
+Y.~Gorishniy, I.~Rubachev, V.~Khrulkov, A.~Babenko, Revisiting deep learning
+  models for tabular data, in: Advances in Neural Information Processing
+  Systems (NeurIPS), 2021.
+
+\bibitem{magalhaes2026unlearning}
+D.~Magalh{\~a}es, et~al., Machine unlearning for the {XGBoost} model with
+  network intrusion datasets, arXiv:2606.19220. Uses GeNIS; orthogonal to this
+  benchmark (unlearning). TODO: complete author list (2026).
+
+\bibitem{shafi2024bup}
+M.~Shafi, A.~H. Lashkari, V.~Rodriguez, R.~Nevo, Toward generating a new
+  cloud-based distributed denial of service ({DDoS}) dataset and cloud
+  intrusion traffic characterization, Information 15~(4) (2024) 195, source of
+  the Benign User Profiler (BUP) tool used to generate GeNIS benign traffic.
+\newblock \href {https://doi.org/10.3390/info15040195}
+  {\path{doi:10.3390/info15040195}}.
+
+\end{thebibliography}

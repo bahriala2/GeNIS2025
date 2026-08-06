@@ -87,3 +87,12 @@ open(f"{T}/t7_intervals_models.tex","w").write("\n".join(rows))
 print("tables:",sorted(os.listdir(T)))
 for f in sorted(os.listdir(T)):
     print("\n---",f); print(open(f"{T}/{f}").read()[:400])
+
+
+# RSTRIP_LAST_ROW : les fragments sont \input dans un tabular ; TeX ne produit pas
+# le \cr final quand un fichier \input se termine par "\\". Le "\\" de la derniere
+# ligne est donc ecrit par main.tex, juste apres le \input.
+import glob as _g, re as _re
+for _f in _g.glob(f"{T}/*.tex"):
+    _s = open(_f).read().rstrip()
+    open(_f, "w").write(_re.sub(r"\\\\\\s*\\Z", "", _s).rstrip() + "\n")

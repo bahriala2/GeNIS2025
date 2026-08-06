@@ -12,6 +12,9 @@ pour les détecteurs GeNIS de BAg-IDS.
 | `docs/plan_v2.md` | Plan expérimental révisé (v2), protocole gelé |
 | `paper/main.tex` | **Article complet** (~6 900 mots) : abstract, intro, related work, corpus, protocole, modèles, résultats, discussion, threats, conclusion |
 | `paper/figures/`, `paper/tables/` | 10 figures (PDF+PNG) et 7 tables LaTeX générées depuis les résultats |
+| `paper/main.pdf` | **PDF compilé** (40 pages, format elsarticle review) |
+| `paper/GeNIS_benchmark_article.docx` | **Version Word** éditable (figures et tables incluses) |
+| `paper/Makefile` | `make pdf` · `make docx` · `make check` |
 | `paper/regenerate_{figures,tables}.py` | Régénèrent figures et tables depuis `article1_results.json` |
 | `paper/article1_results.json` | Résultats de la campagne (154 runs) |
 | `paper/references.bib` | Références de base vérifiées |
@@ -25,7 +28,8 @@ pour les détecteurs GeNIS de BAg-IDS.
 - [x] Notebook de production — **campagne terminée : 154/154 runs**
 - [x] **Article rédigé de bout en bout** avec les chiffres réels
 - [ ] Affiliations, URL du dépôt, relecture Pr Jemili
-- [ ] Compilation LaTeX et soumission
+- [x] Compilation LaTeX vérifiée : 0 erreur, 0 warning de citation/référence
+- [ ] Soumission
 
 ## Références clés
 

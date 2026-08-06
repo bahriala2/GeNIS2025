@@ -16,6 +16,10 @@
 % Working notes to co-authors: \todo{...} prints in red; remove before submission.
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 
+% Petite marge typographique : absorbe les debordements residuels sans
+% relacher la justification dans tout le document.
+\emergencystretch=2em
+
 \journal{Journal of Information Security and Applications}
 
 \begin{document}
@@ -125,7 +129,7 @@ single-core inference cost, and repeat the study across all four aggregation int
   supervised detectors under the natural distribution, showing that the stratified task is saturated
   --- eleven model pairs are not significantly different --- and that the ranking is
   interpretable only under temporal evaluation.
-  \item \textbf{A negative result on reconstruction-based anomaly detection}: AUROC
+  \item \textbf{A negative result on recon\-struction-based anomaly detection}: AUROC
   0.4164 overall and 0.0000 against PSH-ACK floods, because volumetric attacks
   reconstruct better than legitimate traffic.
   \item \textbf{A released artefact} --- blacklist, frozen splits, hyperparameter
@@ -407,7 +411,8 @@ without emptying classes, and we verify the ordering invariant explicitly.
 \label{sec:audit-protocol}
 Columns are categorised by explicit name lists rather than string patterns. Twenty-three
 \textbf{identifier} columns (addresses, MAC, ports, flow and record identifiers, AS and
-VLAN numbers, and the topology-bound \texttt{Ssaddr}/\texttt{Sdaddr} counters) are
+VLAN numbers, and the topology-bound \texttt{Ssaddr}\,/\,\allowbreak\texttt{Sdaddr}
+counters) are
 excluded from every condition. Four \textbf{positional} columns (\texttt{StartTime},
 \texttt{LastTime}, \texttt{Rank}, \texttt{Seq}) encode position in the capture and define
 the contrast between our first two conditions. The remaining columns are
@@ -475,8 +480,9 @@ XGBoost (300 trees, depth 8, histogram splits); LightGBM (300 trees, 63 leaves).
 \textbf{Neural detectors.} The recurrent, convolutional and dense trio is reproduced
 \emph{exactly} as published in our prior comparative study \cite{bahri2023comparative}
 and reused in the companion system paper ---
-SimpleRNN(64)$\rightarrow$Dense(64), Conv1D(64,3)$\rightarrow$Conv1D(32,3)$\rightarrow$
-Dense(64), and Dense(128)$\rightarrow$Dense(64) --- so that this benchmark also serves as
+SimpleRNN(64)\,$\to$\,Dense(64);\allowbreak{} Conv1D(64,3)\,$\to$\,\allowbreak{}
+Conv1D(32,3)\,$\to$\,\allowbreak{} Dense(64);\allowbreak{} and
+Dense(128)\,$\to$\,Dense(64) --- so that this benchmark also serves as
 the provenance record for those detectors. To these we add an \textbf{FT-Transformer}
 (feature tokeniser, CLS token, three attention blocks, $d=64$, eight heads), the strongest
 current deep architecture for tabular data \cite{gorishniy2021ftt}. All are trained with
@@ -550,7 +556,7 @@ points (one benign flow), so 0.0000 means no false positive at all.}
 \cmidrule(lr){2-4}\cmidrule(lr){7-8}
 Model & full & clean & audited & audited & audited & MCC & FPR (\%)\\
 \midrule
-\input{tables/t2_main.tex}
+\input{tables/t2_main.tex}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -558,14 +564,14 @@ Model & full & clean & audited & audited & audited & MCC & FPR (\%)\\
 \subsection{The audit: shortcuts that attribution methods cannot see}
 \label{sec:audit}
 
-\paragraph{The timestamp alone predicts the class.}
+\paragraph{The timestamp alone predicts the class}
 A decision tree given only \texttt{StartTime} classifies the nine classes at
 $0.9970 \pm 0.0002$ under the stratified protocol, against a majority-class rate of
 $0.1942$. The same probe reaches $0.9991$, $0.9988$ and $0.9983$ at the 5-, 10- and
 30-second intervals (Table~\ref{tab:intervals}): the shortcut is a property of the
 corpus, not of one aggregation choice.
 
-\paragraph{Temporal splitting does not remove it.}
+\paragraph{Temporal splitting does not remove it}
 The result we did not anticipate is that the per-class temporal protocol barely reduces
 the shortcut: the same timestamp probe still reaches $0.9862$. The reason is structural.
 Because each class occupies narrow, mutually disjoint windows
@@ -578,7 +584,7 @@ corpora generated one attack at a time, not sufficient. Excluding the offending 
 is what does the work here, which is what makes the blacklist an artefact rather than a
 formality.
 
-\paragraph{All eight behavioural shortcuts have zero attribution importance.}
+\paragraph{All eight behavioural shortcuts have zero attribution importance}
 The audit scans all 63 behavioural features and excludes eight
 (Table~\ref{tab:blacklist}). Every one of them has a permutation importance
 indistinguishable from zero ($<10^{-4}$), while individually predicting the class at
@@ -605,7 +611,7 @@ collapse onto a single point, and the two remaining exclusions
 quantity. Every excluded feature is therefore one of a family of near-duplicates, which is
 precisely the configuration that defeats attribution.
 
-\paragraph{The threshold sits in a gap.}
+\paragraph{The threshold sits in a gap}
 Figure~\ref{fig:spectrum} shows the sorted transferability spectrum. The excluded
 features have $\tau \in \{0.33, 0.43, 0.49\}$ and the lowest retained value is $0.54$
 (\texttt{SrcLoad}), so the 0.50 threshold falls in an empty region rather than cutting
@@ -640,7 +646,7 @@ permutation importance below $10^{-4}$.}
 \toprule
 Feature & Cat. & Perm.\ imp. & $a_{\mathrm{strat}}$ & $a_{\mathrm{temp}}$ & $\tau$\\
 \midrule
-\input{tables/t3_blacklist.tex}
+\input{tables/t3_blacklist.tex}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -733,7 +739,7 @@ the timestamp-only probe at each interval (majority-class rate $0.1942$).}
 \toprule
 Interval & Flows & Benign flows & Benign (\%) & Timestamp probe\\
 \midrule
-\input{tables/t1_intervals.tex}
+\input{tables/t1_intervals.tex}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -748,7 +754,7 @@ as a subscript (three seeds at 5/10/30\,s, five at 60\,s).}
 \toprule
 Interval & Benign (\%) & LightGBM & XGBoost & DNN\\
 \midrule
-\input{tables/t7_intervals_models.tex}
+\input{tables/t7_intervals_models.tex}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -771,7 +777,7 @@ Hyperparameter tuning is similarly inert where it matters. On the test partition
 leaves XGBoost, LightGBM, random forest and the FT-Transformer unchanged to four decimals,
 and moves logistic regression, $k$-NN and the RNN by at most $+0.0016$. It transforms only
 the model that was badly configured to begin with: naive Bayes gains $+0.1668$
-($0.5492 \rightarrow 0.7160$), and still finishes last by a wide margin.
+(from $0.5492$ to $0.7160$), and still finishes last by a wide margin.
 
 Two observations qualify this. First, a validation gain does not guarantee a test gain:
 the DNN improves by $+0.0313$ on validation yet \emph{loses} $0.0043$ on the test
@@ -796,7 +802,7 @@ notes where it fails to transfer to the test partition.}
 \toprule
 Model & $T$ & ECE$_{\mathrm{raw}}$ & ECE$_{\mathrm{cal}}$ & Trials & Time (s) & $\Delta_{\mathrm{val}}$\\
 \midrule
-\input{tables/t5_calib_hpo.tex}
+\input{tables/t5_calib_hpo.tex}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -831,7 +837,7 @@ traffic.}
 \toprule
 Attack family & AUROC & s.d.\\
 \midrule
-\input{tables/t6_autoencoder.tex}
+\input{tables/t6_autoencoder.tex}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -874,7 +880,7 @@ size 1 over 200 samples; throughput at batch size 512.}
 \toprule
 Model & $p_{50}$ (ms) & $p_{99}$ (ms) & Flows/s & Size (MB) & macro-F1\\
 \midrule
-\input{tables/t4_cost.tex}
+\input{tables/t4_cost.tex}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -892,7 +898,7 @@ magnitude.}
 \section{Discussion}
 \label{sec:discussion}
 
-\paragraph{What a benchmark on a saturated corpus can and cannot say.}
+\paragraph{What a benchmark on a saturated corpus can and cannot say}
 Eleven supervised detectors, five seeds and paired significance tests converge on the conclusion
 that the nine-class GeNIS task is solved under a random split, and that the resulting
 leaderboard is not interpretable. This is not a defect of the corpus, which was built to
@@ -901,7 +907,7 @@ are executed one family at a time against a small enterprise topology. The produ
 response is to change what the benchmark measures --- protocol robustness, calibration,
 cost, interval sensitivity --- rather than to keep reporting fourth decimals.
 
-\paragraph{Auditing must not be delegated to attribution.}
+\paragraph{Auditing must not be delegated to attribution}
 Our strongest transferable result is negative and methodological: the eight behavioural
 shortcuts we identify are exactly the features that attribution methods score at zero.
 Any pipeline that selects candidate shortcuts using importance ranking, SHAP, or
@@ -910,7 +916,7 @@ two-protocol evaluation of each feature exposes them. We expect this to generali
 corpus produced by an exporter that emits several statistics of the same underlying
 quantity, which is the norm rather than the exception.
 
-\paragraph{Temporal evaluation is necessary but not sufficient.}
+\paragraph{Temporal evaluation is necessary but not sufficient}
 The finding that the timestamp probe survives a per-class temporal split at $0.9862$
 sharpens the standard methodological advice. Chronological evaluation defends against
 learning \emph{future} information; it does not defend against learning \emph{which
@@ -919,7 +925,7 @@ generated by sequential attack scenarios --- which includes most CyberRange-prod
 datasets --- need feature exclusion in addition to temporal splitting, and the two
 remedies are not interchangeable.
 
-\paragraph{Consequences for future work on GeNIS.}
+\paragraph{Consequences for future work on GeNIS}
 We release the blacklist, the frozen splits, the scaler parameters and the trained models
 so that subsequent studies can adopt the audited feature set directly. Our concrete
 recommendation to anyone benchmarking on this corpus: report macro-F1 under the audited
@@ -931,7 +937,7 @@ evidence.
 \section{Threats to validity}
 \label{sec:threats}
 
-\paragraph{The exclusion threshold.}
+\paragraph{The exclusion threshold}
 The blacklist depends on a rule with two constants. The transferability gap between
 $0.49$ and $0.54$ means small perturbations of the $0.5$ threshold change nothing, but a
 threshold of $0.7$ would additionally exclude seven features
@@ -940,18 +946,18 @@ threshold of $0.7$ would additionally exclude seven features
 (Figure~\ref{fig:spectrum}) precisely so that this choice is inspectable and revisable;
 we do not claim the boundary is intrinsic to the data.
 
-\paragraph{Measurement resolution.}
+\paragraph{Measurement resolution}
 With 5\,029 benign test flows, the FPR resolution is 0.0199 points and macro-F1
 differences below roughly $10^{-4}$ are not meaningful. Several of our reported ties are
 ties at the resolution limit, not demonstrated equalities.
 
-\paragraph{Unequal search budgets.}
+\paragraph{Unequal search budgets}
 The time cap binds unequally: the FT-Transformer completed one trial and naive Bayes
 twenty. Its temporal-protocol lead is therefore obtained with an essentially untuned
 configuration --- which strengthens rather than weakens that particular finding, but
 means the tuned arm does not establish an equal-effort comparison for the deep models.
 
-\paragraph{Scope of the corpus module.}
+\paragraph{Scope of the corpus module}
 We evaluate the \texttt{2-flows} module, which lacks standalone reconnaissance captures;
 our task therefore covers eight attack families rather than the ten in the corpus
 descriptor. We also recount 29\,736 fewer 60-second flows than the descriptor reports,
@@ -959,13 +965,13 @@ attributable to the absent reconnaissance captures and a 2\,003-flow shortfall i
 \texttt{benign-background}. Comparisons with studies using the \texttt{4-preprocessed}
 module are therefore indicative, not controlled.
 
-\paragraph{Calibration is measured under one protocol only.}
+\paragraph{Calibration is measured under one protocol only}
 Expected calibration error is computed on the stratified seed-1 partition. Since that
 partition is saturated, the finding ``calibration has nothing to repair'' may not extend
 to the temporal protocol, where accuracy is lower and confidences may be less reliable.
 Measuring calibration under temporal evaluation is the natural next step.
 
-\paragraph{Testbed generalisation.}
+\paragraph{Testbed generalisation}
 GeNIS is CyberRange-generated traffic representing a small enterprise, dominated by
 volumetrically separable floods, and its benign traffic is synthesised by a profiler
 rather than observed. Our conclusions about protocol and audit methodology are
