@@ -90,3 +90,89 @@ calibration, multi-intervalles) ni sur la granularité de la tâche.
 sur **leurs données et leur taxonomie 4 classes** coûte ~1–2 h et permet d'écrire :
 « nous reproduisons le protocole de Silva et al., puis montrons ce que l'audit y change ».
 À faire dans un notebook séparé, après la campagne principale.
+
+---
+
+# Module `4-preprocessed` : inspection mesurée (2026-08-06)
+
+Inspection faite sur les fichiers locaux (Zenodo inaccessible depuis l'environnement
+d'exécution), via `experiments/inspect_4preprocessed.py` et `experiments/probe_4preprocessed.py`.
+Intervalle 60 s.
+
+## Structure
+
+- `genis-60-sec-train.csv` 294 844 lignes · `genis-60-sec-test.csv` 73 712 · **total 368 556**,
+  soit exactement le compte de la Table 12 du descripteur. La reconnaissance est incluse :
+  confirmation au flux près de notre explication de l'écart de 29 736 avec `2-flows`.
+- **87 colonnes**, dont les one-hot `Proto_*` (5), `Flgs_e*` (7) et `State_*` (11). C'est bien la
+  version prétraitée manuellement décrite en §3.3 du papier FPS, pas un jeu de features
+  sélectionnées.
+- Split 80/20 mélangé et stratifié. Aucune colonne constante.
+- **13 sous-catégories**, pas 9 : les trois profils bénins restent séparés (`benign-user` 10 281,
+  `benign-background` 8 229, `benign-admin` 3 210) et la reconnaissance est présente
+  (`recon-nmap` 22 170, `recon-dns` 16). Part bénigne 7,37 %.
+- `benign-background` = 8 229 en train, cohérent avec les 8 283 de `2-flows` : le déficit de
+  2 003 flux face à la Table 12 est présent dans les deux modules.
+
+## Ce que le prétraitement a corrigé
+
+`StartTime`, `LastTime` et `Rank` sont **absents**. Le raccourci d'horodatage, qui atteint 0,9970
+sur `2-flows`, n'est pas transmissible par ce module.
+
+`Seq` et `Offset` subsistent mais sont **inoffensifs** : compteurs par fichier de capture,
+réinitialisés à chaque PCAPNG, donc sans ordre global. Mesuré, et c'est net :
+
+| feature | accuracy (13 classes) | × hasard |
+|---|---|---|
+| `Seq` | 0,1713 | **0,96** |
+| `Offset` | 0,0672 | 0,38 |
+
+contre un taux de classe majoritaire de 0,1785. Les deux sont **sous le hasard**. Une hypothèse
+inverse avait été formulée avant mesure ; elle est fausse.
+
+## Ce que le prétraitement n'a pas corrigé
+
+**1. Les six colonnes numériquement identiques sont intactes.**
+`Max = Mean = Min = Sum = Dur = RunTime`, **15 paires**, détectées par `np.allclose` sur les
+294 844 lignes d'entraînement. Identique à `2-flows`. `Dur` seule classe les 13 sous-catégories
+à **0,8957**, soit 5,0 fois le hasard.
+
+Conséquence directe : la sélection à cinq méthodes du papier FPS (Table 10) a retenu **six de ces
+six colonnes** parmi ses seize features multiclasses, et cinq parmi les seize binaires (Table 7).
+Plus d'un tiers du budget retenu porte sur une seule quantité répétée.
+
+**2. Les colonnes liées à la topologie sont intactes**, et c'est la fuite la plus forte du module.
+
+| feature | 13 classes | 4 classes | binaire | valeurs distinctes |
+|---|---|---|---|---|
+| `Sdaddr` | **0,9947** (macro-F1 0,9102) | 0,9985 | 0,9985 | 76 |
+| `Ssaddr` | 0,6192 | 0,8907 | 0,9398 | 85 |
+| `Dport` | 0,5085 | 0,9838 | 0,9873 | 1 056 |
+| `Sport` | 0,4530 | 0,8460 | 0,9058 | 63 705 |
+
+`Sdaddr`, compteur HERA de connexions par service et adresse, **résout quasiment la tâche à 13
+classes à elle seule**, avec 76 valeurs distinctes. Le papier FPS écrit pourtant que ces colonnes
+« should be excluded to ensure model generalization across different environments », et les
+exclut effectivement de ses expériences : le défaut porte sur **le module tel que distribué**,
+pas sur leur protocole.
+
+**3. Les cinq features de la zone grise τ\* sont présentes** (`SrcLoad`, `SrcRate`, `DstLoad`,
+`Rate`, `Load`). `SrcLoad` seule : 0,8625.
+
+## Témoin
+
+`TotBytes`, feature comportementale légitime, atteint **0,9190**, au-dessus de `Dur`. Même
+observation que sur `2-flows` (`DstBytes` 0,961 contre 0,922–0,963 pour les raccourcis) : le
+pouvoir prédictif isolé ne sépare pas le raccourci du signal. Seul le comportement entre deux
+protocoles le fait, et ce module ne permet pas de le mesurer, faute d'horodatage.
+
+## Limite de cette inspection
+
+Toutes les valeurs ci-dessus sont mesurées sous **le split aléatoire du module**, le seul
+disponible. On peut donc rapporter un pouvoir prédictif isolé, mais pas une transférabilité τ :
+sans horodatage, aucun protocole temporel n'est constructible sur `4-preprocessed`.
+
+## Recommandation d'usage
+
+Quiconque entraîne sur `4-preprocessed` devrait au minimum retirer
+`Ssaddr`, `Sdaddr`, `Sport`, `Dport` et cinq des six colonnes de la famille de durée.
