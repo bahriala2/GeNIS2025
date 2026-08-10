@@ -19,7 +19,7 @@ La chaîne LaTeX a été abandonnée en août 2026 ; elle est archivée dans
 | `paper/regen_en.py`, `paper/regen_fig6.py` | Régénèrent les figures depuis les résultats |
 | `paper/Makefile` | `make preview` (rendu PDF + images de pages) · `make figures` · `make clean` |
 | `paper/legacy-latex/` | Ancienne chaîne LaTeX, **gelée et obsolète** (voir son README) |
-| `docs/reponse_relecture.md` | Réponse point par point aux 21 remarques de relecture, avec le rebuttal en anglais |
+| `docs/reponse_relecture.md` | Réponse point par point aux 21 remarques de relecture (toutes adoptées), corrections factuelles trouvées en révision, rebuttal en anglais |
 | `docs/verification_proposition.md` | Vérification de la proposition initiale : faits confirmés, corrections C1–C6 |
 | `docs/plan_v2.md` | Plan expérimental révisé (v2), protocole gelé |
 | `docs/preliminary_findings.md` | Lecture des premiers résultats |
@@ -31,7 +31,8 @@ La chaîne LaTeX a été abandonnée en août 2026 ; elle est archivée dans
 - [x] Proposition vérifiée et validée (avec corrections)
 - [x] Campagne terminée : 154/154 runs
 - [x] Article rédigé de bout en bout avec les chiffres réels
-- [x] Relecture « overgeneralisation » traitée : 12 points acceptés, 7 refusés avec argument
+- [x] Relecture « overgeneralisation » traitée : les 21 points adoptés
+- [x] 63 affirmations chiffrées revérifiées contre `article1_results.json`
 - [x] Affiliations et URL du dépôt renseignées
 - [x] Word natif vérifié page par page, sans tiret cadratin
 - [ ] DOI d'archivage du dépôt

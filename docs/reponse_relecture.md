@@ -1,114 +1,192 @@
 # Réponse à la relecture « overgeneralisation » (21 points)
 
-Document de travail. La partie en anglais est rédigée pour être collée telle quelle dans
-une *response to reviewers*. Chaque point renvoie à la numérotation de la relecture.
+État au 6 août 2026, synchronisé avec `paper/GeNIS_benchmark_article.docx`, qui est la
+source de l'article. La partie en anglais est rédigée pour être collée dans une *response
+to reviewers*.
 
-**Bilan** : 12 points acceptés (dont 5 reformulés autrement que proposé), 7 points refusés
-avec argument, 2 points déjà couverts par le texte existant.
+**Bilan : les 21 points sont adoptés.** Sur trois d'entre eux (2, 9, 15) la formulation
+retenue conserve en plus l'explication du mécanisme, désormais appuyée sur deux
+références. Sur le point 8 la formulation diffère de celle proposée mais va dans le même
+sens : l'énoncé universel disparaît au profit d'un conditionnel dont l'antécédent est
+vérifiable. Sur le point 17 nous sommes allés plus loin que demandé.
 
 ---
 
-## Acceptés tels quels (7)
+## Adoptés dans la formulation proposée (17)
 
-| # | Objet | Ce qui a changé dans `main.tex` |
+| # | Emplacement | Ce que dit désormais le texte |
 |---|---|---|
-| 4, 7, 21 | Autoencodeur | « a benign-trained autoencoder » → « the benign-trained autoencoder evaluated here », partout (abstract, contribution 4, conclusion). Titre §6.6 : « Reconstruction-based anomaly detection fails » → « The benign-trained autoencoder fails ». |
-| 13 | Mécanisme de l'autoencodeur | « The mechanism is » → « The mechanism we observe is » ; « for this architecture and corpus » ajouté avant la conclusion sur la règle de décision ; phrase ajoutée : une seule architecture testée, la revendication porte sur la nécessité de vérifier la polarité par classe de menace. |
-| 10 | Bascule du classement | « once evaluation respects time » → « under the per-class temporal protocol », et « outranks them » → « outranks them on this corpus ». |
-| 11 | Titre §6.5 | « Calibration is already solved » → « Calibration has nothing to repair on the saturated task ». |
-| 12 | Rien à recalibrer | « nothing left to repair » → « little left to repair », + renvoi explicite à la limite de §8. |
-| 17 | Corpus CyberRange | « which includes most CyberRange-produced datasets » **supprimé**. Remplacé par : « How common that configuration is across CyberRange-produced corpora is an open empirical question that one dataset cannot settle. » C'était la meilleure prise de la relecture. |
+| 1 | Abstract | « Three findings have methodological implications that may extend beyond this corpus, pending validation on further datasets. » |
+| 3 | Abstract | « on GeNIS, chronological evaluation alone did not neutralise the capture-schedule shortcut created by disjoint attack windows […] so feature exclusion was required in addition to temporal ordering » |
+| 4 | Abstract | « the benign-trained autoencoder evaluated here was anti-correlated with volumetric floods […] in this benchmark » |
+| 5 | Contribution 1 | « the demonstration that, on GeNIS, attribution-based auditing failed to identify the redundant shortcut features it reveals » |
+| 6 | Contribution 2 | « Evidence that, on GeNIS, temporal splitting is necessary but not sufficient because the attack windows are disjoint » |
+| 7 | Contribution 4 | « A negative result for the evaluated benign-trained autoencoder […] on GeNIS » |
+| 10 | §6.3 | « fell to mid-table under the per-class temporal protocol on GeNIS » |
+| 11 | Titre §6.5 | « Calibration is near-perfect on the stratified GeNIS benchmark, and tuning changes almost nothing » |
+| 12 | §6.5 | « calibration had little left to repair » |
+| 13 | §6.6 | « The mechanism we observe on GeNIS […] for this architecture and corpus […] had the wrong polarity for these flood families » |
+| 14 | Titre §7 | « Shortcut auditing should not be delegated to attribution alone » |
+| 16 | Titre §7 | « Temporal evaluation was necessary but not sufficient on GeNIS » |
+| 18 | Conclusion | « Three results have methodological implications that may carry beyond this corpus » |
+| 19 | Conclusion | « on GeNIS, a shortcut audit built on attribution scores failed to identify the shortcuts we found […] was required on this corpus » |
+| 20 | Conclusion | « on GeNIS, temporal splitting alone did not neutralise […] was the operative remedy on this corpus » |
+| 21 | Conclusion | « the benign-trained autoencoder evaluated here was anti-correlated […] in this benchmark » |
 
-## Acceptés mais reformulés autrement (5)
+## Adoptés en conservant le mécanisme (3)
 
-| # | Pourquoi pas la formulation proposée | Ce qui a été écrit à la place |
-|---|---|---|
-| 1, 18 | « may extend beyond this corpus, pending validation » est du hedging non informatif : le lecteur ne sait pas *lesquels* transfèrent ni *pourquoi*. | « Two of our findings follow from structural properties of the data rather than from measurement alone, and therefore hold wherever those properties hold; a third is specific to the model and corpus evaluated here. » Plus précis **et** plus fort. |
-| 2, 5, 19 | « attribution-based auditing failed on GeNIS » perd le mécanisme, qui est la contribution. | Portée resserrée sur ce qui est vrai par construction : « attribution scores cannot isolate **redundant** shortcuts, by construction: permuting one copy of a repeated quantity costs a model nothing ». Magnitude mesurée annoncée séparément (« On GeNIS this appears as permutation importance below 10⁻⁴ »). |
-| 9, 15 | Le « only … exposes them » devait sauter (voir ci-dessous) ; c'était une **erreur factuelle**, pas un excès de prudence. | « Only evaluating each feature in isolation exposes them » → « Evaluating each feature in isolation under two protocols exposes them. A duplicate-column check exposes six of the eight independently, and we recommend running both. » |
+Points **2, 9 et 15**. La portée est ramenée à GeNIS comme demandé, mais la phrase qui
+explique *pourquoi* l'attribution échoue est conservée, parce qu'elle est la contribution
+et qu'elle ne dépend pas du corpus. Elle est maintenant adossée à la littérature, ce
+qu'elle n'était pas au moment de la relecture :
 
-### Correction d'une erreur factuelle que la relecture a permis de trouver
+- §6.2 : « The failure has a mechanical explanation that does not depend on this corpus:
+  an importance measure defined by the loss incurred when a single feature is perturbed
+  cannot register a feature whose information is duplicated elsewhere in the matrix. That
+  dilution of importance across dependent predictors is documented independently of our
+  setting [26, 27]. What is specific to GeNIS is that its shortcuts happen to be
+  duplicated, and we cannot say from one corpus how common that configuration is. »
+- §7 : « The mechanism behind that failure […] is not specific to GeNIS and is documented
+  for dependent predictors [26, 27]; what we cannot establish from one corpus is how often
+  exporters emit several statistics of the same underlying quantity. »
 
-Le manuscrit affirmait quatre fois que **seule** l'évaluation isolée à deux protocoles
-révèle les raccourcis. C'est contredit par le manuscrit lui-même : §6.2 rapporte que la
-vérification de colonnes dupliquées identifie six des huit raccourcis (`Dur = RunTime =
-Mean = Sum = Min = Max`, 15 paires). Les quatre occurrences de « only » ont été retirées
-et la complémentarité des deux tests est maintenant énoncée.
+Références ajoutées :
 
-## Déjà couverts avant la relecture (2)
-
-- **#12** : §8 contenait déjà *« Calibration is measured under one protocol only … may not
-  extend to the temporal protocol »*. Un renvoi explicite depuis §6.5 a été ajouté.
-- **#1/#18, volet corpus** : §8 contenait déjà *« Our conclusions about protocol and audit
-  methodology are corpus-independent by construction; our conclusions about which detector
-  wins are not. »* La phrase a été précisée (« in the sense that they follow from
-  properties of the data that we state and verify rather than from the measurements
-  alone ») et remontée dans l'abstract.
-
-## Renforcement apporté en plus
-
-La cécité de l'importance par permutation aux prédicteurs redondants est un résultat
-connu, que le manuscrit affirmait sans le citer. Ajout de deux références
-(`references.bib`) et de la phrase correspondante en §6.2 et §7 :
-
-- Strobl, Boulesteix, Kneib, Augustin, Zeileis, *Conditional variable importance for
+- [26] Strobl, Boulesteix, Kneib, Augustin, Zeileis, *Conditional variable importance for
   random forests*, BMC Bioinformatics 9:307, 2008.
-- Hooker, Mentch, Zhou, *Unrestricted permutation forces extrapolation*, Statistics and
-  Computing 31:82, 2021.
+- [27] Hooker, Mentch, Zhou, *Unrestricted permutation forces extrapolation*, Statistics
+  and Computing 31:82, 2021.
 
-L'argument passe ainsi de « nous prétendons que » à « propriété documentée, appliquée
-ici », ce qui neutralise à la racine les objections 2, 5, 9, 14, 15 et 19.
+## Adopté sous une autre formulation (1)
+
+Point **8**. L'énoncé universel « No time-based split can neutralise a shortcut whose
+classes are temporally disjoint » a disparu. Il est remplacé en §6.2 par un conditionnel
+borné, dont la limite est énoncée explicitement :
+
+> « The argument generalises in a precise and limited sense: whenever a class occupies a
+> single contiguous window, no split of that window by time can break the association
+> between the class and its position in the capture […] It says nothing about corpora
+> whose classes recur at several separated times, and we have not measured such a corpus.
+> For corpora generated by sequential attack scenarios such as this one, it suggests that
+> the standard advice to adopt chronological evaluation [14] may be necessary but not
+> sufficient. »
+
+## Adopté plus largement que demandé (1)
+
+Point **17**. La phrase « which includes most CyberRange-produced datasets » n'est pas
+seulement atténuée, elle est supprimée, et remplacée par un aveu d'ignorance : « How
+common that configuration is across CyberRange-produced corpora is an open empirical
+question that one dataset cannot settle. »
 
 ---
 
-## Refusés avec argument (7) : texte de rebuttal en anglais
+## Corrections factuelles trouvées pendant la révision
 
-> **Points 3, 6, 8, 16, 20 and the first half of 15.**
+Ces points ne figuraient pas dans la relecture. Ils ont été trouvés en vérifiant le texte
+contre `paper/article1_results.json`.
+
+1. **« Only » était faux.** Le manuscrit affirmait quatre fois que *seule* l'évaluation
+   isolée à deux protocoles révèle les raccourcis, alors que §6.2 rapporte qu'une
+   détection de colonnes dupliquées en identifie six sur huit (`Dur = RunTime = Mean =
+   Sum = Min = Max`, 15 paires). Les quatre occurrences sont retirées et la
+   complémentarité des deux tests est énoncée.
+2. **Coût d'inférence annoncé « single-core » à tort.** Les mesures ont été prises avec
+   `n_jobs = 2` pour les ensembles d'arbres et le k-NN et un parallélisme intra-op non
+   contraint pour les modèles Keras. Table 8 et l'abstract disent désormais
+   « single-host », et la légende déclare les réglages.
+3. **Table 10, ligne DNN.** Le taux de faux positifs moyen sur trois graines à 10 s vaut
+   0.3379, donc 34 % et non 33 %, ce que §6.4 disait déjà.
+4. **Attribution erronée en §6.4.** « one seed degrades sharply (0.9458 ± 0.0766, driven
+   by `bruteforce-ftp` at F1 0.685) » laissait entendre que 0.685 est la valeur de la
+   graine défaillante. C'est la moyenne des trois graines ; la graine qui s'effondre est
+   à 0.056, les deux autres à 0.999 et 1.000. Phrase reformulée.
+5. **Légende de la figure 13.** La figure montre neuf détecteurs, pas onze : naive Bayes
+   et la baseline majoritaire sont sous l'échelle de couleur. La légende le déclare.
+6. **Notes de travail dans la bibliographie.** Quatre champs `note` internes
+   (« TODO: verify pages », « verify venue formatting ») étaient imprimés dans les
+   références. Supprimés.
+
+## Ce que la révision a ajouté au-delà de la relecture
+
+- **Analyse de sensibilité de la règle d'exclusion** (§6.2, §8, Table 9, Figure 6) : le
+  rapport de transférabilité est recalculé au-dessus du hasard, τ\*(f) = (acc_temp −
+  p_max) / (acc_strat − p_max). Sous τ\* la règle exclut treize features comportementales
+  au lieu de huit, et l'intervalle vide au seuil passe de 0.047 à 0.017. Nous le
+  rapportons plutôt que de retenir la lecture qui flatte la règle, et nous publions le
+  spectre sous les deux normalisations pour qu'une liste noire stricte à dix-sept
+  features soit dérivable sans rien relancer.
+- **Table 10, viabilité sur quatre axes** : aucun détecteur ne gagne partout, et l'ordre
+  s'inverse entre qualité temporelle et coût.
+- **Table 11** : ce que chaque travail voisin autorise un lecteur à croire, et sous quel
+  protocole.
+- **Figures 1, 4, 7 et 13** : distribution naturelle des classes, importance d'attribution
+  contre pouvoir prédictif isolé, matrice de McNemar par paires, F1 par classe sous
+  protocole temporel.
+- **Confond déclaré dans les budgets de recherche** (§8) : le plafond de temps était
+  appliqué en temps réel dans un environnement hébergé dont l'allocation d'accélérateur
+  variait entre sessions. Le temps d'entraînement est en conséquence exclu des critères
+  de viabilité.
+- **§11, déclaration d'usage de l'IA générative**, conforme à la politique éditoriale.
+
+## Vérification numérique
+
+Soixante-trois affirmations chiffrées du texte ont été recalculées depuis
+`paper/article1_results.json` : macro-F1 par modèle et par protocole, débits, latences,
+tailles de modèle, températures ajustées, erreurs de calibration, AUROC de l'autoencodeur
+par famille, comptes de flux et parts bénignes aux quatre intervalles, sonde d'horodatage,
+effet de l'audit graine 1, gains de réglage, tests de McNemar (45 paires, 11 non
+significatives). Un seul écart subsistait, le point 4 ci-dessus, et il est corrigé.
+
+---
+
+## Texte de rebuttal (anglais)
+
+> We are grateful for a reading that was both precise and constructive. **We have adopted
+> all twenty-one points.** Every universal quantifier the reviewer identified has been
+> replaced by a claim anchored to the corpus on which it was measured, in the abstract,
+> the contributions, Sections 6 and 7, and the conclusion.
 >
-> We have adopted the reviewer's framing wherever our claim was inductive, and we thank
-> them for a reading that led us to correct a factual error (see our response to point 9).
-> For six statements, however, we respectfully maintain the unqualified form, because the
-> claim is deductive rather than an extrapolation from a single corpus, and we have made
-> the deduction explicit in the revised text rather than hedging it.
+> On three of them (2, 9, 15) we have kept, alongside the corpus-anchored claim, the one
+> sentence that explains *why* attribution fails, because that mechanism is the paper's
+> contribution and does not depend on our data. The reviewer was right that it was
+> asserted rather than supported: we now cite Strobl et al. (2008) and Hooker et al.
+> (2021), where the dilution of importance across dependent predictors is established
+> independently of any corpus. The claim is correspondingly narrowed: attribution cannot
+> isolate *redundant* shortcuts, which is what we observe, rather than shortcuts in
+> general.
 >
-> **On temporal splitting (points 3, 6, 8, 16, 20).** The statement is a conditional whose
-> antecedent is a checkable property of a corpus. If the flows of class A occupy
-> [t₁, t₂] and those of class B occupy [t₃, t₄] with the two intervals disjoint, then any
-> split that preserves capture order within each class yields a training partition in
-> which a single timestamp threshold separates the two classes, and a test partition in
-> which the same threshold separates them. The probe therefore transfers, for every such
-> split. This is a proof, not an observation; what is corpus-specific is whether the
-> antecedent holds, and we verify it for GeNIS in Figure 1 and quantify the consequence at
-> 0.9862. Restating the conclusion as "on GeNIS, no time-based split neutralised the
-> shortcut" would present a theorem as an anecdote and would deprive readers of the one
-> thing that lets them decide whether their own corpus is affected. The revised text now
-> reads: *"The conclusion is therefore deductive rather than observed: no split that
-> respects capture order neutralises a shortcut whose classes occupy disjoint windows. Its
-> antecedent is a checkable property of a corpus, not an assumption about corpora in
-> general, and on GeNIS we verify it directly."* We have separately removed the one
-> genuinely inductive claim in this family, that the configuration covers "most
-> CyberRange-produced datasets" (point 17).
+> On point 8 we have adopted the substance under a different wording. Rather than assert
+> that no time-based split can neutralise such a shortcut, Section 6.2 now states the
+> conditional and its boundary: the argument holds whenever a class occupies a single
+> contiguous window, it says nothing about corpora whose classes recur at several
+> separated times, and we have not measured such a corpus.
 >
-> **On attribution (first half of point 15).** Permutation importance answers "how much
-> does the model lose when this feature is disturbed". When a second feature carries
-> identical information, the answer is near zero regardless of how predictive the feature
-> is. This is a documented property of attribution under dependent predictors
-> [Strobl et al. 2008; Hooker et al. 2021], now cited, not a peculiarity of our data. We
-> have accordingly narrowed the claim from "attribution cannot support a shortcut audit"
-> to "attribution cannot isolate *redundant* shortcuts", which is the precise and
-> defensible statement, and we have removed the uniqueness claim ("only") that the
-> reviewer rightly challenged. We have also softened "by construction" to a description of
-> the ranking mechanism, since a tree ensemble that distributes splits across duplicated
-> columns does lose a little under permutation; the empirical magnitude (< 10⁻⁴) is
-> reported as a measurement.
+> On point 17 we went further than suggested and deleted the claim about CyberRange
+> corpora outright, replacing it with an explicit statement that one dataset cannot settle
+> the question.
+>
+> The reviewer's challenge to our uniqueness claim (point 9) also led us to a factual
+> error of our own: the manuscript asserted four times that *only* an isolated two-protocol
+> evaluation exposes the shortcuts, while Section 6.2 reports that a duplicate-column check
+> independently exposes six of the eight. All four occurrences are removed and the
+> complementarity of the two tests is now stated. Separately, we discovered while
+> re-verifying the manuscript that our inference-cost measurements were reported as
+> single-core when they were taken with default library threading; Table 8 and the abstract
+> now say single-host and the caption declares the settings.
+>
+> Finally, the revision adds a sensitivity analysis that the review did not ask for but
+> that its standard of evidence implies. Our exclusion rule compares raw accuracies; under
+> a chance-corrected ratio it would exclude thirteen behavioural features instead of eight,
+> and the empty interval at the threshold narrows from 0.047 to 0.017. We report this,
+> publish the spectrum under both normalisations, and state plainly that the boundary
+> between shortcut and signal on GeNIS is an interval rather than a point.
 
 ---
 
 ## Note de style
 
-Les révisions proposées ajoutaient une vingtaine de « on GeNIS » et basculaient le texte
-au passé. Nous avons anchré les énoncés inductifs (« on GeNIS », « in this corpus », « the
-autoencoder evaluated here ») sans généraliser le procédé : un texte qui se protège vingt
-fois en trois pages signale qu'il ne croit pas à ses propres résultats. Le présent est
-conservé pour les propriétés des données, qui n'ont pas cessé d'être vraies : les colonnes
-`Dur`, `RunTime`, `Mean`, `Sum`, `Min`, `Max` *sont* identiques.
+Les énoncés inductifs sont ancrés (« on GeNIS », « in this corpus », « the autoencoder
+evaluated here ») sans que le procédé soit généralisé : un texte qui se protège vingt fois
+en trois pages signale qu'il ne croit pas à ses propres résultats. Le présent est conservé
+pour les propriétés des données, qui n'ont pas cessé d'être vraies : les colonnes `Dur`,
+`RunTime`, `Mean`, `Sum`, `Min`, `Max` *sont* identiques.
