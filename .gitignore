@@ -7,3 +7,6 @@ paper/legacy-latex/*.aux
 paper/legacy-latex/*.log
 paper/legacy-latex/*.out
 paper/legacy-latex/*.blg
+
+# sortie de l'inspection locale
+experiments/inspection_4preprocessed.json
