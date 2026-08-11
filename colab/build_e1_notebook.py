@@ -8,6 +8,9 @@ le valide. Relancer ce script apres toute modification.
 import json
 from pathlib import Path
 
+VERSION = "v3"
+BUILD = "2026-08-11"
+
 CELLS = []
 
 
@@ -23,6 +26,8 @@ def code(src):
 # ---------------------------------------------------------------- 0. titre
 md(r"""
 # E1 : comparaison ancrée sur le module `4-preprocessed` de GeNIS
+
+> **Notebook VERSION_PLACEHOLDER, compilé le BUILD_PLACEHOLDER.** La cellule 1.1 réaffiche ce numéro à l'exécution : s'il ne correspond pas, Colab sert une copie en cache, voir la note en fin de notebook.
 
 Expérience complémentaire de l'article *A Leakage-Audited Benchmark of Deep and Ensemble
 Detectors on the GeNIS 2025 Corpus*.
@@ -73,6 +78,8 @@ Les résultats et les figures étant écrits sur Drive, une déconnexion ne fait
 
 code(r"""
 # --- 1.1 Drive, dossiers, corpus -------------------------------------------
+E1_VERSION = "VERSION_PLACEHOLDER"; E1_BUILD = "BUILD_PLACEHOLDER"
+print(f"E1 notebook {E1_VERSION}, compile le {E1_BUILD}")
 import os, json, gc, time, glob, shutil, pathlib, warnings, subprocess
 from pathlib import Path
 warnings.filterwarnings("ignore")
@@ -695,14 +702,36 @@ nombres publiés sur ce module reposent en partie sur des colonnes que leurs pro
 recommandent d'exclure.
 """)
 
+md("""
+---
+
+### Si Colab ouvre une ancienne version
+
+Colab met en cache les notebooks par nom de fichier. Si la bannière imprimée par la cellule 1.1
+n'affiche pas la version annoncée en tête de ce document :
+
+1. **Fichier > Ouvrir un notebook > Importer**, et choisir le `.ipynb` reçu. Ne pas passer par
+   l'historique « Récents », qui rouvre la copie précédente.
+2. Si le notebook est sur Drive, supprimer l'ancien `.ipynb` avant de déposer le nouveau : deux
+   fichiers de même nom cohabitent silencieusement sur Drive.
+3. Au besoin, **Exécution > Redémarrer la session et tout exécuter**, puis rafraîchir la page
+   avec Ctrl+Maj+R.
+
+Le numéro de version est dans le nom du fichier, dans le titre et dans la sortie de la
+cellule 1.1 : les trois doivent concorder.
+""")
+
 nb = {"cells": CELLS,
-      "metadata": {"colab": {"provenance": [], "toc_visible": True},
+      "metadata": {"colab": {"provenance": [], "toc_visible": True, "name": f"e1_anchored_comparison_{VERSION}.ipynb"},
                    "kernelspec": {"display_name": "Python 3", "name": "python3"},
                    "language_info": {"name": "python"},
                    "accelerator": "GPU"},
       "nbformat": 4, "nbformat_minor": 0}
 
-out = Path(__file__).resolve().parent / "e1_anchored_comparison.ipynb"
+CELLS[:] = [dict(c, source=[l.replace("VERSION_PLACEHOLDER", VERSION)
+                            .replace("BUILD_PLACEHOLDER", BUILD) for l in c["source"]])
+            for c in CELLS]
+out = Path(__file__).resolve().parent / f"e1_anchored_comparison_{VERSION}.ipynb"
 out.write_text(json.dumps(nb, indent=1, ensure_ascii=False), encoding="utf-8")
 print(f"{out.name} : {len(CELLS)} cellules "
       f"({sum(c['cell_type']=='code' for c in CELLS)} de code)")
