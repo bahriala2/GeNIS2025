@@ -52,38 +52,97 @@ cellule suivante : Google Drive, ou dépôt direct dans `/content`.
 """)
 
 # ---------------------------------------------------------------- 1. environnement
-md("## 1. Environnement et chemins")
+md("""
+## 1. Environnement et chemins
+
+Colab ne voit pas le disque de votre machine. Il faut donc lui donner les deux fichiers dont
+E1 a besoin, et **deux fichiers suffisent** : `genis-60-sec-train.csv` et
+`genis-60-sec-test.csv`. Inutile de transférer les trois autres intervalles, ni les captures
+brutes.
+
+Trois voies, à choisir dans la cellule suivante avec `SOURCE`.
+
+| `SOURCE` | quand l'utiliser | transfert |
+|---|---|---|
+| `"drive"` | **recommandé** : déposer les deux CSV dans un dossier de Google Drive, une fois pour toutes | une fois |
+| `"upload"` | essai rapide, sans Drive | à chaque session |
+| `"url"` | télécharger directement depuis Zenodo dans Colab | rien depuis votre PC |
+
+Avec `"drive"`, les résultats et les figures sont écrits sur Drive eux aussi : une déconnexion
+ne fait rien perdre. Avec `"upload"`, tout disparaît à la fin de la session, pensez à
+récupérer `e1_results.json` et `e1_figures.zip` avant de fermer.
+""")
 
 code(r"""
-# --- 1.1 Ou sont les donnees ? Choisir UNE des deux voies -------------------
+# --- 1.1 Ou sont les donnees ? ---------------------------------------------
 
-USE_DRIVE = True          # True : monter Google Drive ; False : fichiers deja dans /content
+SOURCE = "drive"          # "drive" | "upload" | "url"
 
-# Chemin du dossier contenant genis-60-sec-train.csv et genis-60-sec-test.csv
-DATA_DIR = "/content/drive/MyDrive/Genis/4-preprocessed"
+# SOURCE = "drive" : dossier de Drive contenant les deux CSV
+DRIVE_DIR = "/content/drive/MyDrive/Genis/4-preprocessed"
 
-# Ou ecrire resultats, modeles et figures (survit aux deconnexions si sur Drive)
-OUT_DIR = "/content/drive/MyDrive/Genis/E1"
+# SOURCE = "url" : liens directs vers les deux fichiers (Zenodo, ou tout autre hebergeur)
+URL_TRAIN = ""
+URL_TEST  = ""
 
 INTERVAL = 60             # 5, 10, 30 ou 60. L'article se concentre sur 60 s.
 SEEDS = [1, 2, 3]         # 3 graines suffisent pour l'ecart entre conditions
 KNN_MAX_TRAIN = 50_000    # k-NN : sous-echantillon declare, comme dans l'article
 HPO = False               # E1 compare des conditions, pas des hyperparametres
 
-import os, json, gc, time, warnings
+import os, json, gc, time, warnings, shutil, subprocess
 from pathlib import Path
 warnings.filterwarnings("ignore")
 
-if USE_DRIVE:
+if SOURCE == "drive":
     from google.colab import drive
     drive.mount("/content/drive")
+    DATA_DIR = DRIVE_DIR
+    OUT_DIR = str(Path(DRIVE_DIR).parent / "E1")
+
+elif SOURCE == "upload":
+    from google.colab import files
+    DATA_DIR = OUT_DIR = "/content/e1"
+    Path(DATA_DIR).mkdir(parents=True, exist_ok=True)
+    have = list(Path(DATA_DIR).glob("*.csv"))
+    if len(have) < 2:
+        print(f"Selectionnez genis-{INTERVAL}-sec-train.csv ET genis-{INTERVAL}-sec-test.csv")
+        for name, blob in files.upload().items():
+            Path(DATA_DIR, name).write_bytes(blob)
+    else:
+        print("fichiers deja presents, televersement saute")
+
+elif SOURCE == "url":
+    DATA_DIR = OUT_DIR = "/content/e1"
+    Path(DATA_DIR).mkdir(parents=True, exist_ok=True)
+    assert URL_TRAIN and URL_TEST, "renseigner URL_TRAIN et URL_TEST"
+    for url, name in ((URL_TRAIN, f"genis-{INTERVAL}-sec-train.csv"),
+                      (URL_TEST,  f"genis-{INTERVAL}-sec-test.csv")):
+        dest = Path(DATA_DIR, name)
+        if dest.exists():
+            print("deja la :", name); continue
+        print("telechargement :", name, flush=True)
+        subprocess.run(["wget", "-q", "--show-progress", "-O", str(dest), url], check=True)
+else:
+    raise ValueError("SOURCE doit valoir drive, upload ou url")
 
 Path(OUT_DIR).mkdir(parents=True, exist_ok=True)
 for sub in ("figures", "models"):
     Path(OUT_DIR, sub).mkdir(exist_ok=True)
 
-print("donnees :", DATA_DIR)
+# --- verification : les deux fichiers sont-ils bien la ? --------------------
+found = sorted(Path(DATA_DIR).rglob(f"*{INTERVAL}-sec*.csv"))
+print(f"\ndonnees : {DATA_DIR}")
+for f in found:
+    print(f"   {f.name:<32} {f.stat().st_size/1e6:8.1f} Mo")
+assert any("train" in f.name.lower() for f in found), \
+    f"genis-{INTERVAL}-sec-train.csv introuvable sous {DATA_DIR}"
+assert any("test" in f.name.lower() for f in found), \
+    f"genis-{INTERVAL}-sec-test.csv introuvable sous {DATA_DIR}"
 print("sorties :", OUT_DIR)
+if SOURCE != "drive":
+    print("\nATTENTION : /content est efface a la fin de la session."
+          "\nRecuperez e1_results.json et e1_figures.zip avant de fermer.")
 """)
 
 code(r"""
