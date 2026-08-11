@@ -10,3 +10,6 @@ paper/legacy-latex/*.blg
 
 # sortie de l'inspection locale
 experiments/inspection_4preprocessed.json
+
+# sorties locales de E1
+experiments/probe_4preprocessed.json
