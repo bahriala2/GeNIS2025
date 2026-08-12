@@ -8,7 +8,7 @@ le valide. Relancer ce script apres toute modification.
 import json
 from pathlib import Path
 
-VERSION = "v3"
+VERSION = "v4"
 BUILD = "2026-08-11"
 
 CELLS = []
@@ -188,7 +188,9 @@ def inventory():
     conds = ["as-distributed", "no-topology", "audited"]
     models = ["xgboost", "lightgbm", "rf", "ftt", "logreg", "rnn", "cnn", "dnn", "knn", "nb", "majority"]
     deep = {"ftt", "rnn", "cnn", "dnn"}
-    plan = [(m, c, t, s) for t in tasks for c in conds for m in models for s in SEEDS]
+    det = {"majority", "nb", "logreg", "knn"}
+    plan = [(m, c, t, s) for t in tasks for c in conds for m in models
+            for s in ([SEEDS[0]] if (m in det or c != "audited") else SEEDS)]
     done = [p for p in plan if f"{p[0]}|{p[1]}|{p[2]}|seed{p[3]}" in STATE["runs"]]
     print(f"runs prevus : {len(plan)}   deja calcules : {len(done)}   restants : {len(plan)-len(done)}")
     for fam, sel in (("rapides (CPU)", lambda m: m not in deep), ("profonds (GPU)", lambda m: m in deep)):
@@ -444,23 +446,76 @@ print(len(MODELS), "detecteurs :", ", ".join(MODELS))
 
 # ---------------------------------------------------------------- 7. boucle
 md("""
-## 7. Campagne
+## 7. Campagne, en quatre lots
 
-`11 détecteurs × 3 conditions × 2 taxonomies`. Chaque run affiche ce qui est en cours et son
-temps, et est écrit sur disque dès qu'il finit. Une déconnexion ne coûte que le run en cours.
+La version précédente enchaînait tous les entraînements dans une seule cellule : une
+déconnexion obligeait à tout reprendre depuis le haut du notebook. Trois changements.
+
+**Les lots sont séparés.** Quatre cellules indépendantes, du moins cher au plus cher. Chacune
+peut être relancée seule, et saute ce qui est déjà calculé.
+
+| lot | modèles | matériel |
+|---|---|---|
+| 7.2 | majority, logreg, nb, xgboost, lightgbm | CPU |
+| 7.3 | rf, k-NN | CPU, le plus lent |
+| 7.4 | rnn, cnn, dnn | GPU recommandé |
+| 7.5 | ft-transformer | GPU, le plus lourd |
+
+**Les matrices sont calculées une fois.** L'ancienne version remettait à l'échelle les 294 844
+lignes à chaque run, soit près de deux cents fois pour six matrices utiles. Elles sont
+désormais calculées une fois par couple (condition, tâche), gardées en mémoire et mises en
+cache sur Drive : après un redémarrage, elles se rechargent en quelques secondes.
+
+**Les modèles déterministes ne tournent qu'une fois.** Sur un découpage figé, `majority`, `nb`,
+`logreg` et `k-NN` donnent exactement le même résultat à chaque graine. Trois graines pour les
+modèles stochastiques sous la condition `audited`, qui porte le résultat principal, une seule
+pour les deux conditions de comparaison.
 """)
 
 code(r"""
-def prepare(cond_cols, label, seed):
-    # Matrices mises a l'echelle ; le scaler est ajuste sur LEUR train uniquement
-    Xtr = TRAIN[cond_cols].apply(pd.to_numeric, errors="coerce").fillna(0).to_numpy("float32")
-    Xte = TEST[cond_cols].apply(pd.to_numeric, errors="coerce").fillna(0).to_numpy("float32")
-    sc = RobustScaler().fit(Xtr)
-    Xtr, Xte = sc.transform(Xtr).astype("float32"), sc.transform(Xte).astype("float32")
+# --- 7.1 Plan, cache des matrices, moteur ----------------------------------
+FAST  = ["majority", "logreg", "nb", "xgboost", "lightgbm"]
+SLOW  = ["rf", "knn"]
+DEEP  = ["rnn", "cnn", "dnn"]
+HEAVY = ["ftt"]
+DETERMINISTIC = {"majority", "nb", "logreg", "knn"}   # resultat identique a chaque graine
+SEEDS_MAIN, SEEDS_OTHER = SEEDS, [SEEDS[0]]
+
+def seeds_for(model, cond):
+    if model in DETERMINISTIC:
+        return [SEEDS[0]]
+    return SEEDS_MAIN if cond == "audited" else SEEDS_OTHER
+
+_XY = {}                                              # cache memoire
+
+def get_xy(cond, label):
+    # Une seule mise a l'echelle par (condition, tache). Le scaler est ajuste sur
+    # LEUR partition d'entrainement uniquement.
+    key = f"{cond}|{label}"
+    if key in _XY:
+        return _XY[key]
+    cache = SAVE / "cache" / f"{key.replace('|', '_')}.npz"
+    cache.parent.mkdir(exist_ok=True)
     le = LabelEncoder().fit(TRAIN[label].astype(str))
     ytr = le.transform(TRAIN[label].astype(str))
     yte = le.transform(TEST[label].astype(str))
-    return Xtr, Xte, ytr, yte, le
+    if cache.exists():
+        z = np.load(cache)
+        Xtr, Xte = z["Xtr"], z["Xte"]
+        print(f"   matrices rechargees du cache : {key}", flush=True)
+    else:
+        t0 = time.time()
+        cc = CONDITIONS[cond]
+        Xtr = TRAIN[cc].apply(pd.to_numeric, errors="coerce").fillna(0).to_numpy("float32")
+        Xte = TEST[cc].apply(pd.to_numeric, errors="coerce").fillna(0).to_numpy("float32")
+        sc = RobustScaler().fit(Xtr)
+        Xtr = np.nan_to_num(sc.transform(Xtr), nan=0., posinf=0., neginf=0.).astype("float32")
+        Xte = np.nan_to_num(sc.transform(Xte), nan=0., posinf=0., neginf=0.).astype("float32")
+        np.savez_compressed(cache, Xtr=Xtr, Xte=Xte)
+        print(f"   matrices calculees et mises en cache : {key} "
+              f"({Xtr.shape[1]} features, {time.time()-t0:.0f} s)", flush=True)
+    _XY[key] = (Xtr, Xte, ytr, yte, le)
+    return _XY[key]
 
 def evaluate(yte, pred, le):
     return {"accuracy": float(accuracy_score(yte, pred)),
@@ -469,24 +524,27 @@ def evaluate(yte, pred, le):
             "per_class_f1": {c: float(v) for c, v in
                              zip(le.classes_, f1_score(yte, pred, average=None, zero_division=0))}}
 
-def run_one(model, cond, label, seed):
+def fmt(sec):
+    m, s_ = divmod(int(sec), 60)
+    return f"{m}m{s_:02d}s" if m else f"{s_}s"
+
+def run_one(model, cond, label, seed, tag=""):
     key = f"{model}|{cond}|{label}|seed{seed}"
     if key in STATE["runs"]:
-        return
-    cols_c = CONDITIONS[cond]
-    t0 = time.time()
-    print(f"  -> {key}  ({len(cols_c)} features)", flush=True)
-    Xtr, Xte, ytr, yte, le = prepare(cols_c, label, seed)
+        return False
+    Xtr, Xte, ytr, yte, le = get_xy(cond, label)
     n_out = len(le.classes_)
+    t0 = time.time()
+    print(f"{tag} {key}  ({Xtr.shape[1]} features)", flush=True)
 
     if model in NEURAL:
         tf.keras.utils.set_random_seed(seed)
         xtr, xte = (Xtr[..., None], Xte[..., None]) if model in ("rnn", "cnn") else (Xtr, Xte)
         net = NEURAL[model](Xtr.shape[1], n_out)
         net.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
-        net.fit(xtr, ytr, epochs=30, batch_size=512, verbose=0, validation_split=0.15,
-                callbacks=[keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True)])
-        pred = net.predict(xte, batch_size=1024, verbose=0).argmax(1)
+        net.fit(xtr, ytr, epochs=EPOCHS, batch_size=512, verbose=0, validation_split=0.15,
+                callbacks=[keras.callbacks.EarlyStopping(patience=4, restore_best_weights=True)])
+        pred = net.predict(xte, batch_size=2048, verbose=0).argmax(1)
         del net; keras.backend.clear_session()
     else:
         if model == "knn" and len(Xtr) > KNN_MAX_TRAIN:
@@ -499,28 +557,76 @@ def run_one(model, cond, label, seed):
         del clf
 
     r = evaluate(yte, pred, le)
-    r.update({"n_features": len(cols_c), "seconds": round(time.time() - t0, 1)})
+    r.update({"n_features": int(Xtr.shape[1]), "seconds": round(time.time() - t0, 1)})
     STATE["runs"][key] = r
     save_state(STATE)
-    print(f"     macro-F1 {r['macro_f1']:.4f}  accuracy {r['accuracy']:.4f}  ({r['seconds']:.0f} s)",
-          flush=True)
-    del Xtr, Xte; gc.collect()
+    print(f"        OK  macro-F1 {r['macro_f1']:.4f}  accuracy {r['accuracy']:.4f}  "
+          f"({fmt(r['seconds'])})", flush=True)
+    gc.collect()
+    return True
+
+def run_batch(models, titre):
+    plan = [(m, c, t, s) for t in TASKS for c in CONDITIONS
+            for m in models for s in seeds_for(m, c)]
+    todo = [p for p in plan if f"{p[0]}|{p[1]}|{p[2]}|seed{p[3]}" not in STATE["runs"]]
+    print(f"=== {titre} : {len(todo)} run(s) a faire sur {len(plan)} ===\n", flush=True)
+    t0 = time.time()
+    for i, (m, c, t, s) in enumerate(todo, 1):
+        el = time.time() - t0
+        eta = f" | reste ~{fmt(el / (i - 1) * (len(todo) - i + 1))}" if i > 1 else ""
+        run_one(m, c, t, s, tag=f"[{i:>3}/{len(todo)}] ecoule {fmt(el)}{eta}\n       >")
+    print(f"\n=== {titre} : termine en {fmt(time.time()-t0)} ===", flush=True)
 
 TASKS = [lab for lab in ("CategoryLabel", "SubCategoryLabel") if lab in LABELS]
-total = len(MODELS) * len(CONDITIONS) * len(TASKS) * len(SEEDS)
-done = 0
-for label in TASKS:
-    for cond in CONDITIONS:
-        print(f"\n=== {label} | {cond} ===", flush=True)
-        for model in MODELS:
-            for seed in SEEDS:
-                run_one(model, cond, label, seed)
-                done += 1
-        print(f"    avancement global : {len(STATE['runs'])}/{total}", flush=True)
-print("\ncampagne terminee :", len(STATE["runs"]), "runs")
+EPOCHS = 30
+print("taches :", TASKS)
+print("total prevu :", sum(len(seeds_for(m, c)) for t in TASKS for c in CONDITIONS
+                           for m in FAST + SLOW + DEEP + HEAVY), "runs")
 """)
 
-# ---------------------------------------------------------------- 8. tableau
+md("""
+### 7.2 Lot 1 : modèles rapides
+
+CPU suffisant. C'est le lot à lancer en premier : il donne déjà l'essentiel du tableau.
+""")
+
+code(r"""
+run_batch(FAST, "lot 1, modeles rapides")
+""")
+
+md("""
+### 7.3 Lot 2 : forêt aléatoire et k-NN
+
+Les deux plus lents sur processeur. Le k-NN est ajusté sur un sous-échantillon de
+`KNN_MAX_TRAIN` flux, déclaré comme dans l'article, mais il prédit sur les 73 712 flux du
+holdout, ce qui reste coûteux. **Ce lot peut être sauté** : les figures et le tableau se
+construisent sans lui, avec deux lignes en moins.
+""")
+
+code(r"""
+run_batch(SLOW, "lot 2, foret et k-NN")
+""")
+
+md("""
+### 7.4 Lot 3 : réseaux RNN, CNN, DNN
+
+GPU recommandé. Vérifier que `GPU : OUI` a été affiché en 1.2, sinon compter plusieurs heures.
+""")
+
+code(r"""
+run_batch(DEEP, "lot 3, reseaux recurrent, convolutif et dense")
+""")
+
+md("""
+### 7.5 Lot 4 : FT-Transformer
+
+Le plus lourd, seul dans son lot pour qu'une déconnexion ne coûte que lui.
+""")
+
+code(r"""
+run_batch(HEAVY, "lot 4, FT-Transformer")
+""")
+
 md("## 8. Tableau de synthèse")
 
 code(r"""
@@ -531,11 +637,14 @@ def agg(model, cond, label):
          if k.startswith(f"{model}|{cond}|{label}|")]
     return (st.mean(v), st.pstdev(v)) if v else (float("nan"), float("nan"))
 
+MODELS_DONE = [m for m in MODELS
+               if any(k.startswith(f"{m}|") for k in STATE["runs"])]
+
 for label in TASKS:
     n_cls = STATE["single_feature"].get(label, {}).get("n_classes", "?")
     print(f"\n{'='*74}\n{label} ({n_cls} classes) : macro-F1 moyen sur {len(SEEDS)} graines\n{'='*74}")
     print(f"{'modele':<12}{'as-distributed':>16}{'no-topology':>14}{'audited':>11}{'delta':>10}")
-    for m in MODELS:
+    for m in MODELS_DONE:
         a = agg(m, "as-distributed", label)[0]
         b = agg(m, "no-topology", label)[0]
         c = agg(m, "audited", label)[0]
@@ -613,7 +722,7 @@ code(r"""
 # --- Figure E1.2 : ce que chaque condition retire, par modele ---------------
 fig, axes = plt.subplots(1, len(TASKS), figsize=(W_IN, 3.1), dpi=DPI, sharey=False)
 axes = np.atleast_1d(axes)
-order = [m for m in MODELS if m != "majority"]
+order = [m for m in MODELS_DONE if m != "majority"]
 x = np.arange(len(order)); w = .27
 for ax, label in zip(axes, TASKS):
     for k, (cond, colr) in enumerate([("as-distributed", RED), ("no-topology", ORANGE), ("audited", BLUE)]):
@@ -639,7 +748,7 @@ plt.close(fig)
 code(r"""
 # --- Figure E1.3 : F1 par classe, condition auditee ------------------------
 label = TASKS[-1]
-rows = [m for m in MODELS if m not in ("majority", "nb")]
+rows = [m for m in MODELS_DONE if m not in ("majority", "nb")]
 per = {}
 for m in rows:
     ks = [k for k in STATE["runs"] if k.startswith(f"{m}|audited|{label}|")]
