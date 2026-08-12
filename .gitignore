@@ -13,3 +13,9 @@ experiments/inspection_4preprocessed.json
 
 # sorties locales de E1
 experiments/probe_4preprocessed.json
+
+# artefacts LaTeX égarés à la racine
+texput.log
+
+# caches Python
+__pycache__/
