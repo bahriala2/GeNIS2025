@@ -8,7 +8,7 @@ le valide. Relancer ce script apres toute modification.
 import json
 from pathlib import Path
 
-VERSION = "v4"
+VERSION = "v5"
 BUILD = "2026-08-11"
 
 CELLS = []
@@ -188,7 +188,7 @@ def inventory():
     conds = ["as-distributed", "no-topology", "audited"]
     models = ["xgboost", "lightgbm", "rf", "ftt", "logreg", "rnn", "cnn", "dnn", "knn", "nb", "majority"]
     deep = {"ftt", "rnn", "cnn", "dnn"}
-    det = {"majority", "nb", "logreg", "knn"}
+    det = {"majority", "nb", "logreg", "knn", "xgboost"}
     plan = [(m, c, t, s) for t in tasks for c in conds for m in models
             for s in ([SEEDS[0]] if (m in det or c != "audited") else SEEDS)]
     done = [p for p in plan if f"{p[0]}|{p[1]}|{p[2]}|seed{p[3]}" in STATE["runs"]]
@@ -428,11 +428,15 @@ NEURAL = {"rnn": build_rnn, "cnn": build_cnn, "dnn": build_dnn, "ftt": build_ftt
 
 def make_sk(name, n_classes, seed):
     if name == "xgboost":
-        return xgb.XGBClassifier(n_estimators=300, max_depth=8, tree_method="hist",
-                                 random_state=seed, n_jobs=2, verbosity=0)
+        # taux 0.1 et non le defaut 0.3 : a 0.3 le modele s'effondre sur la tache a
+        # treize classes, macro-F1 0.3982 contre 0.9748, avec cinq classes a zero
+        # dont recon-nmap, que tous les autres detecteurs trouvent au-dessus de 0.99
+        return xgb.XGBClassifier(n_estimators=300, max_depth=8, learning_rate=0.1,
+                                 tree_method="hist", random_state=seed, n_jobs=2,
+                                 verbosity=0)
     if name == "lightgbm":
-        return lgb.LGBMClassifier(n_estimators=300, num_leaves=63, random_state=seed,
-                                  n_jobs=2, verbose=-1)
+        return lgb.LGBMClassifier(n_estimators=300, num_leaves=63, learning_rate=0.1,
+                                  random_state=seed, n_jobs=2, verbose=-1)
     if name == "rf":       return RandomForestClassifier(n_estimators=200, random_state=seed, n_jobs=2)
     if name == "logreg":   return LogisticRegression(max_iter=1000, n_jobs=2, random_state=seed)
     if name == "knn":      return KNeighborsClassifier(n_neighbors=5, n_jobs=2)
@@ -478,7 +482,9 @@ FAST  = ["majority", "logreg", "nb", "xgboost", "lightgbm"]
 SLOW  = ["rf", "knn"]
 DEEP  = ["rnn", "cnn", "dnn"]
 HEAVY = ["ftt"]
-DETERMINISTIC = {"majority", "nb", "logreg", "knn"}   # resultat identique a chaque graine
+DETERMINISTIC = {"majority", "nb", "logreg", "knn", "xgboost"}  # meme resultat a chaque graine
+# xgboost sans sous-echantillonnage est deterministe : trois graines donnaient
+# 0.3982 a la quatrieme decimale, soit deux tiers du calcul perdus
 SEEDS_MAIN, SEEDS_OTHER = SEEDS, [SEEDS[0]]
 
 def seeds_for(model, cond):
@@ -488,10 +494,15 @@ def seeds_for(model, cond):
 
 _XY = {}                                              # cache memoire
 
-def get_xy(cond, label):
+# Les arbres sont invariants par transformation monotone : les mettre a l'echelle
+# n'apporte rien et, sur cette tache, y ajoute une source d'instabilite. Seuls les
+# modeles a distance ou a gradient en ont besoin.
+TREES = {"xgboost", "lightgbm", "rf", "majority"}
+
+def get_xy(cond, label, scaled=True):
     # Une seule mise a l'echelle par (condition, tache). Le scaler est ajuste sur
     # LEUR partition d'entrainement uniquement.
-    key = f"{cond}|{label}"
+    key = f"{cond}|{label}" + ("" if scaled else "|raw")
     if key in _XY:
         return _XY[key]
     cache = SAVE / "cache" / f"{key.replace('|', '_')}.npz"
@@ -508,9 +519,10 @@ def get_xy(cond, label):
         cc = CONDITIONS[cond]
         Xtr = TRAIN[cc].apply(pd.to_numeric, errors="coerce").fillna(0).to_numpy("float32")
         Xte = TEST[cc].apply(pd.to_numeric, errors="coerce").fillna(0).to_numpy("float32")
-        sc = RobustScaler().fit(Xtr)
-        Xtr = np.nan_to_num(sc.transform(Xtr), nan=0., posinf=0., neginf=0.).astype("float32")
-        Xte = np.nan_to_num(sc.transform(Xte), nan=0., posinf=0., neginf=0.).astype("float32")
+        if scaled:
+            sc = RobustScaler().fit(Xtr)
+            Xtr = np.nan_to_num(sc.transform(Xtr), nan=0., posinf=0., neginf=0.).astype("float32")
+            Xte = np.nan_to_num(sc.transform(Xte), nan=0., posinf=0., neginf=0.).astype("float32")
         np.savez_compressed(cache, Xtr=Xtr, Xte=Xte)
         print(f"   matrices calculees et mises en cache : {key} "
               f"({Xtr.shape[1]} features, {time.time()-t0:.0f} s)", flush=True)
@@ -532,7 +544,7 @@ def run_one(model, cond, label, seed, tag=""):
     key = f"{model}|{cond}|{label}|seed{seed}"
     if key in STATE["runs"]:
         return False
-    Xtr, Xte, ytr, yte, le = get_xy(cond, label)
+    Xtr, Xte, ytr, yte, le = get_xy(cond, label, scaled=model not in TREES)
     n_out = len(le.classes_)
     t0 = time.time()
     print(f"{tag} {key}  ({Xtr.shape[1]} features)", flush=True)
@@ -582,6 +594,30 @@ EPOCHS = 30
 print("taches :", TASKS)
 print("total prevu :", sum(len(seeds_for(m, c)) for t in TASKS for c in CONDITIONS
                            for m in FAST + SLOW + DEEP + HEAVY), "runs")
+""")
+
+md("""
+### 7.1 bis Purge des runs d'arbres calculés sous l'ancienne configuration
+
+À n'exécuter **qu'une fois**, si le fichier de résultats contient des runs produits avant
+la v5. Les modèles à distance et à gradient ne sont pas touchés : leur prétraitement n'a pas
+changé, leurs runs restent valides et ne seront pas recalculés.
+""")
+
+code(r"""
+PURGE = False        # passer a True une seule fois, puis remettre a False
+
+if PURGE:
+    doomed = [k for k in STATE["runs"] if k.split("|")[0] in TREES]
+    for k in doomed:
+        del STATE["runs"][k]
+    for f in (SAVE / "cache").glob("*.npz"):      # les matrices changent aussi
+        f.unlink()
+    save_state(STATE)
+    print(f"{len(doomed)} run(s) d'arbres supprime(s), cache vide.")
+    print(f"runs conserves : {len(STATE['runs'])} (modeles a distance et a gradient)")
+else:
+    print("PURGE est a False : rien n'est supprime.")
 """)
 
 md("""
