@@ -8,8 +8,8 @@ le valide. Relancer ce script apres toute modification.
 import json
 from pathlib import Path
 
-VERSION = "v5"
-BUILD = "2026-08-11"
+VERSION = "v6"
+BUILD = "2026-08-12"
 
 CELLS = []
 
@@ -41,7 +41,8 @@ données, leur découpage et leur taxonomie**, puis mesure ce que l'audit y chan
 
 1. Un audit du module tel qu'il est distribué : colonnes dupliquées, pouvoir prédictif de
    chaque colonne prise seule sur leur holdout.
-2. Onze détecteurs sous **trois conditions de features** :
+2. Les onze détecteurs de l'article, **définitions reprises sans modification** du pipeline
+   `2-flows`, sous **trois conditions de features** :
    `as-distributed` (les 87 colonnes), `no-topology` (sans les identifiants),
    `audited` (sans les identifiants ni les doublons de durée).
 3. Deux granularités : leur tâche à 4 classes `CategoryLabel`, qui est l'ancrage, et la tâche
@@ -148,6 +149,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import RobustScaler, LabelEncoder
 from sklearn.metrics import f1_score, accuracy_score, matthews_corrcoef, confusion_matrix
 from sklearn.dummy import DummyClassifier
+from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
 
 import xgboost as xgb, lightgbm as lgb
 import tensorflow as tf
@@ -375,77 +377,121 @@ for lab, r in STATE["single_feature"].items():
 
 # ---------------------------------------------------------------- 6. modeles
 md("""
-## 6. Les onze détecteurs
+## 6. Les détecteurs, repris tels quels de l'article
 
-Mêmes architectures que dans l'article, pour que la comparaison soit lisible : trio RNN, CNN,
-DNN de l'étude comparative antérieure, FT-Transformer, trois ensembles d'arbres, régression
-logistique, k-NN, bayésien naïf, et une baseline de classe majoritaire.
+Ces définitions sont **copiées du pipeline `2-flows`**, sans modification, pour que les
+chiffres de E1 puissent être posés à côté de ceux du Tableau 2. Une version antérieure de ce
+notebook avait ses propres architectures, plus simples : elle mesurait autre chose.
+
+Repris à l'identique : les hyperparamètres des sept modèles classiques, dont le taux
+d'apprentissage 0.1 des deux arbres boostés ; les quatre architectures profondes avec leurs
+couches de rejet et leurs taux d'apprentissage propres ; le tokeniseur par feature et le jeton
+CLS du FT-Transformer ; l'entraînement à 30 époques avec pondération des classes et arrêt
+anticipé sur la perte de validation.
+
+Une seule adaptation, imposée par les données : le module ne fournit qu'un train et un
+holdout, alors que l'article dispose d'un train, d'une validation et d'un test. La validation
+est donc découpée dans leur partition d'entraînement, à 15 %, stratifiée. Leur holdout reste
+intact et ne sert qu'à l'évaluation finale.
 """)
 
 code(r"""
-def build_rnn(n_in, n_out):
-    m = keras.Sequential([layers.Input((n_in, 1)), layers.SimpleRNN(64), layers.Dense(n_out, activation="softmax")])
-    return m
+# --- 6.1 Modeles classiques, identiques a l'article ------------------------
+from sklearn.dummy import DummyClassifier
 
-def build_cnn(n_in, n_out):
-    return keras.Sequential([layers.Input((n_in, 1)),
-                             layers.Conv1D(64, 3, activation="relu"), layers.Conv1D(32, 3, activation="relu"),
-                             layers.GlobalMaxPooling1D(), layers.Dense(64, activation="relu"),
-                             layers.Dense(n_out, activation="softmax")])
+DEFAULTS_SK = {"majority": {}, "logreg": {"max_iter": 1000}, "nb": {},
+               "knn": {"n_neighbors": 5},
+               "rf": {"n_estimators": 200},
+               "xgboost": {"n_estimators": 300, "max_depth": 8, "learning_rate": .1},
+               "lightgbm": {"n_estimators": 300, "num_leaves": 63, "learning_rate": .1}}
 
-def build_dnn(n_in, n_out):
-    return keras.Sequential([layers.Input((n_in,)), layers.Dense(128, activation="relu"),
-                             layers.Dense(64, activation="relu"), layers.Dense(n_out, activation="softmax")])
+def make_sk(name, seed=0):
+    p = DEFAULTS_SK[name]
+    if name == "majority": return DummyClassifier(strategy="most_frequent")
+    if name == "logreg":   return LogisticRegression(n_jobs=-1, **p)
+    if name == "nb":       return GaussianNB(**p)
+    if name == "knn":      return KNeighborsClassifier(n_jobs=2, **p)
+    if name == "rf":       return RandomForestClassifier(n_jobs=2, random_state=seed, **p)
+    if name == "xgboost":  return xgb.XGBClassifier(tree_method="hist", n_jobs=2,
+                                                    random_state=seed, eval_metric="mlogloss",
+                                                    verbosity=0, **p)
+    if name == "lightgbm": return lgb.LGBMClassifier(n_jobs=2, random_state=seed,
+                                                     verbose=-1, **p)
+    raise ValueError(name)
+""")
 
-class FTTBlock(layers.Layer):
-    def __init__(self, d, h, **kw):
-        super().__init__(**kw)
-        self.att = layers.MultiHeadAttention(h, d // h)
-        self.n1, self.n2 = layers.LayerNormalization(), layers.LayerNormalization()
-        self.ff = keras.Sequential([layers.Dense(2 * d, activation="gelu"), layers.Dense(d)])
-    def call(self, x):
-        x = self.n1(x + self.att(x, x))
-        return self.n2(x + self.ff(x))
+code(r"""
+# --- 6.2 Architectures profondes, identiques a l'article -------------------
+DEFAULTS_DEEP = {
+    "dnn": {"h1": 128, "h2": 64, "d1": .3, "d2": .2, "lr": 1e-3, "bs": 256},
+    "cnn": {"f1": 64, "f2": 32, "dense": 64, "drop": .3, "lr": 1e-3, "bs": 256},
+    "rnn": {"units": 64, "dense": 64, "drop": .3, "lr": 1e-3, "bs": 256},
+    "ftt": {"d": 64, "heads": 8, "blocks": 3, "ff": 128, "drop": .1, "lr": 5e-4, "bs": 256}}
 
-class CLSToken(layers.Layer):
-    # jeton CLS appris ; une tf.Variable creee dans un modele fonctionnel ne se
-    # serialise pas et casse au build, il faut donc passer par une couche
+def build_dnn(F, C):
+    q = DEFAULTS_DEEP["dnn"]
+    return keras.Sequential([layers.Input((F,)),
+        layers.Dense(q["h1"], activation="relu"), layers.Dropout(q["d1"]),
+        layers.Dense(q["h2"], activation="relu"), layers.Dropout(q["d2"]),
+        layers.Dense(C, activation="softmax")], name="dnn")
+
+def build_cnn(F, C):
+    q = DEFAULTS_DEEP["cnn"]
+    return keras.Sequential([layers.Input((F, 1)),
+        layers.Conv1D(q["f1"], 3, activation="relu", padding="same"), layers.MaxPooling1D(2),
+        layers.Conv1D(q["f2"], 3, activation="relu", padding="same"), layers.Flatten(),
+        layers.Dense(q["dense"], activation="relu"), layers.Dropout(q["drop"]),
+        layers.Dense(C, activation="softmax")], name="cnn")
+
+def build_rnn(F, C):
+    q = DEFAULTS_DEEP["rnn"]
+    return keras.Sequential([layers.Input((F, 1)),
+        layers.SimpleRNN(q["units"], activation="relu"), layers.Dropout(q["drop"]),
+        layers.Dense(q["dense"], activation="relu"),
+        layers.Dense(C, activation="softmax")], name="rnn")
+
+class FeatureTokenizer(layers.Layer):
+    def __init__(self, d, **kw): super().__init__(**kw); self.d = d
     def build(self, shape):
-        self.tok = self.add_weight(shape=(1, 1, shape[-1]), name="cls",
-                                   initializer="random_normal", trainable=True)
-    def call(self, x):
-        return tf.concat([tf.tile(self.tok, [tf.shape(x)[0], 1, 1]), x], axis=1)
+        F = int(shape[-1])
+        self.w = self.add_weight(shape=(F, self.d), initializer="glorot_uniform", name="w")
+        self.b = self.add_weight(shape=(F, self.d), initializer="zeros", name="b")
+    def call(self, x): return x[:, :, None] * self.w + self.b
+    def get_config(self): return {**super().get_config(), "d": self.d}
 
-def build_ftt(n_in, n_out, d=64, heads=8, blocks=3):
-    inp = layers.Input((n_in,))
-    t = layers.Dense(d)(layers.Reshape((n_in, 1))(inp))
-    t = CLSToken()(t)
+class ClsToken(layers.Layer):
+    def __init__(self, d, **kw): super().__init__(**kw); self.d = d
+    def build(self, shape):
+        self.cls = self.add_weight(shape=(1, 1, self.d), initializer="glorot_uniform", name="cls")
+    def call(self, x): return tf.concat([tf.tile(self.cls, [tf.shape(x)[0], 1, 1]), x], axis=1)
+    def get_config(self): return {**super().get_config(), "d": self.d}
+
+def build_ftt(F, C):
+    q = DEFAULTS_DEEP["ftt"]
+    d, heads, blocks, ff, drop = q["d"], q["heads"], q["blocks"], q["ff"], q["drop"]
+    inp = layers.Input((F,)); x = ClsToken(d)(FeatureTokenizer(d)(inp))
     for _ in range(blocks):
-        t = FTTBlock(d, heads)(t)
-    return keras.Model(inp, layers.Dense(n_out, activation="softmax")(t[:, 0]))
+        h = layers.LayerNormalization()(x)
+        h = layers.MultiHeadAttention(num_heads=heads, key_dim=max(1, d // heads),
+                                      dropout=drop)(h, h)
+        x = layers.Add()([x, h])
+        h = layers.LayerNormalization()(x)
+        h = layers.Dense(ff, activation="gelu")(h); h = layers.Dropout(drop)(h)
+        x = layers.Add()([x, layers.Dense(d)(h)])
+    return keras.Model(inp, layers.Dense(C, activation="softmax")(
+        layers.LayerNormalization()(x[:, 0])), name="ftt")
 
 NEURAL = {"rnn": build_rnn, "cnn": build_cnn, "dnn": build_dnn, "ftt": build_ftt}
+def shape_for(name, A): return A if name in ("dnn", "ftt") else A.reshape(-1, A.shape[1], 1)
 
-def make_sk(name, n_classes, seed):
-    if name == "xgboost":
-        # taux 0.1 et non le defaut 0.3 : a 0.3 le modele s'effondre sur la tache a
-        # treize classes, macro-F1 0.3982 contre 0.9748, avec cinq classes a zero
-        # dont recon-nmap, que tous les autres detecteurs trouvent au-dessus de 0.99
-        return xgb.XGBClassifier(n_estimators=300, max_depth=8, learning_rate=0.1,
-                                 tree_method="hist", random_state=seed, n_jobs=2,
-                                 verbosity=0)
-    if name == "lightgbm":
-        return lgb.LGBMClassifier(n_estimators=300, num_leaves=63, learning_rate=0.1,
-                                  random_state=seed, n_jobs=2, verbose=-1)
-    if name == "rf":       return RandomForestClassifier(n_estimators=200, random_state=seed, n_jobs=2)
-    if name == "logreg":   return LogisticRegression(max_iter=1000, n_jobs=2, random_state=seed)
-    if name == "knn":      return KNeighborsClassifier(n_neighbors=5, n_jobs=2)
-    if name == "nb":       return GaussianNB()
-    if name == "majority": return DummyClassifier(strategy="most_frequent")
-    raise ValueError(name)
+def class_weights_safe(yy):
+    from sklearn.utils.class_weight import compute_class_weight
+    present = np.unique(yy)
+    w = compute_class_weight("balanced", classes=present, y=yy)
+    return {int(c): float(v) for c, v in zip(present, w)}
 
 MODELS = ["xgboost", "lightgbm", "rf", "ftt", "logreg", "rnn", "cnn", "dnn", "knn", "nb", "majority"]
-print(len(MODELS), "detecteurs :", ", ".join(MODELS))
+print(len(MODELS), "detecteurs, definitions reprises de l'article :", ", ".join(MODELS))
 """)
 
 # ---------------------------------------------------------------- 7. boucle
@@ -551,20 +597,34 @@ def run_one(model, cond, label, seed, tag=""):
 
     if model in NEURAL:
         tf.keras.utils.set_random_seed(seed)
-        xtr, xte = (Xtr[..., None], Xte[..., None]) if model in ("rnn", "cnn") else (Xtr, Xte)
+        q = DEFAULTS_DEEP[model]
+        # l'article dispose d'un train, d'une validation et d'un test ; ce module ne
+        # fournit qu'un train et un holdout, la validation est donc decoupee dans leur
+        # partition d'entrainement, a 15 %, stratifiee. Leur holdout reste intact.
+        itr, iva = next(StratifiedShuffleSplit(n_splits=1, test_size=0.15,
+                                               random_state=seed).split(Xtr, ytr))
+        xtr, xva = shape_for(model, Xtr[itr]), shape_for(model, Xtr[iva])
+        xte = shape_for(model, Xte)
         net = NEURAL[model](Xtr.shape[1], n_out)
-        net.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
-        net.fit(xtr, ytr, epochs=EPOCHS, batch_size=512, verbose=0, validation_split=0.15,
-                callbacks=[keras.callbacks.EarlyStopping(patience=4, restore_best_weights=True)])
+        net.compile(optimizer=keras.optimizers.Adam(q["lr"]),
+                    loss="sparse_categorical_crossentropy", metrics=["accuracy"])
+        net.fit(xtr, ytr[itr], epochs=EPOCHS, batch_size=q["bs"], verbose=0,
+                validation_data=(xva, ytr[iva]),
+                class_weight=class_weights_safe(ytr[itr]),
+                callbacks=[keras.callbacks.EarlyStopping(monitor="val_loss", patience=5,
+                                                         restore_best_weights=True)])
         pred = net.predict(xte, batch_size=2048, verbose=0).argmax(1)
         del net; keras.backend.clear_session()
     else:
         if model == "knn" and len(Xtr) > KNN_MAX_TRAIN:
-            idx = np.random.RandomState(seed).choice(len(Xtr), KNN_MAX_TRAIN, replace=False)
+            # sous-echantillon stratifie, comme fit_sk dans l'article, et non un
+            # tirage uniforme : les classes rares survivent a la reduction
+            idx, _ = train_test_split(np.arange(len(ytr)), train_size=KNN_MAX_TRAIN,
+                                      random_state=seed, stratify=ytr)
             fit_X, fit_y = Xtr[idx], ytr[idx]
         else:
             fit_X, fit_y = Xtr, ytr
-        clf = make_sk(model, n_out, seed).fit(fit_X, fit_y)
+        clf = make_sk(model, seed).fit(fit_X, fit_y)
         pred = clf.predict(Xte)
         del clf
 
@@ -597,25 +657,24 @@ print("total prevu :", sum(len(seeds_for(m, c)) for t in TASKS for c in CONDITIO
 """)
 
 md("""
-### 7.1 bis Purge des runs d'arbres calculés sous l'ancienne configuration
+### 7.1 bis Purge des runs calculés sous les anciennes définitions
 
 À n'exécuter **qu'une fois**, si le fichier de résultats contient des runs produits avant
-la v5. Les modèles à distance et à gradient ne sont pas touchés : leur prétraitement n'a pas
-changé, leurs runs restent valides et ne seront pas recalculés.
+la v6. Les onze détecteurs ont changé en v6, tous les runs antérieurs sont donc à refaire :
+ils ne mesuraient pas les mêmes modèles que l'article. Le cache des matrices, lui, n'est pas
+touché : le prétraitement est inchangé, et le recharger épargne une bonne demi-heure.
 """)
 
 code(r"""
 PURGE = False        # passer a True une seule fois, puis remettre a False
 
 if PURGE:
-    doomed = [k for k in STATE["runs"] if k.split("|")[0] in TREES]
+    doomed = list(STATE["runs"])
     for k in doomed:
         del STATE["runs"][k]
-    for f in (SAVE / "cache").glob("*.npz"):      # les matrices changent aussi
-        f.unlink()
     save_state(STATE)
-    print(f"{len(doomed)} run(s) d'arbres supprime(s), cache vide.")
-    print(f"runs conserves : {len(STATE['runs'])} (modeles a distance et a gradient)")
+    print(f"{len(doomed)} run(s) supprime(s) : definitions de modeles obsoletes.")
+    print("cache des matrices conserve : le pretraitement n'a pas change.")
 else:
     print("PURGE est a False : rien n'est supprime.")
 """)
