@@ -12,7 +12,7 @@ La chaîne LaTeX a été abandonnée en août 2026 ; elle est archivée dans
 
 | Chemin | Rôle |
 |---|---|
-| `paper/GeNIS_benchmark_article.docx` | **L'article** (27 pages, 13 figures, 11 tables, 27 références) : source unique, à éditer directement dans Word |
+| `paper/GeNIS_benchmark_article.docx` | **L'article** (28 pages, 13 figures, 12 tables, 27 références) : source unique, à éditer directement dans Word |
 | `paper/article1_results.json` | Résultats de la campagne (154 runs), source de tous les chiffres |
 | `paper/ARCHIVE_README.md` | Ce que contient réellement l'archive Zenodo publiée |
 | `colab/zenodo_export_cell.py` | Construit l'archive canonique ; dernière cellule du pipeline |
