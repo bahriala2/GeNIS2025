@@ -10,7 +10,7 @@ Relancer ce script apres toute modification.
 import json
 from pathlib import Path
 
-VERSION = "v1"
+VERSION = "v2"
 BUILD = "2026-08-13"
 
 CELLS = []
@@ -177,20 +177,32 @@ print(f"runs de confirmation deja calcules : {len(STATE['runs'])}/18")
 
 # ---------------------------------------------------------------- 3. charge
 md("""
-## 3. Chargement, et la question des colonnes
+## 3. Chargement, en trois temps
 
-CICIDS2017 est connu pour trois pièges que la cellule suivante traite explicitement : des noms
-de colonnes avec des espaces en tête, un fichier en `latin-1` à cause du tiret dans
-« Web Attack – Brute Force », et des valeurs infinies dans `Flow Bytes/s`.
+CICIDS2017 fait environ 2,8 millions de lignes sur 85 colonnes. Charger les huit fichiers puis
+les concaténer d'un coup tient **deux copies** en mémoire au moment du `concat`, ce qui dépasse
+la RAM de Colab. Le chargement est donc découpé :
 
-L'ordre chronologique ne vient **pas** du parsing de l'horodatage, qui est ambigu dans ce
-corpus (format 12 heures sans AM/PM dans certains fichiers). Il vient du jour porté par le nom
-de fichier, ordre connu et fiable, et l'horodatage ne sert qu'à départager à l'intérieur d'un
-même fichier.
+| Cellule | Ce qu'elle fait | Coût |
+|---|---|---|
+| 3.1 | lit les **en-têtes seuls** et répond à la question des colonnes | instantané |
+| 3.2 | convertit **un fichier à la fois** en `.npz` sur Drive, et libère la mémoire | le plus long, **reprenable** |
+| 3.3 | assemble les parts dans un tableau prélloué | quelques secondes |
+
+La 3.2 saute ce qui est déjà converti : si la session tombe, relancez-la, elle reprend au
+fichier suivant. Rien n'est jamais tenu deux fois en mémoire.
+
+Trois pièges connus du corpus sont traités : les espaces en tête des noms de colonnes, un
+fichier en `cp1252` à cause du tiret de « Web Attack – Brute Force », et les valeurs infinies
+de `Flow Bytes/s`.
+
+L'ordre chronologique ne vient **pas** du parsing de l'horodatage, ambigu dans ce corpus
+(format 12 heures sans AM/PM selon les fichiers). Il vient du jour porté par le nom de fichier,
+ordre connu et fiable ; l'horodatage ne sert qu'à départager à l'intérieur d'un même fichier.
 """)
 
 code(r"""
-# --- 3.1 Lecture et normalisation ------------------------------------------
+# --- 3.1 Inventaire des colonnes, sans charger les donnees -----------------
 JOURS = [("monday", 1), ("tuesday", 2), ("wednesday", 3), ("thursday", 4), ("friday", 5)]
 ORDRE_FICHIER = ["monday", "tuesday", "wednesday",
                  "thursday-workinghours-morning-webattacks",
@@ -204,7 +216,7 @@ def rang_fichier(nom):
     for i, motif in enumerate(ORDRE_FICHIER):
         if n.startswith(motif):
             return i
-    for i, m in enumerate(ORDRE_FICHIER):          # tolerance sur les variantes de nom
+    for i, m in enumerate(ORDRE_FICHIER):
         if m.split("-")[0] in n and all(t in n for t in m.split("-")[2:] if len(t) > 4):
             return i
     return 99
@@ -216,99 +228,164 @@ def jour_de(nom):
             return j
     return 0
 
-def lire(path):
-    for enc in ("utf-8", "latin-1"):
+def lire(path, nrows=None):
+    for enc in ("utf-8", "cp1252", "latin-1"):
         try:
-            d = pd.read_csv(path, encoding=enc, low_memory=False)
+            d = pd.read_csv(path, encoding=enc, low_memory=False, nrows=nrows)
             break
         except UnicodeDecodeError:
             continue
     d.columns = [str(c).strip() for c in d.columns]
-    d = d[d[d.columns[-1]].astype(str).str.strip().str.lower() != "label"]   # entete dupliquee
     return d
 
-fichiers = sorted(csvs, key=lambda f: (rang_fichier(pathlib.Path(f).name), pathlib.Path(f).name))
-parts = []
-for i, f in enumerate(fichiers):
-    nom = pathlib.Path(f).name
-    d = lire(f)
-    d["__file_rank"] = rang_fichier(nom)
-    d["__day"] = jour_de(nom)
-    parts.append(d)
-    print(f"   {nom:<58} {len(d):>9,} lignes  jour {jour_de(nom)}".replace(",", " "), flush=True)
+FICHIERS = sorted(csvs, key=lambda f: (rang_fichier(pathlib.Path(f).name),
+                                       pathlib.Path(f).name))
+tete = lire(FICHIERS[0], nrows=5)
+COLS = list(tete.columns)
+LABEL = [c for c in COLS if c.strip().lower() == "label"][0]
 
-DF = pd.concat(parts, ignore_index=True); del parts; gc.collect()
-LABEL = [c for c in DF.columns if c.strip().lower() == "label"][0]
-DF[LABEL] = DF[LABEL].astype(str).str.strip()
-print(f"\ntotal {len(DF):,} lignes, {DF.shape[1]-2} colonnes hors marqueurs".replace(",", " "))
-""")
-
-code(r"""
-# --- 3.2 Quelles colonnes identifiantes sont reellement presentes ? ---------
-# C'est la cellule qui tranche l'ambiguite de l'article AMCAI 2023.
 IDENT_ATTENDUS = ["Flow ID", "Source IP", "Destination IP", "Source Port",
                   "Destination Port", "Protocol"]
 POS_ATTENDUS = ["Timestamp"]
-
-cols = [c for c in DF.columns if not c.startswith("__")]
-present_id = [c for c in IDENT_ATTENDUS if c in cols]
-present_pos = [c for c in POS_ATTENDUS if c in cols]
+present_id = [c for c in IDENT_ATTENDUS if c in COLS]
+present_pos = [c for c in POS_ATTENDUS if c in COLS]
+absents = [c for c in IDENT_ATTENDUS + POS_ATTENDUS if c not in COLS]
 
 print("=" * 74)
-print("COMPOSITION DES FICHIERS CHARGES")
+print("COMPOSITION DES FICHIERS")
 print("=" * 74)
-print(f"   colonnes au total (label inclus)     : {len(cols)}")
+print(f"   colonnes au total (label inclus)     : {len(COLS)}")
 print(f"   colonnes identifiantes presentes     : {len(present_id)}  {present_id}")
 print(f"   colonnes positionnelles presentes    : {len(present_pos)}  {present_pos}")
-absents = [c for c in IDENT_ATTENDUS + POS_ATTENDUS if c not in cols]
 print(f"   attendues mais absentes              : {absents if absents else 'aucune'}")
 print()
-if len(cols) <= 80 and not present_pos:
-    print("   >>> distribution MachineLearningCVE : les identifiants et l'horodatage")
-    print("       ont deja ete retires en amont. L'audit temporel est IMPOSSIBLE ici.")
+if len(COLS) <= 80 and not present_pos:
+    print("   >>> distribution MachineLearningCVE : identifiants et horodatage deja")
+    print("       retires en amont. L'audit temporel est IMPOSSIBLE ici.")
     print("       Recharger GeneratedLabelledFlows/TrafficLabelling.")
 else:
     print("   >>> distribution TrafficLabelling : l'horodatage est present, l'audit")
-    print("       temporel est possible. Les identifiants sont dans les fichiers et")
-    print("       seront exclus par nom, comme en section 4.3 de l'article.")
+    print("       temporel est possible. Les identifiants seront exclus par nom,")
+    print("       comme en section 4.3 de l'article.")
 assert present_pos, "sans Timestamp, ce notebook n'a rien a mesurer"
 
-STATE["columns"] = {"n_total": len(cols), "identifiers_present": present_id,
-                    "positional_present": present_pos, "absent": absents,
-                    "all": cols}
-STATE["meta"] = {"n_rows": int(len(DF)), "n_files": len(fichiers),
-                 "files": [pathlib.Path(f).name for f in fichiers]}
+CAND = [c for c in COLS if c not in present_id + present_pos + [LABEL]]
+print(f"\n{len(FICHIERS)} fichiers, {len(CAND)} colonnes comportementales candidates")
+STATE["columns"] = {"n_total": len(COLS), "identifiers_present": present_id,
+                    "positional_present": present_pos, "absent": absents, "all": COLS}
 save_state(STATE)
 """)
 
+md("""
+### 3.2 Conversion, un fichier à la fois
+
+La cellule longue, et **la seule qui puisse tomber**. Elle traite les fichiers un par un :
+lecture, extraction de la matrice numérique en `float32`, écriture d'un `.npz` sur Drive, puis
+libération de la mémoire avant le fichier suivant. Jamais plus d'un fichier en RAM.
+
+Si la session tombe, relancez cette cellule seule : elle saute ce qui est déjà converti.
+""")
+
 code(r"""
-# --- 3.3 Nettoyage minimal, et matrice classe x jour -----------------------
-NUM = DF[[c for c in cols if c not in present_id + present_pos + [LABEL]]]
-NUM = NUM.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
-nu = NUM.nunique(dropna=True)
-CONST = nu[nu <= 1].index.tolist()
-NUM = NUM.drop(columns=CONST).fillna(0.0).astype(np.float32)
-FEATURES = list(NUM.columns)
-print(f"{len(FEATURES)} features comportementales, {len(CONST)} colonnes constantes retirees")
+# --- 3.2 Conversion fichier par fichier, reprenable ------------------------
+PARTS = SAVE / "parts"; PARTS.mkdir(parents=True, exist_ok=True)
+
+def part_path(nom):
+    return PARTS / (pathlib.Path(nom).stem.replace(" ", "_") + ".npz")
+
+todo = [f for f in FICHIERS if not part_path(f).exists()]
+print(f"{len(FICHIERS) - len(todo)}/{len(FICHIERS)} deja converti(s), {len(todo)} a faire\n")
+
+t0 = time.time()
+for k, f in enumerate(todo, 1):
+    nom = pathlib.Path(f).name
+    d = lire(f)
+    d = d[d[LABEL].astype(str).str.strip().str.lower() != "label"]   # entete dupliquee
+    d = d.reindex(columns=COLS)                                      # ordre fige par 3.1
+    X = (d[CAND].apply(pd.to_numeric, errors="coerce")
+         .replace([np.inf, -np.inf], np.nan).to_numpy(dtype="float32"))
+    lab = d[LABEL].astype(str).str.strip().to_numpy()
+    ts = pd.to_datetime(d[present_pos[0]], errors="coerce", dayfirst=True)
+    t = ts.astype("int64").to_numpy().astype("float64")
+    t[ts.isna().to_numpy()] = np.nan
+    np.savez_compressed(part_path(f), X=X, lab=lab.astype("U40"),
+                        t=t, day=np.full(len(d), jour_de(nom), "int8"),
+                        rank=np.full(len(d), rang_fichier(nom), "int8"))
+    el = time.time() - t0
+    print(f"   [{k}/{len(todo)}] {nom:<56} {len(d):>9,} lignes  "
+          f"({el:.0f} s)".replace(",", " "), flush=True)
+    del d, X, lab, ts, t; gc.collect()
+
+print(f"\n{len(list(PARTS.glob('*.npz')))} part(s) sur disque")
+""")
+
+md("""
+### 3.3 Assemblage
+
+Les parts sont empilées dans un tableau **préalloué**, donc sans copie intermédiaire. Les
+colonnes constantes sont détectées ici, sur l'ensemble et non fichier par fichier, puis la
+matrice classe × jour est imprimée : c'est elle qui dira si le découpage chronologique global
+est dégénéré sur ce corpus comme il l'est sur GeNIS.
+""")
+
+code(r"""
+# --- 3.3 Assemblage dans un tableau prealloue ------------------------------
+parts = [part_path(f) for f in FICHIERS]
+assert all(p.exists() for p in parts), "des parts manquent : relancer la cellule 3.2"
+
+tailles = []
+for p in parts:
+    with np.load(p, allow_pickle=False) as z:
+        tailles.append(z["day"].shape[0])
+N = sum(tailles)
+print(f"{N:,} lignes au total, {len(CAND)} colonnes candidates".replace(",", " "))
+
+BRUT = np.empty((N, len(CAND)), dtype="float32")
+y_txt = np.empty(N, dtype="U40")
+t_num = np.empty(N, dtype="float64")
+jour = np.empty(N, dtype="int8")
+rang = np.empty(N, dtype="int8")
+o = 0
+for p, n in zip(parts, tailles):
+    with np.load(p, allow_pickle=False) as z:
+        BRUT[o:o+n] = z["X"]; y_txt[o:o+n] = z["lab"]
+        t_num[o:o+n] = z["t"]; jour[o:o+n] = z["day"]; rang[o:o+n] = z["rank"]
+    o += n
+    gc.collect()
+
+# colonnes constantes, jugees sur l'ensemble
+fini = np.nan_to_num(BRUT, nan=0., posinf=0., neginf=0.)
+garde = [i for i in range(len(CAND))
+         if np.unique(fini[::17, i]).size > 1]        # 1 ligne sur 17 suffit a trancher
+CONST = [CAND[i] for i in range(len(CAND)) if i not in garde]
+NUM = np.ascontiguousarray(fini[:, garde])
+FEATURES = [CAND[i] for i in garde]
+del BRUT, fini; gc.collect()
+print(f"{len(FEATURES)} features comportementales, {len(CONST)} constantes retirees")
 if CONST:
     print("   constantes :", ", ".join(CONST[:8]), "..." if len(CONST) > 8 else "")
 
-y_txt = DF[LABEL].to_numpy()
 le = LabelEncoder().fit(y_txt)
 y = le.transform(y_txt)
 CLASSES = list(le.classes_)
-jour = DF["__day"].to_numpy()
-rang = DF["__file_rank"].to_numpy()
+
+# l'horodatage illisible est remplace par le rang de fichier, qui est fiable
+n_bad = int(np.isnan(t_num).sum())
+t_num = np.where(np.isnan(t_num), rang.astype("float64") * 1e18, t_num)
+print(f"horodatages illisibles remplaces par le rang de fichier : {n_bad:,}".replace(",", " "))
 
 mat = pd.crosstab(pd.Series(y_txt, name="classe"), pd.Series(jour, name="jour"))
 print(f"\n{len(CLASSES)} classes x 5 jours :")
 print(mat.to_string())
-STATE["day_matrix"] = {"classes": CLASSES, "matrix": mat.to_dict()}
-save_state(STATE)
-
 seul_un_jour = [c for c in mat.index if (mat.loc[c] > 0).sum() == 1]
 print(f"\nclasses presentes un seul jour : {len(seul_un_jour)}/{len(CLASSES)}")
 print("   ", ", ".join(seul_un_jour))
+
+STATE["meta"] = {"n_rows": int(N), "n_files": len(FICHIERS),
+                 "files": [pathlib.Path(f).name for f in FICHIERS],
+                 "n_features": len(FEATURES), "constants_dropped": CONST}
+STATE["day_matrix"] = {"classes": CLASSES, "matrix": mat.to_dict()}
+save_state(STATE)
 """)
 
 # ---------------------------------------------------------------- 4. proto
@@ -395,14 +472,7 @@ le reçoit peut s'en servir au lieu du comportement réseau.
 code(r"""
 # --- 5.1 Sonde sur l'horodatage seul ---------------------------------------
 if not STATE["timestamp_probe"]:
-    ts = pd.to_datetime(DF[present_pos[0]], errors="coerce", dayfirst=True)
-    n_bad = int(ts.isna().sum())
-    # secours : le rang de fichier, qui est fiable, complete les horodatages illisibles
-    t_num = ts.astype("int64").to_numpy().astype("float64")
-    t_num[np.isnan(ts.astype("int64").to_numpy().astype("float64"))] = np.nan
-    t_num = np.where(np.isnan(t_num), rang.astype("float64") * 1e18, t_num)
-    print(f"horodatages illisibles remplaces par le rang de fichier : {n_bad:,}".replace(",", " "))
-
+    # t_num a ete construit en 3.3, horodatage parse et rang de fichier en secours
     res = {}
     for nom, (a, b) in (("stratifie", (TR1, TE1)), ("temporel_par_classe", (TR3, TE3))):
         clf = DecisionTreeClassifier(random_state=1).fit(t_num[a].reshape(-1, 1), y[a])
@@ -422,7 +492,7 @@ else:
 code(r"""
 # --- 5.2 Colonnes numeriquement identiques ---------------------------------
 if not STATE["duplicates"]:
-    M = NUM.to_numpy()
+    M = NUM
     n = M.shape[1]
     sig = {}
     for j in range(n):                      # signature bon marche avant np.allclose
@@ -473,7 +543,7 @@ t0 = time.time()
 for k, f in enumerate(FEATURES, 1):
     if f in SF:
         continue
-    x = NUM[f].to_numpy(dtype="float64").reshape(-1, 1)
+    x = NUM[:, FEATURES.index(f)].astype("float64").reshape(-1, 1)
     r = {}
     for nom, (a, b) in (("strat", (S_TR1, S_TE1)), ("temp", (S_TR3, S_TE3))):
         clf = DecisionTreeClassifier(random_state=1).fit(x[a], y[a])
@@ -495,9 +565,9 @@ print(f"\nbalayage termine, {len(SF)} features en {time.time()-t0:.0f} s")
 code(r"""
 # --- 6.2 Importance par permutation, pour montrer la meme cecite -----------
 if not STATE["perm_importance"]:
-    sc = RobustScaler().fit(NUM.to_numpy()[S_TR1])
-    Xtr = np.nan_to_num(sc.transform(NUM.to_numpy()[S_TR1]), nan=0., posinf=0., neginf=0.)
-    Xte = np.nan_to_num(sc.transform(NUM.to_numpy()[S_TE1]), nan=0., posinf=0., neginf=0.)
+    sc = RobustScaler().fit(NUM[S_TR1])
+    Xtr = np.nan_to_num(sc.transform(NUM[S_TR1]), nan=0., posinf=0., neginf=0.)
+    Xte = np.nan_to_num(sc.transform(NUM[S_TE1]), nan=0., posinf=0., neginf=0.)
     ref = lgb.LGBMClassifier(n_estimators=300, num_leaves=63, learning_rate=.1,
                              n_jobs=2, random_state=0, verbose=-1).fit(Xtr, y[S_TR1])
     six = np.random.RandomState(0).choice(len(Xte), min(15000, len(Xte)), replace=False)
@@ -598,7 +668,7 @@ print({k: len(v) for k, v in CONDITIONS.items()})
 def matrices(cond, split):
     ci = [FEATURES.index(c) for c in CONDITIONS[cond]]
     a, b = split
-    M = NUM.to_numpy()[:, ci]
+    M = NUM[:, ci]
     sc = RobustScaler().fit(M[a])
     f = lambda ix: np.nan_to_num(sc.transform(M[ix]), nan=0., posinf=0., neginf=0.).astype("float32")
     return f(a), f(b), y[a], y[b]
