@@ -11,9 +11,11 @@ Ce fichier a deux usages :
 
   * dans Colab, son contenu est la derniere cellule du pipeline (elle y est
     inseree par append_export_cell.py) ;
-  * en local, `python zenodo_export_cell.py --render-readme paper/` ecrit le
-    README de l'archive a partir de paper/article1_results.json, pour qu'il
-    soit relu et versionne comme le reste.
+  * en local, `python zenodo_export_cell.py --render-readme paper/` ecrit
+    paper/ARCHIVE_README_next_version.md a partir de article1_results.json.
+    Il n'ecrase pas paper/ARCHIVE_README.md, qui decrit la v1.0.0 reellement
+    publiee sur Zenodo, deux zips montes a la main, et qui est tenu a jour a
+    la main.
 
 Ce qui est volontairement exclu de l'archive :
 
@@ -43,8 +45,15 @@ paper reports, and the trained detectors.
 - **Paper**: A Leakage-Audited Benchmark of Deep and Ensemble Detectors on the GeNIS 2025 Corpus
 - **Corpus**: GeNIS 2025, `2-flows` module, 60-second flows, doi:10.5281/zenodo.14919237
 - **Code repository**: https://github.com/bahriala2/GeNIS2025
-- **This archive**: {archive_doi}
+- **This artefact, all versions**: {archive_doi}
+- **This version**: {version_doi}
 - **Built**: {built}
+
+> Version 1.0.0 of this record, doi:10.5281/zenodo.21910663, was assembled by hand
+> and published as two zip files, `article1_final.zip` and `models.zip`, without the
+> layout described below. The paper cites the concept DOI, which resolves to the most
+> recent version. See `ARCHIVE_README.md` in the code repository for what v1.0.0
+> actually contains.
 
 ## What Section 10 promises, and where it is
 
@@ -195,6 +204,12 @@ EXCLUDED = [
 
 REPO_URL = "https://github.com/bahriala2/GeNIS2025.git"
 
+# DOI reels du depot Zenodo, publie le 13 aout 2026.
+# Le DOI de concept ne bouge jamais et est celui que cite la section 10 ;
+# le DOI de version designe un depot precis et change a chaque version.
+CONCEPT_DOI = "10.5281/zenodo.21910662"
+VERSION_DOI_V1 = "10.5281/zenodo.21910663"
+
 
 def human(n):
     for u in ("o", "ko", "Mo", "Go"):
@@ -214,7 +229,8 @@ def sha256(path, chunk=1 << 20):
     return h.hexdigest()
 
 
-def render_readme(results, archive_doi="[reserved DOI, see Zenodo record]"):
+def render_readme(results, archive_doi=CONCEPT_DOI,
+                  version_doi="[assigned when this version is published]"):
     """Remplit le README avec les chiffres reels du fichier de resultats."""
     audit = results.get("audit", {})
     env = results.get("meta", {}).get("env", {})
@@ -224,6 +240,7 @@ def render_readme(results, archive_doi="[reserved DOI, see Zenodo record]"):
         + ["    code/                      snapshot of the GitHub repository"])
     return README.format(
         archive_doi=archive_doi,
+        version_doi=version_doi,
         built=time.strftime("%Y-%m-%d", time.gmtime()),
         n_blacklist=len(audit.get("blacklist", [])),
         n_spectrum=len(audit.get("transfer_table", [])),
@@ -235,7 +252,8 @@ def render_readme(results, archive_doi="[reserved DOI, see Zenodo record]"):
         lgb=env.get("lightgbm", "?"))
 
 
-def build_archive(save_dir, out_dir, archive_doi="[reserved DOI, see Zenodo record]",
+def build_archive(save_dir, out_dir, archive_doi=CONCEPT_DOI,
+                  version_doi="[assigned when this version is published]",
                   include_code=True, include_e1=True, dry_run=False):
     """Assemble l'archive. Retourne le chemin du zip, ou du dossier si dry_run."""
     save = pathlib.Path(save_dir)
@@ -315,7 +333,8 @@ def build_archive(save_dir, out_dir, archive_doi="[reserved DOI, see Zenodo reco
             print("   clone impossible, a ajouter a la main :", r.stderr.strip()[:120])
 
     # --- README et MANIFEST -------------------------------------------------
-    (root / "README.md").write_text(render_readme(results, archive_doi), encoding="utf-8")
+    (root / "README.md").write_text(render_readme(results, archive_doi, version_doi),
+                                    encoding="utf-8")
 
     print("\nempreintes...", flush=True)
     prov_of = {name: prov for name, _, _, prov in LAYOUT}
@@ -359,9 +378,12 @@ def main():
     if a.render_readme:
         d = pathlib.Path(a.render_readme)
         results = json.loads((d / "article1_results.json").read_text(encoding="utf-8"))
-        out = d / "ARCHIVE_README.md"
+        out = d / "ARCHIVE_README_next_version.md"
         out.write_text(render_readme(results), encoding="utf-8")
         print("ecrit :", out)
+        print("note : ARCHIVE_README.md decrit la v1.0.0 reellement publiee,")
+        print("       deux zips montes a la main. Il est tenu a jour a la main")
+        print("       et n'est volontairement pas ecrase par ce script.")
     else:
         ap.error("rien a faire ; voir --render-readme, ou utiliser build_archive() dans Colab")
 

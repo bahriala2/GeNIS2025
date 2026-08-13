@@ -29,8 +29,16 @@ Deux exclusions volontaires : le cache `slice60.npz`, qui est une copie dérivé
 du corpus et que les indices de découpage régénèrent, et le corpus lui-même,
 déjà archivé sous `doi:10.5281/zenodo.14919237`.
 
-Réservez le DOI sur Zenodo avant de lancer (*New upload* puis **Reserve DOI**) et
-reportez-le dans `ARCHIVE_DOI` : il sera écrit dans le README de l'archive.
+Les DOI sont déjà renseignés. Le dépôt Zenodo est publié depuis le 13 août 2026 :
+DOI de concept `10.5281/zenodo.21910662`, cité par la section 10, et version 1.0.0
+`10.5281/zenodo.21910663`.
+
+**Attention** : la v1.0.0 en ligne ne contient pas cette arborescence. Elle a été
+montée à la main en deux zips, `article1_final.zip` et `models.zip`, sans MANIFEST
+ni README ni clone du dépôt. Zenodo interdisant de modifier des fichiers publiés,
+déposer le zip que produit cette cellule créerait une **v2** avec un nouveau DOI de
+version. Le DOI de concept, lui, suivrait automatiquement. Voir `ARCHIVE_README.md`
+dans le dépôt pour ce que contient réellement la v1.0.0.
 """
 
 
@@ -44,7 +52,13 @@ def body():
 # Source : colab/zenodo_export_cell.py dans le depot. Ne pas editer ici,
 # editer le fichier puis relancer colab/append_export_cell.py.
 
-ARCHIVE_DOI = "[A COMPLETER : DOI reserve sur Zenodo]"
+# DOI de concept : ne bouge jamais, c'est celui que cite la section 10.
+ARCHIVE_DOI = "10.5281/zenodo.21910662"
+# DOI de la version que ce zip deviendrait. La v1.0.0 publiee le 13 aout 2026
+# est 10.5281/zenodo.21910663 et ne contient PAS cette arborescence : elle a
+# ete montee a la main en deux zips. Zenodo interdit de modifier des fichiers
+# publies, donc deposer ceci ferait une v2 avec un nouveau DOI de version.
+ARCHIVE_VERSION_DOI = "[attribue a la publication de cette version]"
 INCLUDE_CODE = True     # clone le depot GitHub dans code/
 INCLUDE_E1   = True     # ajoute supplementary/ si le notebook E1 a tourne
 DRY_RUN      = False    # True : affiche le plan sans rien copier
@@ -58,6 +72,7 @@ _save = SAVE if "SAVE" in dir() else pathlib.Path(
 _out = pathlib.Path("/content/zenodo"); _out.mkdir(parents=True, exist_ok=True)
 
 _zip = build_archive(_save, _out, archive_doi=ARCHIVE_DOI,
+                     version_doi=ARCHIVE_VERSION_DOI,
                      include_code=INCLUDE_CODE, include_e1=INCLUDE_E1,
                      dry_run=DRY_RUN)
 
@@ -68,11 +83,11 @@ if _zip:
     print(f"\\ncopie sur Drive : {{_dest}}")
     print("\\nEtapes suivantes :")
     print("  1. telecharger ce zip depuis Drive")
-    print("  2. le deposer sur le brouillon Zenodo ou le DOI a ete reserve")
-    print("  3. auteurs avec ORCID, licence, type Software, related identifier")
-    print("     'is supplement to' vers l'article une fois qu'il a un DOI")
-    print("  4. publier AVANT la soumission : un DOI reserve n'est enregistre")
-    print("     qu'a la publication du depot")
+    print("  2. sur zenodo.org, ouvrir le record 10.5281/zenodo.21910663")
+    print("     puis 'New version' : les fichiers publies ne sont pas modifiables")
+    print("  3. deposer ce zip, publier ; un nouveau DOI de version est attribue")
+    print("  4. le DOI de concept 10.5281/zenodo.21910662, cite par la section 10,")
+    print("     pointera automatiquement vers cette nouvelle version")
 """
 
 
