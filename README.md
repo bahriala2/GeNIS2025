@@ -16,7 +16,8 @@ La chaîne LaTeX a été abandonnée en août 2026 ; elle est archivée dans
 | `paper/article1_results.json` | Résultats de la campagne (154 runs), source de tous les chiffres |
 | `paper/ARCHIVE_README.md` | Ce que contient réellement l'archive Zenodo publiée |
 | `colab/zenodo_export_cell.py` | Construit l'archive canonique ; dernière cellule du pipeline |
-| `paper/figures/` | Figures au format PNG, telles qu'insérées dans le Word |
+| `paper/figures_manuscrit/` | **Les 13 figures du manuscrit**, nommées par leur numéro de figure, avec `MAPPING.md` |
+| `paper/figures/` | Sorties des scripts, sous leurs noms hérités de LaTeX : la numérotation n'est **pas** celle du manuscrit |
 | `paper/figures_annexe/` | 15 figures d'annexe pour le rapport de thèse |
 | `paper/regen_en.py`, `paper/regen_fig6.py` | Régénèrent les figures depuis les résultats |
 | `paper/Makefile` | `make preview` (rendu PDF + images de pages) · `make figures` · `make clean` |
