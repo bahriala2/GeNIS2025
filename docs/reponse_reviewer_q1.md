@@ -87,6 +87,38 @@ descriptor [4] » pour éviter la collision avec le nouveau Tableau 12.
 
 ---
 
+## Deuxième passe de relecture : ce qui a bougé depuis
+
+Le relecteur situe désormais le manuscrit à 8/10 contre 7 à 7,5, et valide la taxonomie, la
+clarification statistique et l'arithmétique 12/13/17. Quatre points restaient. Deux ont été
+traités depuis dans le texte, deux ont reçu leur outil.
+
+**Formulation « attribution-based auditing failed to identify ».** Le relecteur a raison :
+l'absence d'importance par permutation ne prouve pas qu'une méthode d'attribution est fausse,
+elle mesure une autre quantité sous dépendance entre variables. Les quatre occurrences
+deviennent « assigned near-zero importance to », et §6.2 gagne la phrase qui le dit :
+
+> This is not evidence that the attribution measure is wrong: under dependence between
+> predictors it estimates a different quantity, the loss attributable to one feature when the
+> others remain available, and that quantity is genuinely near zero here.
+
+**Pourquoi publier sous τ < 0.5 plutôt que sous la séparation naturelle.** Paragraphe ajouté en
+§8. Deux raisons vérifiables : un seuil numérique unique appliqué aux deux normalisations les
+garde comparables, ce qu'une frontière choisie séparément pour chacune ne ferait pas ; et la
+liste noire produite est celle sous laquelle **tous les modèles de l'article ont été
+entraînés**. Déplacer le seuil après la campagne reviendrait à publier un jeu de features sous
+lequel aucun chiffre rapporté n'a été produit.
+
+**Second corpus.** `colab/e2_cicids2017_audit_v1.ipynb` est écrit et testé de bout en bout. Il
+remplit les cinq lignes demandées sur CICIDS2017. Il exige `GeneratedLabelledFlows` et non
+`MachineLearningCVE`, faute d'horodatage dans cette dernière. Il a déjà révélé un défaut de la
+règle publiée : le filtre `acc > 3 × hasard` est inapplicable sur un corpus à 80 % de classe
+majoritaire, et E2 le réexprime en `acc > hasard + κ(1 − hasard)` avec κ = 0.4818, qui
+reproduit exactement la règle de GeNIS.
+
+**Calibration temporelle et audit résiduel.** `colab/e3_calibration_residual.py` fait les deux,
+sans réentraînement, depuis `probs/` et le cache. Reste à le lancer.
+
 ## Faisable sans réentraîner, à lancer
 
 ### P4, calibration sous le protocole temporel (priorité 4)
