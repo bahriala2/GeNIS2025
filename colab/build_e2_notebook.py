@@ -10,7 +10,7 @@ Relancer ce script apres toute modification.
 import json
 from pathlib import Path
 
-VERSION = "v2"
+VERSION = "v3"
 BUILD = "2026-08-13"
 
 CELLS = []
@@ -172,7 +172,7 @@ ETAPES = ["columns", "duplicates", "day_matrix", "timestamp_probe",
           "single_feature", "perm_importance", "audit"]
 fait = [e for e in ETAPES if STATE.get(e)]
 print(f"etapes deja calculees : {', '.join(fait) if fait else 'aucune'}")
-print(f"runs de confirmation deja calcules : {len(STATE['runs'])}/18")
+print(f"runs de confirmation deja calcules : {len(STATE['runs'])}")
 """)
 
 # ---------------------------------------------------------------- 3. charge
@@ -300,7 +300,16 @@ t0 = time.time()
 for k, f in enumerate(todo, 1):
     nom = pathlib.Path(f).name
     d = lire(f)
-    d = d[d[LABEL].astype(str).str.strip().str.lower() != "label"]   # entete dupliquee
+    lab0 = d[LABEL].astype(str).str.strip()
+    d = d[lab0.str.lower() != "label"]                               # entete dupliquee
+    # Le fichier Thursday-Infiltration se termine par des lignes vides : leur
+    # etiquette est vide ou NaN. Les garder cree une 16e classe fictive et
+    # fausse tout. Les retirer rend exactement le compte canonique du corpus.
+    lab0 = d[LABEL].astype(str).str.strip()
+    vides = lab0.isin(["", "nan", "NaN", "None"]) | d[LABEL].isna()
+    if vides.any():
+        print(f"      {int(vides.sum()):,} ligne(s) sans etiquette retiree(s)".replace(",", " "))
+        d = d[~vides]
     d = d.reindex(columns=COLS)                                      # ordre fige par 3.1
     X = (d[CAND].apply(pd.to_numeric, errors="coerce")
          .replace([np.inf, -np.inf], np.nan).to_numpy(dtype="float32"))
@@ -549,7 +558,9 @@ for k, f in enumerate(FEATURES, 1):
         clf = DecisionTreeClassifier(random_state=1).fit(x[a], y[a])
         p = clf.predict(x[b])
         r[nom] = float(accuracy_score(y[b], p))
+        r[nom + "_f1"] = float(f1_score(y[b], p, average="macro", zero_division=0))
     r["tau"] = r["temp"] / r["strat"] if r["strat"] > 0 else 1.0
+    r["tau_f1"] = r["temp_f1"] / r["strat_f1"] if r["strat_f1"] > 0 else 1.0
     r["n_unique"] = int(np.unique(x[S_TR1]).size)
     SF[f] = r
     if k % 5 == 0 or r["tau"] < 0.5:
@@ -597,15 +608,23 @@ code(r"""
 #     eligible  <=>  acc_strat > hasard + KAPPA x (1 - hasard)
 # KAPPA = 0.4818 reproduit exactement la regle publiee sur GeNIS, ou le hasard
 # vaut 0.1942 : 0.1942 + 0.4818 x 0.8058 = 0.5827 = 3 x 0.1942.
-THR, KAPPA = 0.5, 0.4818
+# Sur un corpus a 80 % de classe majoritaire, l'accuracy mono-feature est
+# ininformative : une colonne qui predit tout en BENIGN atteint deja 0.80. La
+# regle publiee "acc > 3 x hasard" est de surcroit inapplicable, 3 x 0.80 > 1.
+# Le filtre de predictivite porte donc ici sur le MACRO-F1, qui ne recompense
+# pas la classe majoritaire, et le seuil est exprime en fraction de la marge.
+THR, KAPPA, F1_MIN = 0.5, 0.4818, 0.20
 seuil_pred = chance + KAPPA * (1 - chance)
-elig = [f for f in FEATURES if SF[f]["strat"] > seuil_pred]
+elig_acc = [f for f in FEATURES if SF[f]["strat"] > seuil_pred]
 elig_legacy = [f for f in FEATURES if SF[f]["strat"] > 3.0 * chance]
-print(f"hasard {chance:.4f}   seuil de predictivite {seuil_pred:.4f}")
-print(f"   regle publiee (3 x hasard = {3*chance:.4f}) : {len(elig_legacy)} eligibles"
-      f"{'  <-- inapplicable, le seuil depasse 1' if 3*chance >= 1 else ''}")
-print(f"   regle en marge (KAPPA {KAPPA})            : {len(elig)} eligibles")
-noire = sorted(f for f in elig if SF[f]["tau"] < THR)
+elig = [f for f in FEATURES if SF[f].get("strat_f1", 0) > F1_MIN]
+print(f"hasard {chance:.4f}")
+print(f"   regle publiee, acc > 3 x hasard ({3*chance:.4f}) : {len(elig_legacy)} eligibles"
+      f"{'  <-- INAPPLICABLE, le seuil depasse 1' if 3*chance >= 1 else ''}")
+print(f"   marge sur accuracy, seuil {seuil_pred:.4f}      : {len(elig_acc)} eligibles"
+      f"{'  <-- trop strict, l accuracy est saturee par la classe majoritaire' if len(elig_acc) < 10 else ''}")
+print(f"   macro-F1 > {F1_MIN}                          : {len(elig)} eligibles  <- retenu")
+noire = sorted(f for f in elig if SF[f].get("tau_f1", 1.0) < THR)
 STATE["audit"] = {"chance": chance,
                   "rule": {"ratio_below": THR, "kappa": KAPPA,
                            "predictivity_threshold": seuil_pred,
@@ -660,9 +679,16 @@ conditions de features, deux protocoles. Dix-huit runs, pas cent cinquante-quatr
 """)
 
 code(r"""
-CONDITIONS = {"as-distributed": FEATURES,
-              "no-identifier": FEATURES,          # les identifiants ne sont deja plus dans NUM
-              "audited": [f for f in FEATURES if f not in STATE["audit"]["blacklist_behavioural"]]}
+# En v2 les trois conditions etaient identiques : les identifiants n'entraient
+# jamais dans NUM, donc "as-distributed" et "no-identifier" designaient le meme
+# jeu, et dix-huit runs n'en mesuraient que six. On ne garde donc que les
+# conditions qui different reellement.
+noire_b = STATE["audit"]["blacklist_behavioural"]
+CONDITIONS = {"behavioural": FEATURES}
+if noire_b:
+    CONDITIONS["audited"] = [f for f in FEATURES if f not in noire_b]
+else:
+    print("liste noire vide : la condition auditee serait identique, elle est omise")
 print({k: len(v) for k, v in CONDITIONS.items()})
 
 def matrices(cond, split):
@@ -723,7 +749,7 @@ for cond in CONDITIONS:
             print(f"   {cle:<44} macro-F1 {STATE['runs'][cle]['macro_f1']:.4f}  "
                   f"({STATE['runs'][cle]['seconds']:.0f} s)", flush=True)
         del Xtr, Xte; gc.collect()
-print(f"\n{len(STATE['runs'])}/18 runs")
+print(f"\n{len(STATE['runs'])} run(s), {len(CONDITIONS)} condition(s) x 2 protocoles x 3 detecteurs")
 """)
 
 # ---------------------------------------------------------------- 8. figures
