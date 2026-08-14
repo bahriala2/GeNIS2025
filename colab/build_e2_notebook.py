@@ -10,7 +10,7 @@ Relancer ce script apres toute modification.
 import json
 from pathlib import Path
 
-VERSION = "v4"
+VERSION = "v5"
 BUILD = "2026-08-13"
 
 CELLS = []
@@ -394,11 +394,17 @@ print("   ", ", ".join(seul_un_jour))
 # differente est invalide : c'est le piege qui a fait passer les valeurs du
 # premier passage, calculees avec les lignes vides, dans le second.
 SIG = f"{N}|{len(FEATURES)}|{len(CLASSES)}"
-if STATE["meta"].get("signature") not in (None, SIG):
+# Un etat SANS signature est un etat produit avant l'introduction de ce
+# garde-fou, donc precisement celui dont on se mefie. Ne pas le purger etait le
+# defaut de la v4. Sur un etat neuf la purge ne coute rien : tout est deja vide.
+ancienne = STATE["meta"].get("signature")
+if ancienne != SIG:
     perimes = [k for k in ("duplicates", "timestamp_probe", "single_feature",
                            "perm_importance", "audit", "runs") if STATE.get(k)]
-    print(f"\n>>> les donnees ont change : {STATE['meta'].get('signature')} -> {SIG}")
+    print(f"\n>>> empreinte des donnees : {ancienne or 'absente'} -> {SIG}")
     print(f"    resultats perimes effaces : {', '.join(perimes) if perimes else 'aucun'}")
+else:
+    print(f"\nempreinte des donnees inchangee : {SIG}")
     for k in ("duplicates", "audit"):
         STATE[k] = [] if k == "duplicates" else {}
     for k in ("timestamp_probe", "single_feature", "perm_importance", "runs"):
