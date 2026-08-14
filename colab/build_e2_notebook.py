@@ -10,7 +10,7 @@ Relancer ce script apres toute modification.
 import json
 from pathlib import Path
 
-VERSION = "v3"
+VERSION = "v4"
 BUILD = "2026-08-13"
 
 CELLS = []
@@ -390,7 +390,21 @@ seul_un_jour = [c for c in mat.index if (mat.loc[c] > 0).sum() == 1]
 print(f"\nclasses presentes un seul jour : {len(seul_un_jour)}/{len(CLASSES)}")
 print("   ", ", ".join(seul_un_jour))
 
-STATE["meta"] = {"n_rows": int(N), "n_files": len(FICHIERS),
+# Une empreinte des donnees. Tout ce qui a ete calcule sous une empreinte
+# differente est invalide : c'est le piege qui a fait passer les valeurs du
+# premier passage, calculees avec les lignes vides, dans le second.
+SIG = f"{N}|{len(FEATURES)}|{len(CLASSES)}"
+if STATE["meta"].get("signature") not in (None, SIG):
+    perimes = [k for k in ("duplicates", "timestamp_probe", "single_feature",
+                           "perm_importance", "audit", "runs") if STATE.get(k)]
+    print(f"\n>>> les donnees ont change : {STATE['meta'].get('signature')} -> {SIG}")
+    print(f"    resultats perimes effaces : {', '.join(perimes) if perimes else 'aucun'}")
+    for k in ("duplicates", "audit"):
+        STATE[k] = [] if k == "duplicates" else {}
+    for k in ("timestamp_probe", "single_feature", "perm_importance", "runs"):
+        STATE[k] = {}
+
+STATE["meta"] = {"signature": SIG, "n_rows": int(N), "n_files": len(FICHIERS),
                  "files": [pathlib.Path(f).name for f in FICHIERS],
                  "n_features": len(FEATURES), "constants_dropped": CONST}
 STATE["day_matrix"] = {"classes": CLASSES, "matrix": mat.to_dict()}
@@ -613,22 +627,33 @@ code(r"""
 # regle publiee "acc > 3 x hasard" est de surcroit inapplicable, 3 x 0.80 > 1.
 # Le filtre de predictivite porte donc ici sur le MACRO-F1, qui ne recompense
 # pas la classe majoritaire, et le seuil est exprime en fraction de la marge.
-THR, KAPPA, F1_MIN = 0.5, 0.4818, 0.20
+# La regle publiee est "acc > 3 x hasard". Sur un corpus a 80 % de classe
+# majoritaire elle est inapplicable, 3 x 0.80 depasse 1, et l'accuracy est de
+# toute facon saturee : predire tout en BENIGN donne deja 0.80.
+# On garde la FORME de la regle, trois fois la baseline, en la portant sur le
+# macro-F1, qui ne recompense pas la classe majoritaire. La baseline n'est plus
+# choisie : c'est le macro-F1 mesure du classifieur de classe majoritaire.
+THR, KAPPA = 0.5, 0.4818
+maj = int(np.bincount(y[S_TE1]).argmax())
+f1_base = float(f1_score(y[S_TE1], np.full(len(S_TE1), maj),
+                         average="macro", zero_division=0))
+F1_MIN = 3.0 * f1_base
 seuil_pred = chance + KAPPA * (1 - chance)
 elig_acc = [f for f in FEATURES if SF[f]["strat"] > seuil_pred]
 elig_legacy = [f for f in FEATURES if SF[f]["strat"] > 3.0 * chance]
 elig = [f for f in FEATURES if SF[f].get("strat_f1", 0) > F1_MIN]
-print(f"hasard {chance:.4f}")
+print(f"hasard {chance:.4f}   macro-F1 de la classe majoritaire {f1_base:.4f}")
 print(f"   regle publiee, acc > 3 x hasard ({3*chance:.4f}) : {len(elig_legacy)} eligibles"
       f"{'  <-- INAPPLICABLE, le seuil depasse 1' if 3*chance >= 1 else ''}")
 print(f"   marge sur accuracy, seuil {seuil_pred:.4f}      : {len(elig_acc)} eligibles"
-      f"{'  <-- trop strict, l accuracy est saturee par la classe majoritaire' if len(elig_acc) < 10 else ''}")
-print(f"   macro-F1 > {F1_MIN}                          : {len(elig)} eligibles  <- retenu")
+      f"{'  <-- l accuracy est saturee par la classe majoritaire' if len(elig_acc) < 10 else ''}")
+print(f"   macro-F1 > 3 x baseline = {F1_MIN:.4f}          : {len(elig)} eligibles  <- retenu")
 noire = sorted(f for f in elig if SF[f].get("tau_f1", 1.0) < THR)
 STATE["audit"] = {"chance": chance,
                   "rule": {"ratio_below": THR, "kappa": KAPPA,
                            "predictivity_threshold": seuil_pred,
                            "legacy_3x_applicable": bool(3 * chance < 1)},
+                  "f1_majority_baseline": f1_base, "f1_min": F1_MIN,
                   "n_features": len(FEATURES), "n_eligible": len(elig),
                   "blacklist_behavioural": noire,
                   "identifiers_excluded": present_id, "positional": present_pos}
