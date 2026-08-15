@@ -1,0 +1,366 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Genere colab/e4abis_audit_imbrique.ipynb.
+
+E4a a repondu, et la reponse n'est pas celle qu'on attendait : calcule sur la
+VALIDATION, l'audit n'exclut plus rien du tout. Le diagnostic est structurel et
+non computationnel.
+
+  - l'accuracy STRATIFIEE est identique sur validation et test (ecart moyen
+    0.0008) : les deux partitions sont echangeables sous un tirage aleatoire ;
+  - l'accuracy TEMPORELLE est superieure sur validation pour 53 features sur
+    63, de +0.075 en moyenne et jusqu'a +0.323.
+
+La raison : le decoupage temporel par classe met le train en [0, 60 %), la
+validation en [60, 80 %) et le test en [80, 100 %). La validation est ADJACENTE
+au train ; le test est un cran plus loin. Une feature dont le pouvoir predictif
+decroit avec la distance temporelle ne montre sur la validation qu'une partie
+de cette decroissance. Dur passe de 0.627 sur validation a 0.304 sur test pour
+la meme accuracy stratifiee de 0.921.
+
+Consequence : tau ne PEUT PAS se calculer sur la validation, parce que la
+validation est le mauvais instrument. Le remede que le relecteur propose n'est
+pas disponible pour cet audit.
+
+Ce notebook construit le remede qui l'est : un audit IMBRIQUE, entierement
+contenu dans la partition d'entrainement, ou la fenetre d'evaluation est
+posterieure a la fenetre d'ajustement. Ni la validation ni le test ne sont
+ouverts.
+
+Il mesure aussi la decroissance en fonction de l'horizon, qui est le fait
+nouveau que cette histoire a produit et qui merite une figure dans l'article.
+
+Relancer ce script apres toute modification, puis deposer le .ipynb sur Colab.
+"""
+import json
+from pathlib import Path
+
+VERSION = "v1"
+BUILD = "2026-08-15"
+HERE = Path(__file__).resolve().parent
+
+CELLS = []
+md = lambda s: CELLS.append({"cell_type": "markdown", "metadata": {},
+                             "source": s.strip("\n").split("\n")})
+code = lambda s: CELLS.append({"cell_type": "code", "execution_count": None,
+                               "metadata": {}, "outputs": [],
+                               "source": s.strip("\n").split("\n")})
+
+md(f"""
+# E4a-bis — l'audit imbriqué, qui ne touche ni la validation ni le test
+
+> **Notebook {VERSION}, compilé le {BUILD}.**
+
+## Ce que E4a a montré, et pourquoi il faut un autre remède
+
+Calculé sur la validation, l'audit n'exclut **plus rien** : la liste noire passe de huit
+colonnes à zéro. Ce n'est pas un bug. Le contrôle sur le test, même code et même matrice,
+reproduit exactement les huit colonnes publiées.
+
+L'explication est structurelle :
+
+| | validation | test |
+|---|---|---|
+| accuracy **stratifiée** de `Dur` | 0.9210 | 0.9221 |
+| accuracy **temporelle** de `Dur` | 0.6271 | **0.3041** |
+| τ | 0.681 | **0.330** |
+
+L'accuracy stratifiée est la même — les deux partitions sont échangeables sous un tirage
+aléatoire. L'accuracy temporelle ne l'est pas, et sur 53 features des 63 la validation
+donne un chiffre **plus élevé** que le test, de +0.075 en moyenne.
+
+La cause : le découpage temporel par classe place le train en `[0, 60 %)`, la validation
+en `[60, 80 %)`, le test en `[80, 100 %)`. **La validation est adjacente au train ; le
+test est un cran plus loin.** Une feature dont le pouvoir prédictif décroît avec la
+distance temporelle ne montre sur la validation qu'une fraction de cette décroissance.
+
+> τ mesure une décroissance avec la distance temporelle. La validation est trop proche
+> pour la voir. Ce n'est pas la liste noire qui est fragile, c'est l'instrument qui est
+> mal placé.
+
+## Ce que fait ce notebook
+
+| Partie | Ce qu'elle mesure |
+|---|---|
+| A | **audit imbriqué** : τ calculé entièrement dans la partition d'entraînement, fenêtre d'évaluation postérieure à la fenêtre d'ajustement. Ni validation ni test ouverts. |
+| B | **décroissance par horizon** : l'accuracy temporelle des features à distance croissante, qui quantifie le mécanisme et fait une figure |
+| C | **stabilité du classement** : le rang des colonnes sous les trois mesures, parce que E4a montre que l'ordre survit (Spearman 0.876) même quand l'échelle bouge |
+
+**Durée.** Même coût que E4a, 20 à 40 minutes, sans GPU.
+
+**À me renvoyer :** `e4abis_results.json`.
+""")
+
+code(r'''
+# --- 1. Drive, dossier, donnees ------------------------------------------
+E4AB_VERSION = "VERSION_PLACEHOLDER"; E4AB_BUILD = "BUILD_PLACEHOLDER"
+print(f"E4a-bis notebook {E4AB_VERSION}, compile le {E4AB_BUILD}\n")
+import pathlib, json, sys, time, gc
+from google.colab import drive
+drive.mount("/content/drive")
+
+MYDRIVE = pathlib.Path("/content/drive/MyDrive")
+MARQUEUR = "article1_results.json"
+cands = [MYDRIVE / "GeNIS" / "article1_final", MYDRIVE / "article1_final", MYDRIVE / "GeNIS"]
+tr_ = [c for c in cands if (c / MARQUEUR).exists()]
+if not tr_:
+    for prof in ("*/", "*/*/", "*/*/*/"):
+        tr_ = [p.parent for p in MYDRIVE.glob(prof + MARQUEUR)]
+        if tr_:
+            break
+if not tr_:
+    sys.exit(f"{MARQUEUR} introuvable sous {MYDRIVE}.")
+SAVE = tr_[0]
+print(f"dossier : {SAVE}")
+
+import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+
+R = json.loads((SAVE / MARQUEUR).read_text(encoding="utf-8"))
+M = json.loads((SAVE / "cache" / "slice60_meta.json").read_text(encoding="utf-8"))
+z = np.load(SAVE / "cache" / "slice60.npz")
+X, y = z["X"], z["y"].astype(int)
+FEATS = M["feat_all"]; F_CLEAN = R["slice60"]["features_clean"]
+CHANCE = R["audit"]["chance"]; KMIN = R["audit"]["rule"]["min_acc_x_chance"]
+THR = R["audit"]["rule"]["ratio_below"]
+PUB = sorted(f for f in R["audit"]["blacklist"] if f in F_CLEAN)
+C = len(R["slice60"]["classes"])
+
+zs = np.load(SAVE / "frozen_splits_60s.npz")
+TR_T, VA_T, TE_T = zs["temporal_train"], zs["temporal_val"], zs["temporal_test"]
+TR_S = zs["strat_seed1_train"]
+RANG = np.empty(len(y), dtype=np.int64)
+RANG[np.concatenate([TR_T, VA_T, TE_T])] = np.arange(len(y))
+
+print(f"{len(y):,} flux | {len(F_CLEAN)} comportementales | liste publiee : {PUB}"
+      .replace(",", " "))
+
+STATE_PATH = SAVE / "e4abis_results.json"
+def load_state():
+    if STATE_PATH.exists():
+        return json.loads(STATE_PATH.read_text(encoding="utf-8"))
+    return {"meta": {"version": E4AB_VERSION}, "nested": {}, "horizons": {}}
+def save_state(s):
+    t = STATE_PATH.with_suffix(".tmp")
+    t.write_text(json.dumps(s, indent=1, ensure_ascii=False, default=float), encoding="utf-8")
+    t.replace(STATE_PATH)
+STATE = load_state()
+print(f"etat : {len(STATE['nested'])} features imbriquees, {len(STATE['horizons'])} horizons")
+''')
+
+md("""
+## A. L'audit imbriqué
+
+Tout se passe **dans la partition d'entraînement**.
+
+* bras temporel : dans chaque classe, les flux d'entraînement sont ordonnés dans le temps
+  et coupés en 75 % d'ajustement / 25 % d'évaluation. La fenêtre d'évaluation est
+  postérieure, exactement comme le test l'est vis-à-vis du train complet.
+* bras stratifié : même partition d'entraînement, coupée 75/25 **au hasard**.
+
+τ imbriqué = accuracy du bras temporel / accuracy du bras stratifié.
+
+L'écart temporel intérieur est plus court que train → test, donc les valeurs seront
+comprimées vers le haut. Ce qu'il faut lire n'est pas le nombre absolu mais **le
+regroupement** : les colonnes qui décrochent forment-elles encore un paquet séparé ?
+""")
+
+code(r'''
+# --- 2. A. audit imbrique dans le train seul -----------------------------
+def split_imbrique():
+    """Retourne (fit, eval) pour le bras temporel et pour le bras stratifie."""
+    ft, ev = [], []
+    for c_ in range(C):
+        ix = TR_T[y[TR_T] == c_]
+        ix = ix[np.argsort(RANG[ix], kind="stable")]
+        k = int(.75 * len(ix))
+        ft.append(ix[:k]); ev.append(ix[k:])
+    ft_t, ev_t = np.concatenate(ft), np.concatenate(ev)
+    rng = np.random.RandomState(0)
+    perm = rng.permutation(len(TR_S)); k = int(.75 * len(TR_S))
+    ft_s, ev_s = TR_S[perm[:k]], TR_S[perm[k:]]
+    return (ft_t, ev_t), (ft_s, ev_s)
+
+(FT_T, EV_T), (FT_S, EV_S) = split_imbrique()
+ok = all(RANG[FT_T][y[FT_T] == c_].max() <= RANG[EV_T][y[EV_T] == c_].min()
+         for c_ in range(C) if (y[FT_T] == c_).any() and (y[EV_T] == c_).any())
+print(f"bras temporel : ajustement {len(FT_T):,} / evaluation {len(EV_T):,} | "
+      f"invariant {'OK' if ok else 'VIOLE'}".replace(",", " "))
+print(f"bras stratifie: ajustement {len(FT_S):,} / evaluation {len(EV_S):,}"
+      .replace(",", " "))
+assert ok, "l'invariant temporel interieur est viole : ne pas lire la suite"
+
+t0 = time.time()
+for k, f in enumerate(F_CLEAN, 1):
+    if f in STATE["nested"]:
+        continue
+    j = FEATS.index(f)
+    x = np.nan_to_num(X[:, j].astype("float64"), nan=0., posinf=0., neginf=0.).reshape(-1, 1)
+    r = {}
+    for nom, (a, b) in (("strat", (FT_S, EV_S)), ("temp", (FT_T, EV_T))):
+        clf = DecisionTreeClassifier(random_state=1).fit(x[a], y[a])
+        r[nom] = float((clf.predict(x[b]) == y[b]).mean()); del clf
+    r["tau"] = r["temp"] / r["strat"] if r["strat"] > 0 else 1.0
+    STATE["nested"][f] = r
+    if k % 10 == 0:
+        print(f"   [{k:>2}/{len(F_CLEAN)}] {f:20s} tau {r['tau']:.3f}  "
+              f"({time.time()-t0:.0f} s)", flush=True)
+        save_state(STATE)
+    del x; gc.collect()
+save_state(STATE)
+print(f"audit imbrique termine en {time.time()-t0:.0f} s")
+''')
+
+code(r'''
+# --- 3. A. le regroupement survit-il ? -----------------------------------
+N = STATE["nested"]
+elig = [f for f in F_CLEAN if N[f]["strat"] > KMIN * CHANCE]
+srt = sorted(elig, key=lambda f: N[f]["tau"])
+print(f"{len(elig)} eligibles (publie : 38)\n")
+print(f"{'rang':>5}  {'feature':<20}{'tau imbrique':>13}   publiee ?")
+for i, f in enumerate(srt[:14], 1):
+    print(f"{i:>5}  {f:<20}{N[f]['tau']:>13.4f}   {'OUI' if f in PUB else ''}")
+
+rangs = sorted(srt.index(f) + 1 for f in PUB)
+print(f"\nrangs des huit publiees sous l'audit imbrique : {rangs}")
+print(f"forment-elles les huit premieres ? {set(srt[:8]) == set(PUB)}")
+
+taus = [N[f]["tau"] for f in srt]
+gaps = sorted(((taus[i+1] - taus[i], i) for i in range(len(taus)-1)), reverse=True)
+print("\ntrois plus larges ecarts :")
+for g, i in gaps[:3]:
+    dedans = set(srt[:i+1])
+    print(f"   ecart {g:.4f} apres le rang {i+1} : coupure a {i+1} colonnes, "
+          f"dont {len(dedans & set(PUB))}/8 publiees")
+STATE["synthese_nested"] = {"eligibles": len(elig), "rangs_publiees": rangs,
+                            "ordre": srt, "taus": {f: N[f]["tau"] for f in srt}}
+save_state(STATE)
+''')
+
+md("""
+## B. La décroissance par horizon
+
+C'est le fait nouveau. Si τ mesure une décroissance avec la distance temporelle, alors
+l'accuracy d'une feature doit **baisser régulièrement** à mesure qu'on s'éloigne de la
+fenêtre d'entraînement.
+
+On coupe donc la portion `[60 %, 100 %]` de chaque classe — validation puis test — en
+huit tranches successives, et on évalue le même arbre, ajusté une seule fois sur le train,
+sur chacune. Le résultat est une courbe par feature.
+
+Si la courbe décroît, la section 4.3 de l'article gagne une justification mesurée du choix
+de la partition d'évaluation, et l'article gagne une figure qu'aucun des deux relecteurs
+n'attendait.
+""")
+
+code(r'''
+# --- 4. B. accuracy par tranche d'horizon --------------------------------
+N_TRANCHES = 8
+CIBLES = PUB + ["DstBytes", "SrcBytes", "TotPkts", "IdleTime", "DstLoad", "Rate"]
+
+def tranches():
+    out = [[] for _ in range(N_TRANCHES)]
+    for c_ in range(C):
+        ix = np.concatenate([VA_T[y[VA_T] == c_], TE_T[y[TE_T] == c_]])
+        ix = ix[np.argsort(RANG[ix], kind="stable")]
+        for t, part in enumerate(np.array_split(ix, N_TRANCHES)):
+            out[t].append(part)
+    return [np.concatenate(o) for o in out]
+
+TRANCHES = tranches()
+print("tranches d'horizon :", [len(t) for t in TRANCHES])
+
+t0 = time.time()
+for f in CIBLES:
+    if f in STATE["horizons"]:
+        continue
+    j = FEATS.index(f)
+    x = np.nan_to_num(X[:, j].astype("float64"), nan=0., posinf=0., neginf=0.).reshape(-1, 1)
+    clf = DecisionTreeClassifier(random_state=1).fit(x[TR_T], y[TR_T])
+    accs = [float((clf.predict(x[t]) == y[t]).mean()) for t in TRANCHES]
+    STATE["horizons"][f] = accs; save_state(STATE)
+    print(f"   {f:<20}" + " ".join(f"{a:.3f}" for a in accs), flush=True)
+    del clf, x; gc.collect()
+print(f"\nhorizons termines en {time.time()-t0:.0f} s")
+print("\nlecture : tranches 1-4 = ancienne validation, 5-8 = ancien test.")
+print("Une decroissance reguliere confirme que tau mesure une distance et non un bruit.")
+''')
+
+code(r'''
+# --- 5. B. figure : la decroissance par horizon --------------------------
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+W_IN, DPI = 6.698, 3.2
+RED, BLUE, GREY = "#c23b34", "#4a72b0", "#9aa4b1"
+plt.rcParams.update({"font.size": 6.5, "axes.linewidth": .5})
+fig, ax = plt.subplots(figsize=(W_IN, DPI), dpi=300)
+xs = np.arange(1, N_TRANCHES + 1)
+for f, accs in STATE["horizons"].items():
+    est_noire = f in PUB
+    ax.plot(xs, accs, marker="o", ms=2.5, lw=1.0 if est_noire else .7,
+            color=RED if est_noire else GREY, zorder=3 if est_noire else 2,
+            label=f if est_noire else None)
+ax.axvline(4.5, color="k", ls=":", lw=.7)
+ax.text(4.6, ax.get_ylim()[1], " test", fontsize=6, va="top")
+ax.text(4.4, ax.get_ylim()[1], "validation ", fontsize=6, va="top", ha="right")
+ax.axhline(CHANCE, color="0.5", ls="--", lw=.6)
+ax.text(0.6, CHANCE + .01, "hasard", fontsize=5.5, color="0.4")
+ax.set_xlabel("tranche d'horizon, de la plus proche du train a la plus lointaine")
+ax.set_ylabel("accuracy de la feature seule")
+ax.set_title("Decroissance du pouvoir predictif avec la distance temporelle "
+             "(rouge : colonnes de la liste noire)", fontsize=7)
+ax.set_xticks(xs); ax.grid(color="0.92", lw=.4); ax.set_axisbelow(True)
+fig.tight_layout(pad=.4)
+out = SAVE / "figures" / "figE4_horizons.png"
+out.parent.mkdir(exist_ok=True)
+fig.savefig(out, dpi=400, facecolor="white")
+print(f"figure ecrite : {out}")
+plt.show()
+''')
+
+code(r'''
+# --- 6. C. stabilite du classement entre les trois mesures ---------------
+E4A = SAVE / "e4a_results.json"
+if E4A.exists():
+    A = json.loads(E4A.read_text(encoding="utf-8"))
+    V, T = A["scan_val"], A["scan_test"]
+    def rho(a, b, cols):
+        ra = {f: i for i, f in enumerate(sorted(cols, key=lambda f: a[f]["tau"]))}
+        rb = {f: i for i, f in enumerate(sorted(cols, key=lambda f: b[f]["tau"]))}
+        n = len(cols); d2 = sum((ra[f] - rb[f]) ** 2 for f in cols)
+        return 1 - 6 * d2 / (n * (n * n - 1))
+    comm = [f for f in elig if f in V and f in T]
+    print(f"Spearman sur les {len(comm)} eligibles communs :")
+    print(f"   imbrique  vs test        {rho(N, T, comm):.4f}")
+    print(f"   imbrique  vs validation  {rho(N, V, comm):.4f}")
+    print(f"   validation vs test       {rho(V, T, comm):.4f}")
+    STATE["spearman"] = {"nested_test": rho(N, T, comm),
+                         "nested_val": rho(N, V, comm),
+                         "val_test": rho(V, T, comm)}
+    save_state(STATE)
+    print("\nSi l'ordre se conserve alors que l'echelle bouge, la regle doit porter")
+    print("sur le regroupement et non sur un seuil absolu. C'est la conclusion que")
+    print("la section 4.3 devra tirer.")
+else:
+    print("e4a_results.json absent : partie C sautee")
+''')
+
+code(r'''
+# --- 7. Export -----------------------------------------------------------
+save_state(STATE)
+print(f"resultats : {STATE_PATH}  ({STATE_PATH.stat().st_size/1024:.0f} Ko)")
+print("\nA me renvoyer : e4abis_results.json  (et figE4_horizons.png)")
+''')
+
+nb = {"cells": CELLS,
+      "metadata": {"kernelspec": {"display_name": "Python 3", "name": "python3"},
+                   "language_info": {"name": "python"},
+                   "colab": {"provenance": [], "toc_visible": True}},
+      "nbformat": 4, "nbformat_minor": 0}
+txt = json.dumps(nb, indent=1, ensure_ascii=False)
+txt = txt.replace("VERSION_PLACEHOLDER", VERSION).replace("BUILD_PLACEHOLDER", BUILD)
+out = HERE / "e4abis_audit_imbrique.ipynb"
+out.write_text(txt, encoding="utf-8")
+print(f"ecrit : {out}  ({len(CELLS)} cellules)")
