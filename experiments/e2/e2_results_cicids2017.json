@@ -1,0 +1,1046 @@
+{
+ "meta": {
+  "signature": "2830743|69|15",
+  "n_rows": 2830743,
+  "n_files": 8,
+  "files": [
+   "Monday-WorkingHours.pcap_ISCX.csv",
+   "Tuesday-WorkingHours.pcap_ISCX.csv",
+   "Wednesday-workingHours.pcap_ISCX.csv",
+   "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv",
+   "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv",
+   "Friday-WorkingHours-Morning.pcap_ISCX.csv",
+   "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv",
+   "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv"
+  ],
+  "n_features": 69,
+  "constants_dropped": [
+   "Bwd PSH Flags",
+   "Bwd URG Flags",
+   "Fwd Avg Bytes/Bulk",
+   "Fwd Avg Packets/Bulk",
+   "Fwd Avg Bulk Rate",
+   "Bwd Avg Bytes/Bulk",
+   "Bwd Avg Packets/Bulk",
+   "Bwd Avg Bulk Rate"
+  ]
+ },
+ "columns": {
+  "n_total": 85,
+  "identifiers_present": [
+   "Flow ID",
+   "Source IP",
+   "Destination IP",
+   "Source Port",
+   "Destination Port",
+   "Protocol"
+  ],
+  "positional_present": [
+   "Timestamp"
+  ],
+  "absent": [],
+  "all": [
+   "Flow ID",
+   "Source IP",
+   "Source Port",
+   "Destination IP",
+   "Destination Port",
+   "Protocol",
+   "Timestamp",
+   "Flow Duration",
+   "Total Fwd Packets",
+   "Total Backward Packets",
+   "Total Length of Fwd Packets",
+   "Total Length of Bwd Packets",
+   "Fwd Packet Length Max",
+   "Fwd Packet Length Min",
+   "Fwd Packet Length Mean",
+   "Fwd Packet Length Std",
+   "Bwd Packet Length Max",
+   "Bwd Packet Length Min",
+   "Bwd Packet Length Mean",
+   "Bwd Packet Length Std",
+   "Flow Bytes/s",
+   "Flow Packets/s",
+   "Flow IAT Mean",
+   "Flow IAT Std",
+   "Flow IAT Max",
+   "Flow IAT Min",
+   "Fwd IAT Total",
+   "Fwd IAT Mean",
+   "Fwd IAT Std",
+   "Fwd IAT Max",
+   "Fwd IAT Min",
+   "Bwd IAT Total",
+   "Bwd IAT Mean",
+   "Bwd IAT Std",
+   "Bwd IAT Max",
+   "Bwd IAT Min",
+   "Fwd PSH Flags",
+   "Bwd PSH Flags",
+   "Fwd URG Flags",
+   "Bwd URG Flags",
+   "Fwd Header Length",
+   "Bwd Header Length",
+   "Fwd Packets/s",
+   "Bwd Packets/s",
+   "Min Packet Length",
+   "Max Packet Length",
+   "Packet Length Mean",
+   "Packet Length Std",
+   "Packet Length Variance",
+   "FIN Flag Count",
+   "SYN Flag Count",
+   "RST Flag Count",
+   "PSH Flag Count",
+   "ACK Flag Count",
+   "URG Flag Count",
+   "CWE Flag Count",
+   "ECE Flag Count",
+   "Down/Up Ratio",
+   "Average Packet Size",
+   "Avg Fwd Segment Size",
+   "Avg Bwd Segment Size",
+   "Fwd Header Length.1",
+   "Fwd Avg Bytes/Bulk",
+   "Fwd Avg Packets/Bulk",
+   "Fwd Avg Bulk Rate",
+   "Bwd Avg Bytes/Bulk",
+   "Bwd Avg Packets/Bulk",
+   "Bwd Avg Bulk Rate",
+   "Subflow Fwd Packets",
+   "Subflow Fwd Bytes",
+   "Subflow Bwd Packets",
+   "Subflow Bwd Bytes",
+   "Init_Win_bytes_forward",
+   "Init_Win_bytes_backward",
+   "act_data_pkt_fwd",
+   "min_seg_size_forward",
+   "Active Mean",
+   "Active Std",
+   "Active Max",
+   "Active Min",
+   "Idle Mean",
+   "Idle Std",
+   "Idle Max",
+   "Idle Min",
+   "Label"
+  ]
+ },
+ "duplicates": [
+  [
+   "Total Fwd Packets",
+   "Subflow Fwd Packets"
+  ],
+  [
+   "Total Backward Packets",
+   "Subflow Bwd Packets"
+  ],
+  [
+   "Fwd Packet Length Mean",
+   "Avg Fwd Segment Size"
+  ],
+  [
+   "Bwd Packet Length Mean",
+   "Avg Bwd Segment Size"
+  ],
+  [
+   "Fwd PSH Flags",
+   "SYN Flag Count"
+  ],
+  [
+   "Fwd URG Flags",
+   "CWE Flag Count"
+  ],
+  [
+   "Fwd Header Length",
+   "Fwd Header Length.1"
+  ]
+ ],
+ "day_matrix": {
+  "classes": [
+   "BENIGN",
+   "Bot",
+   "DDoS",
+   "DoS GoldenEye",
+   "DoS Hulk",
+   "DoS Slowhttptest",
+   "DoS slowloris",
+   "FTP-Patator",
+   "Heartbleed",
+   "Infiltration",
+   "PortScan",
+   "SSH-Patator",
+   "Web Attack – Brute Force",
+   "Web Attack – Sql Injection",
+   "Web Attack – XSS"
+  ],
+  "matrix": {
+   "1": {
+    "BENIGN": 529918,
+    "Bot": 0,
+    "DDoS": 0,
+    "DoS GoldenEye": 0,
+    "DoS Hulk": 0,
+    "DoS Slowhttptest": 0,
+    "DoS slowloris": 0,
+    "FTP-Patator": 0,
+    "Heartbleed": 0,
+    "Infiltration": 0,
+    "PortScan": 0,
+    "SSH-Patator": 0,
+    "Web Attack – Brute Force": 0,
+    "Web Attack – Sql Injection": 0,
+    "Web Attack – XSS": 0
+   },
+   "2": {
+    "BENIGN": 432074,
+    "Bot": 0,
+    "DDoS": 0,
+    "DoS GoldenEye": 0,
+    "DoS Hulk": 0,
+    "DoS Slowhttptest": 0,
+    "DoS slowloris": 0,
+    "FTP-Patator": 7938,
+    "Heartbleed": 0,
+    "Infiltration": 0,
+    "PortScan": 0,
+    "SSH-Patator": 5897,
+    "Web Attack – Brute Force": 0,
+    "Web Attack – Sql Injection": 0,
+    "Web Attack – XSS": 0
+   },
+   "3": {
+    "BENIGN": 440031,
+    "Bot": 0,
+    "DDoS": 0,
+    "DoS GoldenEye": 10293,
+    "DoS Hulk": 231073,
+    "DoS Slowhttptest": 5499,
+    "DoS slowloris": 5796,
+    "FTP-Patator": 0,
+    "Heartbleed": 11,
+    "Infiltration": 0,
+    "PortScan": 0,
+    "SSH-Patator": 0,
+    "Web Attack – Brute Force": 0,
+    "Web Attack – Sql Injection": 0,
+    "Web Attack – XSS": 0
+   },
+   "4": {
+    "BENIGN": 456752,
+    "Bot": 0,
+    "DDoS": 0,
+    "DoS GoldenEye": 0,
+    "DoS Hulk": 0,
+    "DoS Slowhttptest": 0,
+    "DoS slowloris": 0,
+    "FTP-Patator": 0,
+    "Heartbleed": 0,
+    "Infiltration": 36,
+    "PortScan": 0,
+    "SSH-Patator": 0,
+    "Web Attack – Brute Force": 1507,
+    "Web Attack – Sql Injection": 21,
+    "Web Attack – XSS": 652
+   },
+   "5": {
+    "BENIGN": 414322,
+    "Bot": 1966,
+    "DDoS": 128027,
+    "DoS GoldenEye": 0,
+    "DoS Hulk": 0,
+    "DoS Slowhttptest": 0,
+    "DoS slowloris": 0,
+    "FTP-Patator": 0,
+    "Heartbleed": 0,
+    "Infiltration": 0,
+    "PortScan": 158930,
+    "SSH-Patator": 0,
+    "Web Attack – Brute Force": 0,
+    "Web Attack – Sql Injection": 0,
+    "Web Attack – XSS": 0
+   }
+  },
+  "p2_degenerate": true,
+  "p2_shared_classes": [
+   "BENIGN"
+  ]
+ },
+ "timestamp_probe": {
+  "stratifie": {
+   "accuracy": 0.9529081566866673,
+   "macro_f1": 0.28836975158260164,
+   "majority": 0.8030041561497062
+  },
+  "temporel_par_classe": {
+   "accuracy": 0.10281953592378086,
+   "macro_f1": 0.19526547967484376,
+   "majority": 0.8029928094150562
+  },
+  "tau": 0.10790078267489288
+ },
+ "single_feature": {
+  "Flow Duration": {
+   "strat": 0.83596,
+   "strat_f1": 0.2708644970351878,
+   "temp": 0.80259,
+   "temp_f1": 0.22168185081604547,
+   "tau": 0.9600818220967511,
+   "tau_f1": 0.8184234303222359,
+   "n_unique": 144842
+  },
+  "Total Fwd Packets": {
+   "strat": 0.80533,
+   "strat_f1": 0.08506937185968019,
+   "temp": 0.79662,
+   "temp_f1": 0.144888769266694,
+   "tau": 0.9891845578831038,
+   "tau_f1": 1.70318372052499,
+   "n_unique": 532
+  },
+  "Total Backward Packets": {
+   "strat": 0.81712,
+   "strat_f1": 0.13187739475163834,
+   "temp": 0.79593,
+   "temp_f1": 0.08241685165722973,
+   "tau": 0.9740674564323478,
+   "tau_f1": 0.6249505596652367,
+   "n_unique": 657
+  },
+  "Total Length of Fwd Packets": {
+   "strat": 0.89892,
+   "strat_f1": 0.4063962925767916,
+   "temp": 0.88967,
+   "temp_f1": 0.40587128845592324,
+   "tau": 0.9897098740711074,
+   "tau_f1": 0.9987081473663563,
+   "n_unique": 6948
+  },
+  "Total Length of Bwd Packets": {
+   "strat": 0.90463,
+   "strat_f1": 0.33110541849698966,
+   "temp": 0.874,
+   "temp_f1": 0.3738491956218422,
+   "tau": 0.9661408531664879,
+   "tau_f1": 1.1290941637828895,
+   "n_unique": 16490
+  },
+  "Fwd Packet Length Max": {
+   "strat": 0.87317,
+   "strat_f1": 0.3819034829479625,
+   "temp": 0.88132,
+   "temp_f1": 0.3441511623402164,
+   "tau": 1.0093338067043074,
+   "tau_f1": 0.9011469591313203,
+   "n_unique": 3101
+  },
+  "Fwd Packet Length Min": {
+   "strat": 0.80853,
+   "strat_f1": 0.14994023924879243,
+   "temp": 0.83831,
+   "temp_f1": 0.1380486602828171,
+   "tau": 1.036832275858657,
+   "tau_f1": 0.9206912098743293,
+   "n_unique": 201
+  },
+  "Fwd Packet Length Mean": {
+   "strat": 0.85772,
+   "strat_f1": 0.37995297520607824,
+   "temp": 0.87207,
+   "temp_f1": 0.3123696769185347,
+   "tau": 1.0167304015296368,
+   "tau_f1": 0.8221272033706596,
+   "n_unique": 20872
+  },
+  "Fwd Packet Length Std": {
+   "strat": 0.875,
+   "strat_f1": 0.3945120785807856,
+   "temp": 0.85188,
+   "temp_f1": 0.28753125924622874,
+   "tau": 0.9735771428571428,
+   "tau_f1": 0.7288275184896525,
+   "n_unique": 37664
+  },
+  "Bwd Packet Length Max": {
+   "strat": 0.88038,
+   "strat_f1": 0.27019157502079655,
+   "temp": 0.80206,
+   "temp_f1": 0.33858123148132113,
+   "tau": 0.9110384152297871,
+   "tau_f1": 1.2531154291367548,
+   "n_unique": 3365
+  },
+  "Bwd Packet Length Min": {
+   "strat": 0.80304,
+   "strat_f1": 0.06372366392338373,
+   "temp": 0.76772,
+   "temp_f1": 0.09381405078493484,
+   "tau": 0.9560171348874278,
+   "tau_f1": 1.4722011417568424,
+   "n_unique": 412
+  },
+  "Bwd Packet Length Mean": {
+   "strat": 0.89209,
+   "strat_f1": 0.38494619012445846,
+   "temp": 0.84476,
+   "temp_f1": 0.34283570060054713,
+   "tau": 0.946944814985035,
+   "tau_f1": 0.8906068156946911,
+   "n_unique": 26638
+  },
+  "Bwd Packet Length Std": {
+   "strat": 0.89165,
+   "strat_f1": 0.3893406549774814,
+   "temp": 0.86839,
+   "temp_f1": 0.3319765684265429,
+   "tau": 0.9739135310940391,
+   "tau_f1": 0.852663507348709,
+   "n_unique": 34525
+  },
+  "Flow Bytes/s": {
+   "strat": 0.8403,
+   "strat_f1": 0.2832736777816931,
+   "temp": 0.81191,
+   "temp_f1": 0.21577077612186457,
+   "tau": 0.9662144472212305,
+   "tau_f1": 0.7617042918055729,
+   "n_unique": 185516
+  },
+  "Flow Packets/s": {
+   "strat": 0.82096,
+   "strat_f1": 0.24873069101981307,
+   "temp": 0.79394,
+   "temp_f1": 0.21546115806922858,
+   "tau": 0.9670873124147339,
+   "tau_f1": 0.8662427510888299,
+   "n_unique": 154427
+  },
+  "Flow IAT Mean": {
+   "strat": 0.82266,
+   "strat_f1": 0.2631451976109335,
+   "temp": 0.79372,
+   "temp_f1": 0.21981179389284294,
+   "tau": 0.9648214329127465,
+   "tau_f1": 0.8353251204600737,
+   "n_unique": 152041
+  },
+  "Flow IAT Std": {
+   "strat": 0.82293,
+   "strat_f1": 0.24372066154294217,
+   "temp": 0.78864,
+   "temp_f1": 0.209421829030778,
+   "tau": 0.9583318143706026,
+   "tau_f1": 0.8592699022929539,
+   "n_unique": 121058
+  },
+  "Flow IAT Max": {
+   "strat": 0.85059,
+   "strat_f1": 0.3252572386337666,
+   "temp": 0.81294,
+   "temp_f1": 0.259810187717635,
+   "tau": 0.9557366063555885,
+   "tau_f1": 0.7987837221054941,
+   "n_unique": 99758
+  },
+  "Flow IAT Min": {
+   "strat": 0.81063,
+   "strat_f1": 0.1538783376294481,
+   "temp": 0.8083,
+   "temp_f1": 0.126393531688951,
+   "tau": 0.9971256923627303,
+   "tau_f1": 0.8213861264430683,
+   "n_unique": 28804
+  },
+  "Fwd IAT Total": {
+   "strat": 0.84977,
+   "strat_f1": 0.249237369202325,
+   "temp": 0.8237,
+   "temp_f1": 0.2074391717507115,
+   "tau": 0.9693211104181131,
+   "tau_f1": 0.8322956241056986,
+   "n_unique": 67201
+  },
+  "Fwd IAT Mean": {
+   "strat": 0.83825,
+   "strat_f1": 0.2409665777203502,
+   "temp": 0.81164,
+   "temp_f1": 0.20055279510863575,
+   "tau": 0.968255293766776,
+   "tau_f1": 0.8322846969316383,
+   "n_unique": 90048
+  },
+  "Fwd IAT Std": {
+   "strat": 0.84372,
+   "strat_f1": 0.278797638020152,
+   "temp": 0.81222,
+   "temp_f1": 0.22163851624653547,
+   "tau": 0.9626653392120609,
+   "tau_f1": 0.7949798922992132,
+   "n_unique": 79284
+  },
+  "Fwd IAT Max": {
+   "strat": 0.85709,
+   "strat_f1": 0.30526607541223244,
+   "temp": 0.83168,
+   "temp_f1": 0.24579728949761742,
+   "tau": 0.9703531717789263,
+   "tau_f1": 0.8051903218059585,
+   "n_unique": 65736
+  },
+  "Fwd IAT Min": {
+   "strat": 0.81241,
+   "strat_f1": 0.16819102081064144,
+   "temp": 0.80668,
+   "temp_f1": 0.12353565263241188,
+   "tau": 0.9929469110424539,
+   "tau_f1": 0.7344961225456561,
+   "n_unique": 21447
+  },
+  "Bwd IAT Total": {
+   "strat": 0.82119,
+   "strat_f1": 0.19857677075644994,
+   "temp": 0.79994,
+   "temp_f1": 0.17018581403193522,
+   "tau": 0.9741229191782657,
+   "tau_f1": 0.8570278053351185,
+   "n_unique": 58402
+  },
+  "Bwd IAT Mean": {
+   "strat": 0.81068,
+   "strat_f1": 0.20150482356590743,
+   "temp": 0.79364,
+   "temp_f1": 0.1511871369516261,
+   "tau": 0.9789806088715647,
+   "tau_f1": 0.7502904112971588,
+   "n_unique": 80010
+  },
+  "Bwd IAT Std": {
+   "strat": 0.8158,
+   "strat_f1": 0.2237901726139136,
+   "temp": 0.79676,
+   "temp_f1": 0.15052320529123245,
+   "tau": 0.9766609463103703,
+   "tau_f1": 0.6726086473462689,
+   "n_unique": 75737
+  },
+  "Bwd IAT Max": {
+   "strat": 0.82962,
+   "strat_f1": 0.2513954738009389,
+   "temp": 0.80652,
+   "temp_f1": 0.1756837054161603,
+   "tau": 0.9721559268098647,
+   "tau_f1": 0.698834003492326,
+   "n_unique": 57802
+  },
+  "Bwd IAT Min": {
+   "strat": 0.82858,
+   "strat_f1": 0.18226740161598026,
+   "temp": 0.81217,
+   "temp_f1": 0.12743247785233514,
+   "tau": 0.9801950324651814,
+   "tau_f1": 0.699151229032293,
+   "n_unique": 10856
+  },
+  "Fwd PSH Flags": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80299,
+   "temp_f1": 0.05938210047384252,
+   "tau": 0.9999875466998754,
+   "tau_f1": 0.9333268867750517,
+   "n_unique": 2
+  },
+  "Fwd URG Flags": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80299,
+   "temp_f1": 0.05938210047384252,
+   "tau": 0.9999875466998754,
+   "tau_f1": 0.9333268867750517,
+   "n_unique": 2
+  },
+  "Fwd Header Length": {
+   "strat": 0.86408,
+   "strat_f1": 0.24462387168244465,
+   "temp": 0.85238,
+   "temp_f1": 0.25881036140497465,
+   "tau": 0.9864595870752709,
+   "tau_f1": 1.057993071669416,
+   "n_unique": 1314
+  },
+  "Bwd Header Length": {
+   "strat": 0.84551,
+   "strat_f1": 0.17560266493678256,
+   "temp": 0.81018,
+   "temp_f1": 0.1521725705078628,
+   "tau": 0.9582145687218365,
+   "tau_f1": 0.8665732411444059,
+   "n_unique": 1427
+  },
+  "Fwd Packets/s": {
+   "strat": 0.82411,
+   "strat_f1": 0.25217294533453,
+   "temp": 0.79573,
+   "temp_f1": 0.20470378643002787,
+   "tau": 0.9655628496195897,
+   "tau_f1": 0.811759509563843,
+   "n_unique": 153246
+  },
+  "Bwd Packets/s": {
+   "strat": 0.83602,
+   "strat_f1": 0.25203815789296585,
+   "temp": 0.81518,
+   "temp_f1": 0.18445863054382658,
+   "tau": 0.9750723666897921,
+   "tau_f1": 0.7318678730470702,
+   "n_unique": 138538
+  },
+  "Min Packet Length": {
+   "strat": 0.80689,
+   "strat_f1": 0.10834977772437937,
+   "temp": 0.83721,
+   "temp_f1": 0.11456538102008287,
+   "tau": 1.0375763734833745,
+   "tau_f1": 1.0573660918023735,
+   "n_unique": 154
+  },
+  "Max Packet Length": {
+   "strat": 0.87589,
+   "strat_f1": 0.3686361620538933,
+   "temp": 0.83061,
+   "temp_f1": 0.37044867095713646,
+   "tau": 0.9483040107776091,
+   "tau_f1": 1.004916796260965,
+   "n_unique": 3914
+  },
+  "Packet Length Mean": {
+   "strat": 0.92231,
+   "strat_f1": 0.4317865028033782,
+   "temp": 0.89631,
+   "temp_f1": 0.35658492435139727,
+   "tau": 0.9718099120686104,
+   "tau_f1": 0.825836199224075,
+   "n_unique": 38163
+  },
+  "Packet Length Std": {
+   "strat": 0.9399,
+   "strat_f1": 0.5264144754698926,
+   "temp": 0.89518,
+   "temp_f1": 0.39789509178772536,
+   "tau": 0.952420470262794,
+   "tau_f1": 0.7558589482794006,
+   "n_unique": 58916
+  },
+  "Packet Length Variance": {
+   "strat": 0.93947,
+   "strat_f1": 0.5242148795278745,
+   "temp": 0.89487,
+   "temp_f1": 0.3963900267955552,
+   "tau": 0.9525264244733733,
+   "tau_f1": 0.7561594343765239,
+   "n_unique": 58673
+  },
+  "FIN Flag Count": {
+   "strat": 0.80962,
+   "strat_f1": 0.08948234504029755,
+   "temp": 0.81265,
+   "temp_f1": 0.08421897014721048,
+   "tau": 1.00374249647983,
+   "tau_f1": 0.9411797389673152,
+   "n_unique": 2
+  },
+  "SYN Flag Count": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80299,
+   "temp_f1": 0.05938210047384252,
+   "tau": 0.9999875466998754,
+   "tau_f1": 0.9333268867750517,
+   "n_unique": 2
+  },
+  "RST Flag Count": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80299,
+   "temp_f1": 0.05938210047384252,
+   "tau": 0.9999875466998754,
+   "tau_f1": 0.9333268867750517,
+   "n_unique": 2
+  },
+  "PSH Flag Count": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80299,
+   "temp_f1": 0.05938210047384252,
+   "tau": 0.9999875466998754,
+   "tau_f1": 0.9333268867750517,
+   "n_unique": 2
+  },
+  "ACK Flag Count": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80299,
+   "temp_f1": 0.05938210047384252,
+   "tau": 0.9999875466998754,
+   "tau_f1": 0.9333268867750517,
+   "n_unique": 2
+  },
+  "URG Flag Count": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80299,
+   "temp_f1": 0.05938210047384252,
+   "tau": 0.9999875466998754,
+   "tau_f1": 0.9333268867750517,
+   "n_unique": 2
+  },
+  "CWE Flag Count": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80299,
+   "temp_f1": 0.05938210047384252,
+   "tau": 0.9999875466998754,
+   "tau_f1": 0.9333268867750517,
+   "n_unique": 2
+  },
+  "ECE Flag Count": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80299,
+   "temp_f1": 0.05938210047384252,
+   "tau": 0.9999875466998754,
+   "tau_f1": 0.9333268867750517,
+   "n_unique": 2
+  },
+  "Down/Up Ratio": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80239,
+   "temp_f1": 0.07424969686939904,
+   "tau": 0.9992403486924035,
+   "tau_f1": 1.1670055095749508,
+   "n_unique": 14
+  },
+  "Average Packet Size": {
+   "strat": 0.93029,
+   "strat_f1": 0.4745870573199176,
+   "temp": 0.88856,
+   "temp_f1": 0.3424857008039612,
+   "tau": 0.9551430199185201,
+   "tau_f1": 0.7216498965185488,
+   "n_unique": 37309
+  },
+  "Avg Fwd Segment Size": {
+   "strat": 0.85772,
+   "strat_f1": 0.37995297520607824,
+   "temp": 0.87207,
+   "temp_f1": 0.3123696769185347,
+   "tau": 1.0167304015296368,
+   "tau_f1": 0.8221272033706596,
+   "n_unique": 20872
+  },
+  "Avg Bwd Segment Size": {
+   "strat": 0.89209,
+   "strat_f1": 0.38494619012445846,
+   "temp": 0.84476,
+   "temp_f1": 0.34283570060054713,
+   "tau": 0.946944814985035,
+   "tau_f1": 0.8906068156946911,
+   "n_unique": 26638
+  },
+  "Fwd Header Length.1": {
+   "strat": 0.86408,
+   "strat_f1": 0.24462387168244465,
+   "temp": 0.85238,
+   "temp_f1": 0.25881036140497465,
+   "tau": 0.9864595870752709,
+   "tau_f1": 1.057993071669416,
+   "n_unique": 1314
+  },
+  "Subflow Fwd Packets": {
+   "strat": 0.80533,
+   "strat_f1": 0.08506937185968019,
+   "temp": 0.79662,
+   "temp_f1": 0.144888769266694,
+   "tau": 0.9891845578831038,
+   "tau_f1": 1.70318372052499,
+   "n_unique": 532
+  },
+  "Subflow Fwd Bytes": {
+   "strat": 0.89892,
+   "strat_f1": 0.4063962925767916,
+   "temp": 0.88967,
+   "temp_f1": 0.40587128845592324,
+   "tau": 0.9897098740711074,
+   "tau_f1": 0.9987081473663563,
+   "n_unique": 6948
+  },
+  "Subflow Bwd Packets": {
+   "strat": 0.81712,
+   "strat_f1": 0.13187739475163834,
+   "temp": 0.79593,
+   "temp_f1": 0.08241685165722973,
+   "tau": 0.9740674564323478,
+   "tau_f1": 0.6249505596652367,
+   "n_unique": 657
+  },
+  "Subflow Bwd Bytes": {
+   "strat": 0.90463,
+   "strat_f1": 0.33110541849698966,
+   "temp": 0.874,
+   "temp_f1": 0.3738491956218422,
+   "tau": 0.9661408531664879,
+   "tau_f1": 1.1290941637828895,
+   "n_unique": 16491
+  },
+  "Init_Win_bytes_forward": {
+   "strat": 0.8824,
+   "strat_f1": 0.27858024219615124,
+   "temp": 0.91852,
+   "temp_f1": 0.2716703039235136,
+   "tau": 1.0409338168631006,
+   "tau_f1": 0.9751958781492757,
+   "n_unique": 4692
+  },
+  "Init_Win_bytes_backward": {
+   "strat": 0.8992,
+   "strat_f1": 0.3404029368218616,
+   "temp": 0.87334,
+   "temp_f1": 0.3033817810698341,
+   "tau": 0.971241103202847,
+   "tau_f1": 0.8912431364497854,
+   "n_unique": 4574
+  },
+  "act_data_pkt_fwd": {
+   "strat": 0.803,
+   "strat_f1": 0.06362411853260438,
+   "temp": 0.80297,
+   "temp_f1": 0.0639788196620686,
+   "tau": 0.9999626400996263,
+   "tau_f1": 1.0055749476400597,
+   "n_unique": 393
+  },
+  "min_seg_size_forward": {
+   "strat": 0.81836,
+   "strat_f1": 0.1156483717022665,
+   "temp": 0.83945,
+   "temp_f1": 0.11635299393544737,
+   "tau": 1.0257710543037295,
+   "tau_f1": 1.0060927985652484,
+   "n_unique": 16
+  },
+  "Active Mean": {
+   "strat": 0.84795,
+   "strat_f1": 0.22148876477153756,
+   "temp": 0.82863,
+   "temp_f1": 0.1832642659365444,
+   "tau": 0.9772156377144878,
+   "tau_f1": 0.8274201453314295,
+   "n_unique": 41107
+  },
+  "Active Std": {
+   "strat": 0.80355,
+   "strat_f1": 0.0957252750676206,
+   "temp": 0.80333,
+   "temp_f1": 0.08298339380214911,
+   "tau": 0.9997262149212868,
+   "tau_f1": 0.866891150153702,
+   "n_unique": 21549
+  },
+  "Active Max": {
+   "strat": 0.84733,
+   "strat_f1": 0.21910567668614014,
+   "temp": 0.82764,
+   "temp_f1": 0.19023297782247853,
+   "tau": 0.9767623004024406,
+   "tau_f1": 0.8682247794746981,
+   "n_unique": 40514
+  },
+  "Active Min": {
+   "strat": 0.8474,
+   "strat_f1": 0.2057924154278423,
+   "temp": 0.82691,
+   "temp_f1": 0.1690741309868842,
+   "tau": 0.9758201557705924,
+   "tau_f1": 0.8215761044224064,
+   "n_unique": 31317
+  },
+  "Idle Mean": {
+   "strat": 0.84836,
+   "strat_f1": 0.22874651052444964,
+   "temp": 0.81192,
+   "temp_f1": 0.17649689408980887,
+   "tau": 0.9570465368475647,
+   "tau_f1": 0.7715828918445685,
+   "n_unique": 24820
+  },
+  "Idle Std": {
+   "strat": 0.80679,
+   "strat_f1": 0.14997748114163936,
+   "temp": 0.79825,
+   "temp_f1": 0.1315338379850106,
+   "tau": 0.9894148415324929,
+   "tau_f1": 0.8770239170825217,
+   "n_unique": 21310
+  },
+  "Idle Max": {
+   "strat": 0.85082,
+   "strat_f1": 0.23113320736542375,
+   "temp": 0.81209,
+   "temp_f1": 0.17983243307183785,
+   "tau": 0.9544792082931759,
+   "tau_f1": 0.7780467165305291,
+   "n_unique": 18938
+  },
+  "Idle Min": {
+   "strat": 0.84754,
+   "strat_f1": 0.20739865622994064,
+   "temp": 0.81288,
+   "temp_f1": 0.15778938198963396,
+   "tau": 0.9591051749769923,
+   "tau_f1": 0.7608023352605264,
+   "n_unique": 28734
+  }
+ },
+ "perm_importance": {
+  "Flow Duration": 0.0029599999999999848,
+  "Total Fwd Packets": -3.999999999999559e-05,
+  "Total Backward Packets": 9.333333333332306e-05,
+  "Total Length of Fwd Packets": -0.00024000000000001798,
+  "Total Length of Bwd Packets": 0.0002533333333333054,
+  "Fwd Packet Length Max": 0.04253333333333331,
+  "Fwd Packet Length Min": 0.00046666666666661527,
+  "Fwd Packet Length Mean": 0.024973333333333313,
+  "Fwd Packet Length Std": 2.666666666666373e-05,
+  "Bwd Packet Length Max": 0.03517333333333332,
+  "Bwd Packet Length Min": 0.007306666666666639,
+  "Bwd Packet Length Mean": 0.0,
+  "Bwd Packet Length Std": -0.0006400000000000405,
+  "Flow Bytes/s": 0.02622666666666664,
+  "Flow Packets/s": 0.00047999999999994716,
+  "Flow IAT Mean": -0.018840000000000013,
+  "Flow IAT Std": -0.0013733333333333596,
+  "Flow IAT Max": 0.008373333333333321,
+  "Flow IAT Min": -0.010159999999999992,
+  "Fwd IAT Total": 2.666666666666373e-05,
+  "Fwd IAT Mean": 0.01070666666666662,
+  "Fwd IAT Std": 0.03362666666666665,
+  "Fwd IAT Max": 0.008866666666666644,
+  "Fwd IAT Min": -0.0059466666666667,
+  "Bwd IAT Total": 0.030053333333333286,
+  "Bwd IAT Mean": -0.0008533333333333504,
+  "Bwd IAT Std": 0.005839999999999979,
+  "Bwd IAT Max": -0.0006533333333333724,
+  "Bwd IAT Min": 7.999999999999118e-05,
+  "Fwd PSH Flags": 0.0,
+  "Fwd URG Flags": 0.0,
+  "Fwd Header Length": 0.004213333333333314,
+  "Bwd Header Length": -1.3333333333331865e-05,
+  "Fwd Packets/s": -0.004146666666666699,
+  "Bwd Packets/s": 0.0018933333333333024,
+  "Min Packet Length": -0.00036000000000002697,
+  "Max Packet Length": -0.00017333333333331425,
+  "Packet Length Mean": 0.0,
+  "Packet Length Std": 0.011466666666666625,
+  "Packet Length Variance": 0.0,
+  "FIN Flag Count": 0.0,
+  "SYN Flag Count": 0.0,
+  "RST Flag Count": 0.0,
+  "PSH Flag Count": 0.0,
+  "ACK Flag Count": 0.0,
+  "URG Flag Count": -0.0002666666666666817,
+  "CWE Flag Count": 0.0,
+  "ECE Flag Count": 0.0,
+  "Down/Up Ratio": -7.999999999999118e-05,
+  "Average Packet Size": 0.0,
+  "Avg Fwd Segment Size": 0.0,
+  "Avg Bwd Segment Size": 0.0,
+  "Fwd Header Length.1": 0.0,
+  "Subflow Fwd Packets": 0.0,
+  "Subflow Fwd Bytes": 0.0,
+  "Subflow Bwd Packets": 0.0,
+  "Subflow Bwd Bytes": 0.0,
+  "Init_Win_bytes_forward": -0.0006133333333333546,
+  "Init_Win_bytes_backward": 0.0006799999999999917,
+  "act_data_pkt_fwd": 0.017013333333333304,
+  "min_seg_size_forward": 0.0005466666666666065,
+  "Active Mean": -5.333333333337187e-05,
+  "Active Std": 0.0,
+  "Active Max": 0.0006266666666665977,
+  "Active Min": 5.333333333332746e-05,
+  "Idle Mean": 6.666666666665932e-05,
+  "Idle Std": -1.3333333333331865e-05,
+  "Idle Max": -0.0006400000000000405,
+  "Idle Min": 0.0
+ },
+ "audit": {
+  "chance": 0.803,
+  "rule": {
+   "ratio_below": 0.5,
+   "kappa": 0.4818,
+   "predictivity_threshold": 0.8979146,
+   "legacy_3x_applicable": false
+  },
+  "f1_majority_baseline": 0.06362411853260438,
+  "f1_min": 0.19087235559781315,
+  "n_features": 69,
+  "n_eligible": 43,
+  "blacklist_behavioural": [],
+  "identifiers_excluded": [
+   "Flow ID",
+   "Source IP",
+   "Destination IP",
+   "Source Port",
+   "Destination Port",
+   "Protocol"
+  ],
+  "positional": [
+   "Timestamp"
+  ]
+ },
+ "runs": {
+  "lightgbm|behavioural|stratifie": {
+   "macro_f1": 0.17733477161601588,
+   "accuracy": 0.7579100201537051,
+   "mcc": 0.38258059217432355,
+   "n_features": 69,
+   "seconds": 989.1
+  },
+  "logreg|behavioural|stratifie": {
+   "macro_f1": 0.14012267532578848,
+   "accuracy": 0.6000028261111474,
+   "mcc": 0.15771896041315964,
+   "n_features": 69,
+   "seconds": 1359.6
+  },
+  "dnn|behavioural|stratifie": {
+   "macro_f1": 0.48103661190502833,
+   "accuracy": 0.9169140985853548,
+   "mcc": 0.7382773001567625,
+   "n_features": 69,
+   "seconds": 496.1
+  },
+  "lightgbm|behavioural|temporel_par_classe": {
+   "macro_f1": 0.11910419454570441,
+   "accuracy": 0.7911780654482767,
+   "mcc": 0.3282839850028364,
+   "n_features": 69,
+   "seconds": 867.9
+  },
+  "logreg|behavioural|temporel_par_classe": {
+   "macro_f1": 0.09281113800982813,
+   "accuracy": 0.6226682704620803,
+   "mcc": 0.15149409219452958,
+   "n_features": 69,
+   "seconds": 1371.3
+  },
+  "dnn|behavioural|temporel_par_classe": {
+   "macro_f1": 0.4217942612452425,
+   "accuracy": 0.9194198782316566,
+   "mcc": 0.7472216176096194,
+   "n_features": 69,
+   "seconds": 493.6
+  }
+ }
+}
