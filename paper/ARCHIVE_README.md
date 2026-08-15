@@ -64,11 +64,23 @@ in the repository:
 | 7, the audit re-run on CICIDS2017 | `experiments/e2/e2_results_cicids2017.json` | `colab/e2_cicids2017_audit_v5.ipynb` |
 | 6.5, calibration under both protocols, and 6.2, residual redundancy | `experiments/e3/e3_results.json` | `colab/e3_calibration_residual_v3.ipynb` |
 
-The duplicate columns E2 finds on CICIDS2017 overlap the literature: three of the seven
-pairs are already reported by Rosay et al. (ICISSP 2022), reference [10] of the paper,
-four are not, and one pair they report is duplicated by definition but not numerically in
-the released files. Section 7 states the overlap rather than claiming the finding is new;
-the claim it does make is that attribution scores those columns at exactly zero either way.
+The duplicate columns E2 finds on CICIDS2017 overlap the literature, and Section 7 states
+the overlap rather than claiming the finding is new. Three of the seven pairs are already
+reported — `Fwd Header Length` by Engelen et al., reference [1] of the paper, and the two
+packet-length/segment-size pairs by Rosay et al., reference [10]. Two more have a
+documented cause: Engelen et al. record that CICFlowMeter failed to increment the PSH and
+URG counters, which is what makes `Fwd PSH Flags` coincide with `SYN Flag Count` and
+`Fwd URG Flags` with `CWE Flag Count`. Two we have not found reported. And one pair that
+literature calls duplicated, `Average Packet Size` / `Packet Length Mean`, is duplicated by
+definition but not numerically in the released files. The claim Section 7 does make is that
+permutation importance scores those columns at exactly zero either way.
+
+**Caveat on that paragraph.** The Rosay et al. PDF could not be opened from the environment
+these sections were written in; its list of duplicated pairs was reconstructed from
+concordant secondary summaries. The Engelen et al. attribution rests on the README of their
+own CICFlowMeter fork, which is primary. Check the Rosay list against the PDF before
+submission — if it names pairs beyond those three, the sentence naming what is unreported
+needs narrowing.
 
 E3 reads `probs/` and `frozen_splits_60s.npz` from `article1_final.zip` and retrains
 nothing. E2 needs CICIDS2017 itself, in the `GeneratedLabelledFlows` distribution and
