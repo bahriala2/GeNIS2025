@@ -64,6 +64,12 @@ in the repository:
 | 7, the audit re-run on CICIDS2017 | `experiments/e2/e2_results_cicids2017.json` | `colab/e2_cicids2017_audit_v5.ipynb` |
 | 6.5, calibration under both protocols, and 6.2, residual redundancy | `experiments/e3/e3_results.json` | `colab/e3_calibration_residual_v3.ipynb` |
 
+The duplicate columns E2 finds on CICIDS2017 overlap the literature: three of the seven
+pairs are already reported by Rosay et al. (ICISSP 2022), reference [10] of the paper,
+four are not, and one pair they report is duplicated by definition but not numerically in
+the released files. Section 7 states the overlap rather than claiming the finding is new;
+the claim it does make is that attribution scores those columns at exactly zero either way.
+
 E3 reads `probs/` and `frozen_splits_60s.npz` from `article1_final.zip` and retrains
 nothing. E2 needs CICIDS2017 itself, in the `GeneratedLabelledFlows` distribution and
 not `MachineLearningCVE`: the latter has no `Timestamp` column, and every step of the
