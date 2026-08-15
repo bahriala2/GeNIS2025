@@ -53,6 +53,23 @@ autoencoder reconstruction errors as `ae_scores_seed1.npz`.
 `paper/article1_results.json`, so the blacklist, the spectrum and the hyperparameter
 configurations can be read without downloading anything.
 
+## The two measurements added without retraining
+
+Two sections of the paper rest on measurements that are **not** in either zip, because
+both are derived from files the zips already contain and both are small enough to live
+in the repository:
+
+| Section | Result file | Notebook |
+|---|---|---|
+| 7, the audit re-run on CICIDS2017 | `experiments/e2/e2_results_cicids2017.json` | `colab/e2_cicids2017_audit_v5.ipynb` |
+| 6.5, calibration under both protocols, and 6.2, residual redundancy | `experiments/e3/e3_results.json` | `colab/e3_calibration_residual_v3.ipynb` |
+
+E3 reads `probs/` and `frozen_splits_60s.npz` from `article1_final.zip` and retrains
+nothing. E2 needs CICIDS2017 itself, in the `GeneratedLabelledFlows` distribution and
+not `MachineLearningCVE`: the latter has no `Timestamp` column, and every step of the
+audit rests on capture order. Each file carries a data signature the notebook checks
+at load time; E2's is `2830743|69|15`.
+
 ### Two points to confirm against the record's file listing
 
 The mapping above follows the pipeline's output layout. Two details of the hand-built
@@ -106,9 +123,10 @@ manuscript actually shows are committed alongside it under their figure numbers.
 | `python3 regen_en.py` | 2 capture windows, 3 per-class F1 audited, 5 transferability plane, 10 intervals |
 | `python3 regenerate_figures.py` | 8 conditions and protocols, 9 bootstrap intervals, 11 autoencoder AUROC |
 | `python3 regen_fig6.py` | 6 transferability spectrum, drawn at final page width |
+| `python3 regen_e2.py` | 13 the audit re-run on CICIDS2017, drawn at final page width |
 | `make figures` | runs `regen_en.py` and `regen_fig6.py` |
 
-**Five of the thirteen figures have no committed script.** Figures 1, 4, 7, 12 and 13
+**Five of the fourteen figures have no committed script.** Figures 1, 4, 7, 12 and 14
 were rendered while the native Word document was being built and were never written
 back to `paper/figures/`. The images are committed under
 `paper/figures_manuscrit/`, so nothing is lost, and their values were re-checked

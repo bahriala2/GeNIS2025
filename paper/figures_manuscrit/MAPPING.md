@@ -1,6 +1,6 @@
 # The manuscript figures
 
-The thirteen images extracted from `GeNIS_benchmark_article.docx`, named by the
+The fourteen images the manuscript shows, named by the
 **figure number the manuscript uses**. This folder is the answer to the question
 "what does Figure N look like"; `paper/figures/` is a different thing, the output
 of the regeneration scripts under their historical names.
@@ -33,11 +33,12 @@ figure they are. Two traps in particular:
 | 10 | `figure10_intervals_per_class.png` | `fig3_interval_heatmap.png` | regen_en.py |
 | 11 | `figure11_autoencoder_auroc.png` | `fig10_autoencoder.png` | regenerate_figures.py |
 | 12 | `figure12_cost_vs_quality.png` | **none** | none, see below |
-| 13 | `figure13_per_class_f1_temporal.png` | **none** | none, see below |
+| 13 | `figure13_cicids2017_audit.png` | `figE2_cicids2017_audit.png` | regen_e2.py |
+| 14 | `figure14_per_class_f1_temporal.png` | **none** | none, see below |
 
 ## The five figures with no script
 
-Figures 1, 4, 7, 12 and 13 were rendered while the native Word document was being
+Figures 1, 4, 7, 12 and 14 were rendered while the native Word document was being
 built and were never written back to `paper/figures/`. The images here are the ones
 the manuscript shows, extracted from the document itself, so nothing is lost. Their
 underlying values were re-checked against `article1_results.json`: Figure 12's nine
@@ -60,4 +61,5 @@ a regeneration path, that is the gap to close.
 - **Figure 10** (1593x1114 px): Per-class F1 across aggregation intervals
 - **Figure 11** (1832x934 px): Per-family AUROC of the benign-trained autoencoder
 - **Figure 12** (1803x1276 px): Inference cost against detection quality, temporal protocol
-- **Figure 13** (2096x1581 px): Per-class F1 under the temporal protocol
+- **Figure 13** (2679x1100 px): The audit re-run on CICIDS2017
+- **Figure 14** (2096x1581 px): Per-class F1 under the temporal protocol
