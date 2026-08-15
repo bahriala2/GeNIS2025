@@ -11,7 +11,7 @@ Relancer ce script apres toute modification du .py.
 import json
 from pathlib import Path
 
-VERSION = "v2"
+VERSION = "v3"
 BUILD = "2026-08-13"
 HERE = Path(__file__).resolve().parent
 SRC = (HERE / "e3_calibration_residual.py").read_text(encoding="utf-8")
@@ -49,48 +49,76 @@ qui est précisément le mécanisme que l'article accuse l'attribution de manque
 """)
 
 code(r"""
-# --- 1. Drive et verification des entrees ----------------------------------
+# --- 1. Drive, recherche du dossier de sortie, verification ----------------
 E3_VERSION = "VERSION_PLACEHOLDER"; E3_BUILD = "BUILD_PLACEHOLDER"
 print(f"E3 notebook {E3_VERSION}, compile le {E3_BUILD}\n")
 import pathlib, json
 from google.colab import drive
 drive.mount("/content/drive")
 
-SAVE = pathlib.Path("/content/drive/MyDrive/GeNIS/article1_final")
+MYDRIVE = pathlib.Path("/content/drive/MyDrive")
+MARQUEUR = "article1_results.json"     # le fichier qui identifie le dossier
 
-ATTENDU = {
-    "article1_results.json": "les resultats de la campagne",
-    "frozen_splits_60s.npz": "les indices de decoupage geles",
-    "cache/slice60.npz":     "les etiquettes et la matrice de features",
-    "cache/slice60_meta.json": "les noms de colonnes",
-    "probs":                 "les probabilites par run",
-}
-print("=" * 70)
-print(f"ENTREES SOUS {SAVE}")
-print("=" * 70)
-manque = []
-for rel, quoi in ATTENDU.items():
-    p = SAVE / rel
-    if p.exists():
-        n = len(list(p.glob("*.npz"))) if p.is_dir() else 1
-        taille = (sum(f.stat().st_size for f in p.rglob("*")) if p.is_dir()
-                  else p.stat().st_size) / 1e6
-        print(f"   OK      {rel:<26} {n:>4} fichier(s)  {taille:8.1f} Mo   {quoi}")
-    else:
-        manque.append(rel)
-        print(f"   ABSENT  {rel:<26} {'':>18}   {quoi}")
+# On ne suppose plus le chemin : on cherche le marqueur, d'abord aux endroits
+# attendus, puis dans tout MyDrive jusqu'a trois niveaux.
+candidats = [MYDRIVE / "GeNIS" / "article1_final", MYDRIVE / "article1_final",
+             MYDRIVE / "GeNIS"]
+trouves = [c for c in candidats if (c / MARQUEUR).exists()]
+if not trouves:
+    print(f"recherche de {MARQUEUR} dans MyDrive...", flush=True)
+    for prof in ("*/", "*/*/", "*/*/*/"):
+        trouves = [p.parent for p in MYDRIVE.glob(prof + MARQUEUR)]
+        if trouves:
+            break
 
-if manque:
-    print("\n>>> Ce qui manque limite ce qui est calculable :")
-    if "probs" in manque or "frozen_splits_60s.npz" in manque:
-        print("    la partie A (calibration) sera sautee")
-    if "cache/slice60.npz" in manque:
-        print("    les parties A ET B seront sautees : le cache porte les etiquettes")
-    print("\n    Ces fichiers sont produits par article1_pipeline.ipynb et vivent")
-    print("    dans MyDrive/GeNIS/article1_final/. Si le dossier a ete deplace,")
-    print("    corrigez SAVE ci-dessus.")
+SAVE = trouves[0] if trouves else None
+if len(trouves) > 1:
+    print(f"{len(trouves)} dossiers candidats, le premier est retenu :")
+    for t in trouves:
+        print("   ", t)
+
+print("=" * 72)
+if SAVE is None:
+    print("DOSSIER DE SORTIE INTROUVABLE")
+    print("=" * 72)
+    print(f"   {MARQUEUR} n'est nulle part dans MyDrive.")
+    print()
+    print("   Ce dossier est produit par article1_pipeline.ipynb. S'il a ete")
+    print("   efface apres la creation de l'archive Zenodo, redeposez")
+    print("   article1_final.zip sous MyDrive/GeNIS/ et decompressez-le :")
+    print()
+    print("      !unzip -q /content/drive/MyDrive/GeNIS/article1_final.zip \\")
+    print("             -d /content/drive/MyDrive/GeNIS/")
+    print()
+    print("   puis relancez cette cellule. Les cellules suivantes ne feront")
+    print("   rien tant que SAVE vaut None : elles s'arretent proprement.")
 else:
-    print("\n>>> tout est present, les deux parties sont calculables")
+    print(f"DOSSIER DE SORTIE : {SAVE}")
+    print("=" * 72)
+    ATTENDU = {"article1_results.json": "les resultats de la campagne",
+               "frozen_splits_60s.npz": "les indices de decoupage geles",
+               "cache/slice60.npz": "les etiquettes et la matrice de features",
+               "cache/slice60_meta.json": "les noms de colonnes",
+               "probs": "les probabilites par run"}
+    manque = []
+    for rel, quoi in ATTENDU.items():
+        p = SAVE / rel
+        if p.exists():
+            n = len(list(p.glob("*.npz"))) if p.is_dir() else 1
+            t = (sum(f.stat().st_size for f in p.rglob("*")) if p.is_dir()
+                 else p.stat().st_size) / 1e6
+            print(f"   OK      {rel:<26} {n:>4} fichier(s) {t:8.1f} Mo   {quoi}")
+        else:
+            manque.append(rel)
+            print(f"   ABSENT  {rel:<26} {'':>21}   {quoi}")
+    if manque:
+        print("\n   >>> consequences :")
+        if {"probs", "frozen_splits_60s.npz"} & set(manque):
+            print("       partie A (calibration) sautee")
+        if "cache/slice60.npz" in manque:
+            print("       parties A ET B sautees : le cache porte les etiquettes")
+    else:
+        print("\n   >>> tout est present, les deux parties sont calculables")
 """)
 
 code("# --- 2. Fonctions ----------------------------------------------------------\n"
@@ -112,7 +140,10 @@ logits par le pipeline plutôt que publier des valeurs dégradées.
 
 code(r"""
 res = {"source": str(SAVE)}
-partie_calibration(SAVE, res)
+if SAVE is None:
+    print("SAVE vaut None : rien a calculer, voir la cellule 1.")
+else:
+    partie_calibration(SAVE, res)
 """)
 
 md("""
@@ -124,17 +155,35 @@ boucle de la contribution centrale de l'article.
 """)
 
 code(r"""
-partie_residuel(SAVE, res)
+if SAVE is None:
+    print("SAVE vaut None : rien a calculer, voir la cellule 1.")
+else:
+    partie_residuel(SAVE, res)
 """)
 
 code(r"""
 # --- Export ----------------------------------------------------------------
-out = SAVE / "e3_results.json"
-out.write_text(json.dumps(res, indent=1, ensure_ascii=False, default=float),
-               encoding="utf-8")
-print("ecrit :", out)
-print(f"   parties presentes : {', '.join(k for k in res if k != 'source')}")
-print("\nA me renvoyer : e3_results.json")
+# Ecrire dans un dossier absent leve une erreur peu parlante ; on cree le
+# parent, et on se rabat sur /content si Drive n'est pas ecrivable.
+mesures = [k for k in res if k != "source"]
+if not mesures:
+    print("aucune mesure a exporter : voir la cellule 1 pour la cause.")
+else:
+    out = (SAVE / "e3_results.json") if SAVE else pathlib.Path("/content/e3_results.json")
+    try:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(res, indent=1, ensure_ascii=False, default=float),
+                       encoding="utf-8")
+    except OSError as e:
+        out = pathlib.Path("/content/e3_results.json")
+        out.write_text(json.dumps(res, indent=1, ensure_ascii=False, default=float),
+                       encoding="utf-8")
+        print(f"Drive non ecrivable ({e.__class__.__name__}), repli sur /content")
+    print("ecrit :", out)
+    print(f"   parties presentes : {', '.join(mesures)}")
+    print("\nA me renvoyer : e3_results.json")
+    if str(out).startswith("/content/e3"):
+        print("   (a telecharger depuis le panneau Fichiers de Colab)")
 """)
 
 nb = {"cells": [dict(c, source=[l.replace("VERSION_PLACEHOLDER", VERSION)
