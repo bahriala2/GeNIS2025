@@ -1,12 +1,18 @@
 # Réponse à la relecture Q1
 
-État au 13 août 2026. Trois colonnes : ce qui est **fait** dans le manuscrit, ce qui
+État au 15 août 2026. Trois colonnes : ce qui est **fait** dans le manuscrit, ce qui
 est **faisable sans réentraîner** et attend seulement d'être lancé, et ce qui exige une
 **campagne**.
 
 Le relecteur formule le diagnostic central ainsi : *« certaines limites doivent être
 traitées expérimentalement et pas seulement déclarées »*. C'est la bonne critique. Ce
 document sépare donc systématiquement ce qui a été mesuré de ce qui reste déclaré.
+
+> **Numérotation.** L'insertion de la section 7 (second corpus) a décalé ce qui suit :
+> les sections 7–11 sont devenues 8–12 et les tableaux 9–12 sont devenus 11–14. Les
+> renvois écrits **avant** cette insertion, plus bas dans ce document, sont restés dans
+> l'ancienne numérotation : y lire §9 pour « §8 » (*Threats to validity*) et Tableau 14
+> pour « Tableau 12 » (sensibilité au seuil).
 
 ---
 
@@ -109,12 +115,27 @@ liste noire produite est celle sous laquelle **tous les modèles de l'article on
 entraînés**. Déplacer le seuil après la campagne reviendrait à publier un jeu de features sous
 lequel aucun chiffre rapporté n'a été produit.
 
-**Second corpus.** `colab/e2_cicids2017_audit_v1.ipynb` est écrit et testé de bout en bout. Il
-remplit les cinq lignes demandées sur CICIDS2017. Il exige `GeneratedLabelledFlows` et non
-`MachineLearningCVE`, faute d'horodatage dans cette dernière. Il a déjà révélé un défaut de la
-règle publiée : le filtre `acc > 3 × hasard` est inapplicable sur un corpus à 80 % de classe
-majoritaire, et E2 le réexprime en `acc > hasard + κ(1 − hasard)` avec κ = 0.4818, qui
-reproduit exactement la règle de GeNIS.
+**Second corpus. Fait.** `colab/e2_cicids2017_audit_v5.ipynb` a tourné sur les 2 830 743 flux de
+CICIDS2017 (`GeneratedLabelledFlows`, et non `MachineLearningCVE`, faute d'horodatage dans cette
+dernière). Résultats bruts dans `experiments/e2/`, lecture dans son `FINDINGS.md`, et **section 7
+du manuscrit**, « External validation on a second corpus », avec les tableaux 9 et 10. Les
+sections suivantes ont été renumérotées, 7–11 devenant 8–12, et les tableaux 9–12 devenant 11–14.
+
+Trois choses à retenir de ce qui est écrit dans l'article :
+
+- le mécanisme de redondance **se reproduit** : sept paires de colonnes identiques, dix des
+  quatorze colonnes concernées à importance par permutation exactement nulle ;
+- la deuxième conclusion est **corrigée par le second corpus**, pas confirmée : sur CICIDS2017 la
+  sonde d'horodatage s'effondre à 0.1028 sous le protocole temporel, contre 0.9862 sur GeNIS. Le
+  découpage temporel suffit ou ne suffit pas **selon le corpus**, et cela se mesure ;
+- la règle publiée ne se transpose pas : `acc > 3 × hasard` est inapplicable à 80 % de classe
+  majoritaire. Deux réexpressions sont consignées, `acc > hasard + κ(1 − hasard)` avec
+  κ = 0.4818 qui reproduit exactement la règle de GeNIS, et le portage sur le macro-F1,
+  `macro-F1 > 3 × 0.0636`, qui est celle retenue.
+
+Non repris dans le manuscrit : les six runs de confirmation (LightGBM, régression logistique, DNN
+sous les deux protocoles) présents dans `e2_results_cicids2017.json`. Leurs macro-F1 sont trop bas
+pour être publiés tels quels et demandent un diagnostic avant d'être cités.
 
 **Calibration temporelle et audit résiduel.** `colab/e3_calibration_residual.py` fait les deux,
 sans réentraînement, depuis `probs/` et le cache. Reste à le lancer.
@@ -146,18 +167,6 @@ découpage régénèrent en une dizaine de minutes.
 ---
 
 ## Exige une campagne
-
-### P1, second corpus (priorité 1 du relecteur)
-
-**Non fait, et c'est le risque principal de rejet.** Le relecteur a raison sur le fond :
-trois résultats à portée méthodologique sont démontrés sur un seul corpus.
-
-Le minimum viable qu'il propose est juste : pas 154 runs sur un second corpus, mais la
-sonde temporelle, la sonde mono-feature, l'importance par permutation, le découpage
-temporel et la transférabilité. Sur CICIDS2017 ou UNSW-NB15, cela représente une
-poignée d'heures de calcul, pas une seconde campagne.
-
-À arbitrer contre le calendrier : Article 1 doit précéder BAg-IDS.
 
 ### P3, protocoles temporels supplémentaires (priorité 3)
 

@@ -1,5 +1,8 @@
 # E2 sur CICIDS2017 : ce que l'audit trouve
 
+> Rédigé dans le manuscrit : **section 7, « External validation on a second corpus »**,
+> tableaux 9 et 10. Les six points ci-dessous y sont tous repris.
+
 Source : `e2_results_cicids2017.json`, empreinte `2830743|69|15`, notebook E2 v5.
 2 830 743 flux, le compte canonique du corpus. 15 classes, 69 features
 comportementales, 8 colonnes constantes retirees, 6 identifiants et 1 colonne

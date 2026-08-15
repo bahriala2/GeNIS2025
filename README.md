@@ -12,7 +12,7 @@ La chaîne LaTeX a été abandonnée en août 2026 ; elle est archivée dans
 
 | Chemin | Rôle |
 |---|---|
-| `paper/GeNIS_benchmark_article.docx` | **L'article** (28 pages, 13 figures, 12 tables, 27 références) : source unique, à éditer directement dans Word |
+| `paper/GeNIS_benchmark_article.docx` | **L'article** (12 sections, 13 figures, 14 tables, 27 références) : source unique, à éditer directement dans Word |
 | `paper/article1_results.json` | Résultats de la campagne (154 runs), source de tous les chiffres |
 | `paper/ARCHIVE_README.md` | Ce que contient réellement l'archive Zenodo publiée |
 | `colab/zenodo_export_cell.py` | Construit l'archive canonique ; dernière cellule du pipeline |
@@ -46,7 +46,7 @@ Le dépôt v1.0.0 contient deux zips montés à la main, `article1_final.zip` et
 ici, sur GitHub. Voir `paper/ARCHIVE_README.md` pour la correspondance élément par
 élément, et pour ce qu'apporterait une v2.
 
-## État (2026-08-13)
+## État (2026-08-15)
 
 - [x] Proposition vérifiée et validée (avec corrections)
 - [x] Campagne terminée : 154/154 runs
@@ -56,6 +56,8 @@ ici, sur GitHub. Voir `paper/ARCHIVE_README.md` pour la correspondance élément
 - [x] Affiliations et URL du dépôt renseignées
 - [x] Word natif vérifié page par page, sans tiret cadratin
 - [x] DOI d'archivage : `10.5281/zenodo.21910662` (concept), `10.5281/zenodo.21910663` (v1.0.0)
+- [x] Second corpus (priorité 1 du relecteur) : audit E2 sur CICIDS2017, rédigé en **section 7**
+      du manuscrit ; sections 7–11 renumérotées 8–12, tableaux 9–12 renumérotés 11–14
 - [ ] Relecture Pr Jemili
 - [ ] Soumission
 
