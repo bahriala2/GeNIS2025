@@ -12,14 +12,15 @@ La chaîne LaTeX a été abandonnée en août 2026 ; elle est archivée dans
 
 | Chemin | Rôle |
 |---|---|
-| `paper/GeNIS_benchmark_article.docx` | **L'article** (12 sections, 13 figures, 14 tables, 27 références) : source unique, à éditer directement dans Word |
+| `paper/GeNIS_benchmark_article.docx` | **L'article** (12 sections, 14 figures, 14 tables, 27 références) : source unique, à éditer directement dans Word |
 | `paper/article1_results.json` | Résultats de la campagne (154 runs), source de tous les chiffres |
 | `paper/ARCHIVE_README.md` | Ce que contient réellement l'archive Zenodo publiée |
 | `colab/zenodo_export_cell.py` | Construit l'archive canonique ; dernière cellule du pipeline |
-| `paper/figures_manuscrit/` | **Les 13 figures du manuscrit**, nommées par leur numéro de figure, avec `MAPPING.md` |
+| `paper/figures_manuscrit/` | **Les 14 figures du manuscrit**, nommées par leur numéro de figure, avec `MAPPING.md` |
 | `paper/figures/` | Sorties des scripts, sous leurs noms hérités de LaTeX : la numérotation n'est **pas** celle du manuscrit |
 | `paper/figures_annexe/` | 15 figures d'annexe pour le rapport de thèse |
 | `paper/regen_en.py`, `paper/regen_fig6.py` | Régénèrent les figures depuis les résultats |
+| `paper/regen_fig13_cicids2017.py` | Régénère la figure 13 (audit CICIDS2017) depuis `experiments/e2/` |
 | `paper/Makefile` | `make preview` (rendu PDF + images de pages) · `make figures` · `make clean` |
 | `paper/legacy-latex/` | Ancienne chaîne LaTeX, **gelée et obsolète** (voir son README) |
 | `docs/reponse_relecture.md` | Réponse point par point aux 21 remarques de relecture (toutes adoptées), corrections factuelles trouvées en révision, rebuttal en anglais |
@@ -35,7 +36,7 @@ L'artefact est déposé sous deux DOI, et la distinction compte :
 
 | DOI | Ce qu'il désigne |
 |---|---|
-| `10.5281/zenodo.21910662` | **DOI de concept.** Résout toujours vers la version la plus récente. C'est celui que cite la section 10 de l'article. |
+| `10.5281/zenodo.21910662` | **DOI de concept.** Résout toujours vers la version la plus récente. C'est celui que cite la section 11 de l'article. |
 | `10.5281/zenodo.21910663` | **DOI de version, v1.0.0**, publiée le 13 août 2026. Il fige l'état exact sur lequel repose l'article ; le DOI de concept, lui, suivra les versions ultérieures. |
 
 Citez le DOI de version pour reproduire précisément les chiffres publiés, le DOI de
@@ -57,7 +58,8 @@ ici, sur GitHub. Voir `paper/ARCHIVE_README.md` pour la correspondance élément
 - [x] Word natif vérifié page par page, sans tiret cadratin
 - [x] DOI d'archivage : `10.5281/zenodo.21910662` (concept), `10.5281/zenodo.21910663` (v1.0.0)
 - [x] Second corpus (priorité 1 du relecteur) : audit E2 sur CICIDS2017, rédigé en **section 7**
-      du manuscrit ; sections 7–11 renumérotées 8–12, tableaux 9–12 renumérotés 11–14
+      du manuscrit, avec les tableaux 9–10 et la figure 13 ; sections 7–11 renumérotées 8–12,
+      tableaux 9–12 renumérotés 11–14, figure 13 renumérotée 14
 - [ ] Relecture Pr Jemili
 - [ ] Soumission
 

@@ -18,6 +18,7 @@ preview: $(DOCX)
 figures:
 	python3 regen_en.py
 	python3 regen_fig6.py
+	python3 regen_fig13_cicids2017.py
 
 clean:
 	rm -f $(basename $(DOCX)).pdf page-*.jpg

@@ -12,7 +12,7 @@ document sépare donc systématiquement ce qui a été mesuré de ce qui reste d
 > les sections 7–11 sont devenues 8–12 et les tableaux 9–12 sont devenus 11–14. Les
 > renvois écrits **avant** cette insertion, plus bas dans ce document, sont restés dans
 > l'ancienne numérotation : y lire §9 pour « §8 » (*Threats to validity*) et Tableau 14
-> pour « Tableau 12 » (sensibilité au seuil).
+> pour « Tableau 12 » (sensibilité au seuil). L'ancienne figure 13 est devenue la 14.
 
 ---
 
@@ -118,8 +118,15 @@ lequel aucun chiffre rapporté n'a été produit.
 **Second corpus. Fait.** `colab/e2_cicids2017_audit_v5.ipynb` a tourné sur les 2 830 743 flux de
 CICIDS2017 (`GeneratedLabelledFlows`, et non `MachineLearningCVE`, faute d'horodatage dans cette
 dernière). Résultats bruts dans `experiments/e2/`, lecture dans son `FINDINGS.md`, et **section 7
-du manuscrit**, « External validation on a second corpus », avec les tableaux 9 et 10. Les
-sections suivantes ont été renumérotées, 7–11 devenant 8–12, et les tableaux 9–12 devenant 11–14.
+du manuscrit**, « External validation on a second corpus », avec les tableaux 9 et 10 et la
+figure 13. Les sections suivantes ont été renumérotées, 7–11 devenant 8–12, les tableaux 9–12
+devenant 11–14, et l'ancienne figure 13 devenant 14.
+
+La figure de `e2_figures.zip` n'a pas été reprise : elle traçait les **neuf** features éligibles
+sous la marge en accuracy, pas les quarante-trois retenues sous le macro-F1, donc elle
+contredisait la règle du texte. `paper/regen_fig13_cicids2017.py` la remplace et la régénère
+depuis le JSON, en trois panneaux : le spectre des 43 éligibles, le plan de l'attribution avec
+les quatorze colonnes dupliquées, et la sonde d'horodatage sur les deux corpus.
 
 Trois choses à retenir de ce qui est écrit dans l'article :
 
