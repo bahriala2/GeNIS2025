@@ -1,0 +1,404 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Genere colab/e4a_audit_sans_test.ipynb.
+
+E4a est le verrou de la revision : il recalcule la transferabilite sur la
+partition de VALIDATION au lieu du TEST, et dit si la liste noire publiee
+change. Tout le reste du plan de revision en depend, parce qu'une liste noire
+differente invalide le jeu de features sur lequel les 154 runs ont tourne.
+
+Ce que le relecteur a releve, et qui est exact : dans la cellule 5.2 du
+pipeline, probe() entraine sur tr_ et evalue sur te_, et l'importance par
+permutation est calculee sur Xte/yte. La liste noire est donc selectionnee
+avec de l'information de test.
+
+Aucun reentrainement de detecteur. Tout se calcule depuis cache/slice60.npz
+et frozen_splits_60s.npz, deja sur le Drive. Quelques dizaines de minutes.
+
+Relancer ce script apres toute modification, puis deposer le .ipynb sur Colab.
+"""
+import json
+from pathlib import Path
+
+VERSION = "v1"
+BUILD = "2026-08-15"
+HERE = Path(__file__).resolve().parent
+
+CELLS = []
+md = lambda s: CELLS.append({"cell_type": "markdown", "metadata": {},
+                             "source": s.strip("\n").split("\n")})
+code = lambda s: CELLS.append({"cell_type": "code", "execution_count": None,
+                               "metadata": {}, "outputs": [],
+                               "source": s.strip("\n").split("\n")})
+
+md(f"""
+# E4a — l'audit recalculé sans toucher au test
+
+> **Notebook {VERSION}, compilé le {BUILD}.** La cellule 1 réaffiche ce numéro.
+> S'il ne correspond pas, Colab sert une copie en cache.
+
+**Pourquoi ce notebook, et pourquoi il passe en premier.**
+
+Le relecteur a relevé un défaut de protocole, et la lecture du code lui donne raison.
+Dans la cellule 5.2 du pipeline, `probe()` entraîne sur `tr_` et évalue sur `te_`, et
+l'importance par permutation est calculée sur `Xte`/`yte`. La transférabilité τ, donc la
+liste noire, donc le jeu de features sur lequel les 154 runs ont été entraînés, sont
+mesurés sur la partition de **test**.
+
+Ce notebook refait la même mesure sur la partition de **validation** et répond à une
+seule question :
+
+> **la liste noire change-t-elle ?**
+
+| Réponse | Conséquence |
+|---|---|
+| identique | le défaut disparaît en une phrase, rien à réentraîner, le reste du plan tient |
+| différente | il faut relancer le benchmark sur la nouvelle liste avant toute autre campagne |
+
+C'est pour cela que rien d'autre ne doit partir avant d'avoir le résultat.
+
+**Aucun réentraînement de détecteur.** Tout se calcule depuis `cache/slice60.npz` et
+`frozen_splits_60s.npz`, déjà sur le Drive.
+
+| Partie | Ce qu'elle fait |
+|---|---|
+| A | balayage mono-feature sur **validation**, sous les deux protocoles → liste noire |
+| B | contrôle : le même balayage sur **test**, qui doit reproduire le Tableau 3 publié |
+| C | importance par permutation sur validation |
+| D | environnement complet de la machine (CPU, RAM, OS, threads, versions) |
+
+**Durée.** 63 features × 2 protocoles × 2 partitions, arbres de décision sur ~200 000
+lignes : compter 20 à 40 minutes. Aucun GPU nécessaire.
+
+**À me renvoyer :** `e4a_results.json`.
+""")
+
+code(r'''
+# --- 1. Drive, recherche du dossier, verification --------------------------
+E4A_VERSION = "VERSION_PLACEHOLDER"; E4A_BUILD = "BUILD_PLACEHOLDER"
+print(f"E4a notebook {E4A_VERSION}, compile le {E4A_BUILD}\n")
+import pathlib, json, sys
+from google.colab import drive
+drive.mount("/content/drive")
+
+MYDRIVE = pathlib.Path("/content/drive/MyDrive")
+MARQUEUR = "article1_results.json"
+
+candidats = [MYDRIVE / "GeNIS" / "article1_final", MYDRIVE / "article1_final",
+             MYDRIVE / "GeNIS"]
+trouves = [c for c in candidats if (c / MARQUEUR).exists()]
+if not trouves:
+    print(f"recherche de {MARQUEUR} dans MyDrive...", flush=True)
+    for prof in ("*/", "*/*/", "*/*/*/"):
+        trouves = [p.parent for p in MYDRIVE.glob(prof + MARQUEUR)]
+        if trouves:
+            break
+if not trouves:
+    sys.exit(f"{MARQUEUR} introuvable sous {MYDRIVE}. Verifie le montage du Drive.")
+
+SAVE = trouves[0]
+print(f"dossier de travail : {SAVE}")
+
+CACHE = SAVE / "cache" / "slice60.npz"
+META = SAVE / "cache" / "slice60_meta.json"
+SPLITS_PATH = SAVE / "frozen_splits_60s.npz"
+for p in (CACHE, META, SPLITS_PATH):
+    print(f"   {'OK ' if p.exists() else 'MANQUE'}  {p.relative_to(SAVE)}")
+if not all(p.exists() for p in (CACHE, META, SPLITS_PATH)):
+    sys.exit("il manque le cache des features ou les splits geles : E4a ne peut pas tourner")
+''')
+
+code(r'''
+# --- 2. Chargement, et empreinte des donnees ------------------------------
+import numpy as np, time, gc
+from sklearn.tree import DecisionTreeClassifier
+
+R = json.loads((SAVE / "article1_results.json").read_text(encoding="utf-8"))
+M = json.loads(META.read_text(encoding="utf-8"))
+z = np.load(CACHE)
+X, y = z["X"], z["y"].astype(int)
+FEATS = M["feat_all"]
+
+zs = np.load(SPLITS_PATH)
+SPLITS = {}
+for k in list(R["slice60"].get("split_keys", [])) or \
+         [f"strat_seed{s}" for s in (1, 2, 3, 4, 5)] + ["temporal"]:
+    if f"{k}_train" in zs:
+        SPLITS[k] = (zs[f"{k}_train"], zs[f"{k}_val"], zs[f"{k}_test"])
+
+F_CLEAN = R["slice60"]["features_clean"]
+CHANCE = R["audit"]["chance"]
+RULE = R["audit"]["rule"]
+THR, KMIN = RULE["ratio_below"], RULE["min_acc_x_chance"]
+PUB = [f for f in R["audit"]["blacklist"] if f in F_CLEAN]   # les 8 comportementales
+
+SIGNATURE = f"{X.shape[0]}|{len(FEATS)}|{len(F_CLEAN)}|{len(np.unique(y))}"
+print(f"empreinte des donnees : {SIGNATURE}")
+print(f"   {X.shape[0]:,} lignes, {len(FEATS)} colonnes en cache, "
+      f"{len(F_CLEAN)} comportementales".replace(",", " "))
+print(f"   splits disponibles : {sorted(SPLITS)}")
+print(f"   hasard {CHANCE:.4f} | regle : acc_strat > {KMIN}x hasard et tau < {THR}")
+print(f"   liste noire comportementale publiee ({len(PUB)}) : {PUB}")
+
+ATTENDU = "338820|67|63|9"
+if SIGNATURE != ATTENDU:
+    print(f"\n!! empreinte inattendue (attendu {ATTENDU}). Les chiffres ci-dessous ne")
+    print("   seront pas comparables au manuscrit. Verifie le dossier avant de continuer.")
+''')
+
+code(r'''
+# --- 3. Etat reprenable ----------------------------------------------------
+# Le balayage est long ; on ecrit apres chaque feature pour pouvoir reprendre.
+STATE_PATH = SAVE / "e4a_results.json"
+
+def load_state():
+    if STATE_PATH.exists():
+        return json.loads(STATE_PATH.read_text(encoding="utf-8"))
+    return {"meta": {"signature": SIGNATURE, "version": E4A_VERSION},
+            "scan_val": {}, "scan_test": {}, "perm_val": {}, "verdict": {}, "env": {}}
+
+def save_state(s):
+    tmp = STATE_PATH.with_suffix(".tmp")
+    tmp.write_text(json.dumps(s, indent=1, ensure_ascii=False, default=float),
+                   encoding="utf-8")
+    tmp.replace(STATE_PATH)
+
+STATE = load_state()
+print(f"etat : {len(STATE['scan_val'])}/{len(F_CLEAN)} features balayees sur validation, "
+      f"{len(STATE['scan_test'])}/{len(F_CLEAN)} sur test")
+''')
+
+md("""
+## A. Le balayage, sur la validation
+
+Chaque feature est évaluée **seule**, arbre de décision entraîné sur la partition
+d'entraînement et évalué sur la partition de **validation**, sous les deux protocoles.
+
+`DecisionTreeClassifier(random_state=1)` et rien d'autre : tous les hyperparamètres sont
+ceux de scikit-learn par défaut, exactement comme dans le pipeline. C'est ce que le
+manuscrit doit déclarer (mineur 13 du rapport).
+""")
+
+code(r'''
+# --- 4. Balayage sur VALIDATION puis sur TEST -----------------------------
+def scan(cible, store, titre):
+    """cible = 1 (validation) ou 2 (test) dans le triplet (train, val, test)."""
+    t0, n = time.time(), len(F_CLEAN)
+    for k, f in enumerate(F_CLEAN, 1):
+        if f in store:
+            continue
+        j = FEATS.index(f)
+        x = np.nan_to_num(X[:, j].astype("float64"),
+                          nan=0., posinf=0., neginf=0.).reshape(-1, 1)
+        r = {}
+        for nom, cle in (("strat", "strat_seed1"), ("temp", "temporal")):
+            tr_ = SPLITS[cle][0]; ev_ = SPLITS[cle][cible]
+            clf = DecisionTreeClassifier(random_state=1).fit(x[tr_], y[tr_])
+            r[nom] = float((clf.predict(x[ev_]) == y[ev_]).mean())
+            del clf
+        r["tau"] = r["temp"] / r["strat"] if r["strat"] > 0 else 1.0
+        store[f] = r
+        if k % 5 == 0 or r["tau"] < THR:
+            el = time.time() - t0
+            print(f"   [{k:>2}/{n}] {f:20s} {r['strat']:.3f} -> {r['temp']:.3f}  "
+                  f"tau {r['tau']:.2f}"
+                  f"{'   <-- SOUS LE SEUIL' if r['tau'] < THR else ''}   ({el:.0f} s)",
+                  flush=True)
+            save_state(STATE)
+        del x; gc.collect()
+    save_state(STATE)
+    print(f"{titre} termine en {time.time()-t0:.0f} s\n")
+
+print("=== A. balayage sur la VALIDATION ===", flush=True)
+scan(1, STATE["scan_val"], "balayage validation")
+
+print("=== B. controle : balayage sur le TEST (doit reproduire le Tableau 3) ===",
+      flush=True)
+scan(2, STATE["scan_test"], "balayage test")
+''')
+
+code(r'''
+# --- 5. Les deux listes noires, et le verdict -----------------------------
+def liste_noire(store):
+    elig = [f for f in F_CLEAN if store[f]["strat"] > KMIN * CHANCE]
+    noire = sorted(f for f in elig if store[f]["tau"] < THR)
+    return elig, noire
+
+elig_v, noire_v = liste_noire(STATE["scan_val"])
+elig_t, noire_t = liste_noire(STATE["scan_test"])
+
+print("=" * 74)
+print(f"{'':<34}{'validation':>14}{'test':>12}{'publie':>12}")
+print("=" * 74)
+print(f"{'features eligibles':<34}{len(elig_v):>14}{len(elig_t):>12}{38:>12}")
+print(f"{'exclues par la regle':<34}{len(noire_v):>14}{len(noire_t):>12}{len(PUB):>12}")
+print()
+
+controle_ok = sorted(noire_t) == sorted(PUB)
+print(f"CONTROLE  le balayage sur test reproduit la liste publiee : "
+      f"{'OUI' if controle_ok else 'NON'}")
+if not controle_ok:
+    print(f"   test   : {sorted(noire_t)}")
+    print(f"   publie : {sorted(PUB)}")
+    print("   -> si les deux different, la matrice en cache n'est pas celle de la campagne.")
+
+identique = sorted(noire_v) == sorted(PUB)
+ajoutees = sorted(set(noire_v) - set(PUB))
+retirees = sorted(set(PUB) - set(noire_v))
+
+print()
+print("=" * 74)
+print("VERDICT : la liste noire recalculee sur la VALIDATION est",
+      "IDENTIQUE a la publiee" if identique else "DIFFERENTE de la publiee")
+print("=" * 74)
+if identique:
+    print("   Rien a reentrainer. Le defaut se corrige par une phrase de methode :")
+    print("   la liste est la meme, qu'on la calcule sur validation ou sur test.")
+else:
+    print(f"   entrent  ({len(ajoutees)}) : {ajoutees or 'aucune'}")
+    print(f"   sortent  ({len(retirees)}) : {retirees or 'aucune'}")
+    print("   -> il faut relancer le benchmark sur cette liste AVANT E4b et E4c.")
+
+print("\n   detail des features qui changent de statut :")
+for f in ajoutees + retirees:
+    v, t = STATE["scan_val"][f], STATE["scan_test"][f]
+    print(f"      {f:20s} val: {v['strat']:.3f}->{v['temp']:.3f} tau {v['tau']:.3f}   "
+          f"test: {t['strat']:.3f}->{t['temp']:.3f} tau {t['tau']:.3f}")
+
+# marge : de combien le seuil peut bouger sans changer la liste, sur validation
+taus_v = sorted(STATE["scan_val"][f]["tau"] for f in elig_v)
+bas = max([t for t in taus_v if t < THR], default=0.0)
+haut = min([t for t in taus_v if t >= THR], default=1.0)
+print(f"\n   sur validation, la liste est stable pour tout seuil dans ]{bas:.4f}, {haut:.4f}]"
+      f"  (largeur {haut-bas:.4f})")
+
+STATE["verdict"] = {"identique": bool(identique), "controle_test_ok": bool(controle_ok),
+                    "noire_validation": noire_v, "noire_test": noire_t,
+                    "noire_publiee": PUB, "ajoutees": ajoutees, "retirees": retirees,
+                    "n_eligibles_val": len(elig_v), "n_eligibles_test": len(elig_t),
+                    "vide_au_seuil_val": [bas, haut]}
+save_state(STATE)
+''')
+
+md("""
+## C. L'importance par permutation, sur la validation
+
+Même mesure que la figure 4 du manuscrit, mais calculée sur la validation. Elle sert à
+deux choses : vérifier que la cécité de l'attribution aux colonnes dupliquées ne dépend
+pas non plus de la partition, et donner une figure qui ne touche pas au test.
+""")
+
+code(r'''
+# --- 6. Importance par permutation sur la VALIDATION ----------------------
+if not STATE["perm_val"]:
+    from sklearn.inspection import permutation_importance
+    from sklearn.preprocessing import RobustScaler
+    from lightgbm import LGBMClassifier
+
+    ci = [FEATS.index(c) for c in F_CLEAN]
+    tr_, va_, _ = SPLITS["strat_seed1"]
+    sc = RobustScaler().fit(X[tr_][:, ci])
+    f = lambda ix: np.nan_to_num(sc.transform(X[ix][:, ci]),
+                                 nan=0., posinf=0., neginf=0.).astype("float32")
+    Xtr, Xva = f(tr_), f(va_)
+
+    print("modele de reference LightGBM...", flush=True)
+    ref = LGBMClassifier(n_estimators=300, num_leaves=63, learning_rate=.1,
+                         n_jobs=2, random_state=0, verbose=-1).fit(Xtr, y[tr_])
+    rng = np.random.RandomState(0)
+    six = rng.choice(len(va_), size=min(15000, len(va_)), replace=False)
+    print("importance par permutation sur la validation...", flush=True)
+    imp = permutation_importance(ref, Xva[six], y[va_][six], n_repeats=5,
+                                 random_state=0, n_jobs=1, scoring="accuracy")
+    STATE["perm_val"] = {F_CLEAN[i]: float(imp.importances_mean[i])
+                         for i in range(len(F_CLEAN))}
+    save_state(STATE)
+    del ref, Xtr, Xva; gc.collect()
+
+P = STATE["perm_val"]
+pub_imp = R["audit"]["perm_importance"]
+zero_v = [f for f in noire_v if abs(P.get(f, 1.0)) < 1e-4]
+print(f"\nexclues dont l'importance sur validation est < 1e-4 : "
+      f"{len(zero_v)}/{len(noire_v)}")
+print(f"{'feature':<20}{'imp. validation':>17}{'imp. test (publiee)':>22}")
+for f in sorted(set(noire_v) | set(PUB)):
+    print(f"{f:<20}{P.get(f, float('nan')):>17.6f}{pub_imp.get(f, float('nan')):>22.6f}")
+''')
+
+md("""
+## D. L'environnement de la machine
+
+Le rapport demande, pour le banc de coût, le processeur, la mémoire, le système, le
+nombre de threads et les versions. Le fichier de résultats n'enregistre aujourd'hui que
+les versions de bibliothèques. Cette cellule capture le reste ; elle ne coûte rien et
+sert au majeur 12.
+""")
+
+code(r'''
+# --- 7. Environnement complet ---------------------------------------------
+import platform, os, subprocess, re
+env = {"python": platform.python_version(), "platform": platform.platform(),
+       "processor": platform.processor(), "machine": platform.machine(),
+       "cpu_count_logical": os.cpu_count()}
+try:
+    cpuinfo = pathlib.Path("/proc/cpuinfo").read_text()
+    m = re.search(r"model name\s*:\s*(.+)", cpuinfo)
+    if m:
+        env["cpu_model"] = m.group(1).strip()
+    env["cpu_physical_cores"] = len(set(re.findall(r"core id\s*:\s*(\d+)", cpuinfo))) or None
+except Exception as e:
+    env["cpuinfo_error"] = str(e)
+try:
+    mem = pathlib.Path("/proc/meminfo").read_text()
+    env["mem_total_kb"] = int(re.search(r"MemTotal:\s*(\d+)", mem).group(1))
+    env["mem_total_gb"] = round(env["mem_total_kb"] / 1e6, 1)
+except Exception as e:
+    env["meminfo_error"] = str(e)
+for v in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
+          "NUMEXPR_NUM_THREADS"):
+    env[v] = os.environ.get(v)
+for mod in ("numpy", "sklearn", "lightgbm", "xgboost", "tensorflow", "pandas", "scipy"):
+    try:
+        env[mod] = __import__(mod).__version__
+    except Exception:
+        env[mod] = None
+try:
+    env["gpu"] = subprocess.run(["nvidia-smi", "--query-gpu=name",
+                                 "--format=csv,noheader"],
+                                capture_output=True, text=True, timeout=20).stdout.strip() or None
+except Exception:
+    env["gpu"] = None
+
+STATE["env"] = env
+save_state(STATE)
+for k, v in env.items():
+    print(f"   {k:24s} {v}")
+''')
+
+code(r'''
+# --- 8. Export -------------------------------------------------------------
+save_state(STATE)
+print(f"resultats : {STATE_PATH}")
+print(f"taille    : {STATE_PATH.stat().st_size/1024:.0f} Ko")
+print("\nA me renvoyer : e4a_results.json")
+print()
+print("=" * 74)
+if STATE["verdict"]["identique"]:
+    print("La liste noire ne change pas. E4b et E4c peuvent partir tels quels.")
+else:
+    print("La liste noire change. NE PAS lancer E4b ni E4c : le benchmark doit")
+    print("d'abord etre relance sur la nouvelle liste.")
+print("=" * 74)
+''')
+
+nb = {"cells": CELLS,
+      "metadata": {"kernelspec": {"display_name": "Python 3", "name": "python3"},
+                   "language_info": {"name": "python"},
+                   "colab": {"provenance": [], "toc_visible": True}},
+      "nbformat": 4, "nbformat_minor": 0}
+
+txt = json.dumps(nb, indent=1, ensure_ascii=False)
+txt = txt.replace("VERSION_PLACEHOLDER", VERSION).replace("BUILD_PLACEHOLDER", BUILD)
+out = HERE / "e4a_audit_sans_test.ipynb"
+out.write_text(txt, encoding="utf-8")
+print(f"ecrit : {out}  ({len(CELLS)} cellules)")
