@@ -64,23 +64,26 @@ in the repository:
 | 7, the audit re-run on CICIDS2017 | `experiments/e2/e2_results_cicids2017.json` | `colab/e2_cicids2017_audit_v5.ipynb` |
 | 6.5, calibration under both protocols, and 6.2, residual redundancy | `experiments/e3/e3_results.json` | `colab/e3_calibration_residual_v3.ipynb` |
 
-The duplicate columns E2 finds on CICIDS2017 overlap the literature, and Section 7 states
-the overlap rather than claiming the finding is new. Three of the seven pairs are already
-reported — `Fwd Header Length` by Engelen et al., reference [1] of the paper, and the two
-packet-length/segment-size pairs by Rosay et al., reference [10]. Two more have a
-documented cause: Engelen et al. record that CICFlowMeter failed to increment the PSH and
-URG counters, which is what makes `Fwd PSH Flags` coincide with `SYN Flag Count` and
-`Fwd URG Flags` with `CWE Flag Count`. Two we have not found reported. And one pair that
-literature calls duplicated, `Average Packet Size` / `Packet Length Mean`, is duplicated by
-definition but not numerically in the released files. The claim Section 7 does make is that
-permutation importance scores those columns at exactly zero either way.
+The duplicate columns E2 finds on CICIDS2017 are all accounted for in the literature, and
+Section 7 says so rather than claiming the finding is new. Rosay et al., reference [10] of the
+paper, sort the defects of the released files into five categories. Three of our seven pairs are
+among the four they name as duplications (`Fwd Packet Length Mean` / `Avg Fwd Segment Size`,
+`Bwd Packet Length Mean` / `Avg Bwd Segment Size`, `Fwd Header Length` / `Fwd Header Length.1`,
+the last also traced to the extractor by Engelen et al., reference [1]). The other four follow
+from defects they describe under miscalculation: a subflow counter incremented on every packet,
+which equates `Subflow Fwd/Bwd Packets` with `Total Fwd/Backward Packets`; and inverted and
+never-updated TCP flag counters, which collapse `Fwd PSH Flags` onto `SYN Flag Count` and
+`Fwd URG Flags` onto `CWE Flag Count`. Our own loading corroborates the latter: `Bwd PSH Flags`
+and `Bwd URG Flags` are constant in the released files and dropped before the audit.
 
-**Caveat on that paragraph.** The Rosay et al. PDF could not be opened from the environment
-these sections were written in; its list of duplicated pairs was reconstructed from
-concordant secondary summaries. The Engelen et al. attribution rests on the README of their
-own CICFlowMeter fork, which is primary. Check the Rosay list against the PDF before
-submission — if it names pairs beyond those three, the sentence naming what is unreported
-needs narrowing.
+The one pair they name that our check does **not** return is `Average Packet Size` /
+`Packet Length Mean`: duplicated by definition, but 37 309 against 38 163 distinct values in the
+released files, because the same study reports the first packet of each flow being counted twice
+in the packet-length mean. That is why the check measures identity on values rather than reading
+the feature list.
+
+The claim Section 7 does make is that permutation importance scores these columns at exactly
+zero whether or not their redundancy is documented.
 
 E3 reads `probs/` and `frozen_splits_60s.npz` from `article1_final.zip` and retrains
 nothing. E2 needs CICIDS2017 itself, in the `GeneratedLabelledFlows` distribution and
