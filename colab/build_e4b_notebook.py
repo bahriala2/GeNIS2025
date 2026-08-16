@@ -25,8 +25,8 @@ Relancer ce script apres toute modification, puis deposer le .ipynb sur Colab.
 import json
 from pathlib import Path
 
-VERSION = "v1"
-BUILD = "2026-08-15"
+VERSION = "v2"
+BUILD = "2026-08-16"
 HERE = Path(__file__).resolve().parent
 
 CELLS = []
@@ -172,6 +172,29 @@ def save_state(s):
                    encoding="utf-8")
     tmp.replace(STATE_PATH)
 STATE = load_state()
+
+# --- reparation d'un etat produit par la v1 -------------------------------
+# La v1 construisait un CNN et un RNN qui n'etaient pas ceux du pipeline :
+# GlobalMaxPooling1D au lieu de MaxPooling1D(2) + Flatten, et SimpleRNN laisse
+# sur tanh au lieu de relu. Les lignes cnn et rnn mesuraient donc un autre
+# detecteur, et le CNN tombait a 0.68 la ou le papier publie 0.99. La partie B
+# ne trouvait par ailleurs aucune matrice de probabilites, faute de respecter
+# la convention de nommage du pipeline. On purge ce qui est perime, on garde
+# le reste : rien de ce qui a ete calcule correctement n'est recalcule.
+if STATE["meta"].get("archi") != "pipeline":
+    perimes = [k for k in STATE["origines"] if k.split("|")[0] in ("cnn", "rnn")]
+    for k in perimes:
+        del STATE["origines"][k]
+    if perimes:
+        print(f"etat v1 detecte : {len(perimes)} runs cnn/rnn purges "
+              f"(architecture non conforme au pipeline)")
+    if STATE.get("bootstrap_apparie"):
+        STATE["bootstrap_apparie"] = {}
+        print("   bootstrap apparie purge : il sera recalcule")
+    STATE["meta"]["archi"] = "pipeline"
+    STATE["meta"]["version"] = E4B_VERSION
+    save_state(STATE)
+
 print(f"etat : {len(STATE['origines'])} runs d'origine, "
       f"{len(STATE['lofo'])} runs leave-one-family-out")
 ''')
@@ -214,16 +237,22 @@ def build_deep(name, F, n_out):
             layers.Dense(128, activation="relu"), layers.Dropout(.3),
             layers.Dense(64, activation="relu"), layers.Dropout(.2),
             layers.Dense(n_out, activation="softmax")], name="dnn")
+    # Recopie mot pour mot de build_cnn et build_rnn du pipeline principal.
+    # Une version anterieure de ce notebook mettait GlobalMaxPooling1D la ou le
+    # pipeline met MaxPooling1D(2) puis Flatten, et laissait SimpleRNN sur son
+    # activation tanh par defaut la ou le pipeline demande relu. Ce n'etaient
+    # pas les memes detecteurs, et le CNN tombait de 0.99 a 0.68.
     if name == "cnn":
         return models.Sequential([layers.Input((F, 1)),
             layers.Conv1D(64, 3, activation="relu", padding="same"),
+            layers.MaxPooling1D(2),
             layers.Conv1D(32, 3, activation="relu", padding="same"),
-            layers.GlobalMaxPooling1D(), layers.Dropout(.3),
-            layers.Dense(64, activation="relu"),
+            layers.Flatten(),
+            layers.Dense(64, activation="relu"), layers.Dropout(.3),
             layers.Dense(n_out, activation="softmax")], name="cnn")
     if name == "rnn":
         return models.Sequential([layers.Input((F, 1)),
-            layers.SimpleRNN(64), layers.Dropout(.3),
+            layers.SimpleRNN(64, activation="relu"), layers.Dropout(.3),
             layers.Dense(64, activation="relu"),
             layers.Dense(n_out, activation="softmax")], name="rnn")
     raise KeyError(name)
@@ -382,16 +411,20 @@ PROBS = SAVE / "probs"
 B = 1000
 
 def charge(cle):
-    p = PROBS / f"{cle.replace('|', '__')}.npz"
+    # Convention du pipeline, cellule kfile() : "|" -> "_" et "#" -> "-".
+    # Une version anterieure cherchait un double underscore et ne trouvait
+    # jamais rien, ce qui faisait sauter toute la partie B en silence.
+    p = PROBS / f"{cle.replace('|', '_').replace('#', '-')}.npz"
     if not p.exists():
-        for cand in PROBS.glob("*"):
-            if cand.stem.replace("__", "|") == cle:
-                p = cand; break
-    if not p.exists():
+        print(f"   introuvable : {p.name}")
         return None
     with np.load(p) as zz:
-        k = [x for x in zz.files if zz[x].ndim == 2]
-        return zz[k[0]] if k else None
+        # le fichier contient probs_val ET probs_test : on veut le test, et le
+        # prendre par son nom plutot que par sa position dans l'archive.
+        if "probs_test" not in zz.files:
+            print(f"   {p.name} ne contient pas probs_test : {zz.files}")
+            return None
+        return zz["probs_test"]
 
 for proto, split_idx in (("strat_seed1", None), ("temporal", TEMPORAL[2])):
     if proto in STATE["bootstrap_apparie"]:
