@@ -13,8 +13,8 @@ pour chacune, macro-F1 stratifie, macro-F1 temporel, FPR et ECE. C'est ce qui
 fait passer la regle de "diagnostic propose" a "methode validee".
 
 Le majeur 11 du rapport, cinq graines a 5/10/30 s au lieu de trois, n'est PAS
-ici : il demande de recharger le corpus brut, et la cellule 6.4 du pipeline
-principal le fait deja correctement. Voir la derniere cellule markdown.
+ici : il demande le corpus brut et non le cache 60 s. Il a son propre notebook,
+colab/e5_intervalles_cinq_graines.ipynb.
 
 PREREQUIS : E4a-bis doit avoir confirme la liste noire par l'audit imbrique.
 
@@ -382,35 +382,19 @@ print("\nA me renvoyer : e4c_results.json")
 ''')
 
 md("""
-## Le majeur 11 n'est pas ici, et c'est volontaire
+## Le majeur 11 n'est pas ici, et c'est voulu
 
-Le rapport demande cinq graines à 5/10/30 s au lieu de trois, pour que la comparaison
-entre intervalles soit équilibrée. Cette expérience a besoin du **corpus brut**, pas du
-cache 60 s que ce notebook utilise, et la cellule **6.4 du pipeline principal** la fait
-déjà correctement.
+Le rapport demande cinq graines à 5, 10 et 30 s, contre trois aujourd'hui, pour que la
+comparaison entre intervalles soit équilibrée. Cette expérience a besoin du **corpus
+brut**, pas du cache 60 s que ce notebook utilise : les intervalles courts n'y sont pas.
 
-Réimplémenter le chargement multi-intervalles ici serait dupliquer du code qui marche,
-avec le risque de le dupliquer mal. La modification tient en une ligne, dans
-`article1_pipeline.ipynb`, cellule 6.4 :
+Elle a donc son propre notebook, **`e5_intervalles_cinq_graines.ipynb`**, qui ne rejoue
+pas les graines 1 à 3 mais vérifie d'abord qu'il les reproduit, puis calcule les seules
+graines 4 et 5. Compter 2 à 3 h, contre 4 à 6 h pour un rejeu intégral.
 
-```python
-for s in [1, 2, 3]:        # <-- remplacer par [1, 2, 3, 4, 5]
-```
-
-et il faut vider `RESULTS["intervals"]` avant de relancer, sinon la cellule saute les
-intervalles déjà présents :
-
-```python
-RESULTS.pop("intervals", None); save_results()
-```
-
-Coût : l'intervalle 5 s porte 2,77 millions de flux, c'est le plus lourd de la campagne.
-Compter 4 à 6 h pour les deux graines supplémentaires sur les trois intervalles.
-
-**Ce que ça règle.** Le manuscrit rapporte aujourd'hui 0.9458 ± 0.0766 pour LightGBM à
-10 s, une moyenne de trois graines dont une s'est effondrée. Avec cinq graines, soit
-l'effondrement se reproduit et devient un résultat sur la stabilité, soit il reste isolé
-et la moyenne cesse d'être trompeuse. Dans les deux cas la section 6.4 gagne en solidité.
+Les deux autres demandes du majeur 11, publier tous les runs individuels et cesser de
+résumer LightGBM à 10 s par sa moyenne, sont déjà réglées dans le manuscrit : le
+tableau 6 affiche désormais chaque graine, tiret compris là où elle manque.
 """)
 
 nb = {"cells": CELLS,
