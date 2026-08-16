@@ -105,11 +105,30 @@ stable des huit sur les origines, s'effondre sur trois familles et tombe à l'AU
 sur `dos-icmp`, c'est-à-dire au hasard. Le DNN fait de même sur `dos-udp` (AUROC 0.4879).
 Aucun détecteur ne domine sur les deux axes.
 
-La réserve : `1.000` exactement, pour deux modèles, sur les huit familles, avec des AUROC
-à `1.0` exactement, est le genre de chiffre qui mérite qu'on le regarde deux fois avant
-de l'écrire dans un papier. Le fait que random forest donne `0.000` sur deux familles et
-`1.000` sur deux autres prouve que la mesure discrimine, donc ce n'est probablement pas
-un artefact — mais je ne l'écrirai pas dans le manuscrit sans avoir relu le calcul.
+### La réserve sur les 1.000, levée — et la limite qu'elle révèle
+
+`1.000` exactement, deux modèles, huit familles, méritait relecture du calcul. Elle est
+faite.
+
+**Ce n'est pas un artefact de mesure.** Un modèle qui prédirait « attaque » partout
+obtiendrait un rappel de 1.000 sans rien avoir appris — mais son FPR bénin vaudrait 1.000
+aussi. Or XGBoost et LightGBM ont un **FPR bénin de 0.000 sur les huit familles** : ils
+classent correctement les 5 030 flux bénins tout en signalant 100 % de la famille jamais
+vue. La séparation est réelle. Random forest à 0.000 sur `bruteforce-ftp` et 1.000 sur
+`dos-icmp` confirme par ailleurs que la mesure discrimine.
+
+**Mais l'expérience est plus faible que son nom.** Retirer `bruteforce-ftp` laisse
+`bruteforce-smb` et `bruteforce-ssh` à l'entraînement ; retirer `dos-hulk` laisse quatre
+autres familles DoS. Le modèle n'affronte donc jamais une catégorie d'attaque inconnue,
+seulement une variante d'une catégorie qu'il connaît déjà. C'est ce qui explique les
+1.000 sans les invalider.
+
+Conséquence pour la rédaction : ce résultat s'énonce **« généralise à une variante non
+vue d'une catégorie connue »**, et surtout pas « généralise à une attaque nouvelle ». Le
+test qui répondrait à la seconde question est un leave-one-*category*-out — retirer les
+trois brute-force d'un bloc, ou les cinq DoS. Il n'a pas été fait, et c'est la façon
+honnête de présenter la chose : E4b répond à une question plus étroite que celle que la
+section 4.2 déclare ouverte.
 
 ## Ce qu'il faut relancer
 
