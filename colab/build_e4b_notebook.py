@@ -16,9 +16,9 @@ E4b repond aux critiques 4 et 5 et au majeur 8 du rapport de relecture :
      les modeles apprennent-ils un comportement transferable ou la signature
      des huit scenarios scriptes ? C'est la vraie question ouverte du papier.
 
-PREREQUIS : E4a doit avoir tourne et conclu que la liste noire ne change pas.
-Si elle change, le benchmark doit d'abord etre relance sur la nouvelle liste,
-sinon E4b mesure la variance d'un jeu de features perime.
+PREREQUIS : E4a-bis. Le verrou recalcule le classement de l'audit imbrique et
+verifie qu'il retrouve la liste noire publiee. E4a seul ne suffit pas : il a
+montre que tau ne peut pas s'estimer sur la validation, adjacente au train.
 
 Relancer ce script apres toute modification, puis deposer le .ipynb sur Colab.
 """
@@ -41,8 +41,10 @@ md(f"""
 
 > **Notebook {VERSION}, compilé le {BUILD}.** La cellule 1 réaffiche ce numéro.
 
-**Prérequis : E4a doit avoir tourné.** La cellule 2 le vérifie et s'arrête si la liste
-noire a changé. Mesurer la variance d'un jeu de features périmé ne servirait à rien.
+**Prérequis : E4a-bis doit avoir tourné.** La cellule 2 recalcule le classement de
+l'audit imbriqué et s'arrête s'il ne retrouve pas la liste noire publiée. C'est E4a-bis
+qui fait foi, pas E4a : ce dernier a montré que τ ne peut pas s'estimer sur la validation,
+adjacente à la fenêtre d'entraînement.
 
 **Ce que ce notebook règle.**
 
@@ -96,21 +98,39 @@ print(f"dossier de travail : {SAVE}")
 ''')
 
 code(r'''
-# --- 2. Verrou : E4a doit avoir conclu que la liste noire ne change pas ---
-E4A = SAVE / "e4a_results.json"
-if not E4A.exists():
-    sys.exit("e4a_results.json introuvable : lance E4a d'abord. E4b en depend.")
-V = json.loads(E4A.read_text(encoding="utf-8")).get("verdict", {})
-if not V:
-    sys.exit("e4a_results.json ne contient pas de verdict : E4a n'est pas alle au bout.")
-print(f"E4a : liste noire recalculee sur validation "
-      f"{'IDENTIQUE' if V['identique'] else 'DIFFERENTE'} de la publiee")
-if not V["identique"]:
-    print(f"   entrent : {V['ajoutees']}")
-    print(f"   sortent : {V['retirees']}")
-    sys.exit("\nARRET. Le benchmark doit etre relance sur la nouvelle liste noire "
-             "avant de mesurer quoi que ce soit ici.")
-print("verrou leve : le jeu de features auditees est valide.\n")
+# --- 2. Verrou : l'audit imbrique doit confirmer la liste noire ----------
+# E4a a montre que tau ne peut pas se calculer sur la validation, qui est
+# adjacente au train et sous-estime la decroissance. C'est donc E4a-bis,
+# l'audit imbrique dans la partition d'entrainement, qui fait foi. Le verrou
+# recalcule le classement depuis les donnees plutot que de lire un booleen.
+E4AB = SAVE / "e4abis_results.json"
+if not E4AB.exists():
+    sys.exit("e4abis_results.json introuvable : lance E4a-bis d'abord. Le "
+             "verdict de E4a seul ne suffit pas ; voir experiments/e4a/FINDINGS.md")
+_B = json.loads(E4AB.read_text(encoding="utf-8"))
+_R = json.loads((SAVE / MARQUEUR).read_text(encoding="utf-8"))
+_N = _B["nested"]
+_PUB = sorted(f for f in _R["audit"]["blacklist"] if f in _N)
+_P, _K = _R["audit"]["chance"], _R["audit"]["rule"]["min_acc_x_chance"]
+_elig = [f for f in _N if _N[f]["strat"] > _K * _P]
+_srt = sorted(_elig, key=lambda f: _N[f]["tau"])
+_taus = [_N[f]["tau"] for f in _srt]
+_gmax, _imax = max((_taus[i + 1] - _taus[i], i) for i in range(len(_taus) - 1))
+_ok_liste = set(_srt[:len(_PUB)]) == set(_PUB)
+_ok_ecart = _imax + 1 == len(_PUB)
+print(f"audit imbrique : {len(_elig)} eligibles, {len(_PUB)} colonnes publiees")
+print(f"   les {len(_PUB)} publiees sont-elles les {len(_PUB)} plus basses ? "
+      f"{'OUI' if _ok_liste else 'NON'}")
+print(f"   le plus large ecart ({_gmax:.4f}) tombe-t-il apres le rang {len(_PUB)} ? "
+      f"{'OUI' if _ok_ecart else 'NON, apres le rang %d' % (_imax + 1)}")
+if not _ok_liste:
+    print(f"   classement imbrique : {_srt[:len(_PUB) + 2]}")
+    sys.exit("\nARRET. L'audit imbrique ne retrouve pas la liste publiee : le "
+             "benchmark doit d'abord etre relance sur la liste qu'il retourne.")
+if not _ok_ecart:
+    print("   avertissement : la liste est retrouvee mais la coupure naturelle "
+          "ne tombe pas exactement apres elle. On continue.")
+print("verrou leve : la liste noire est confirmee sans information de test.\n")
 ''')
 
 code(r'''
