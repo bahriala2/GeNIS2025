@@ -1,6 +1,6 @@
 # The manuscript figures
 
-The fourteen images the manuscript shows, named by the
+The fifteen images the manuscript shows, named by the
 **figure number the manuscript uses**. This folder is the answer to the question
 "what does Figure N look like"; `paper/figures/` is a different thing, the output
 of the regeneration scripts under their historical names.
@@ -35,6 +35,7 @@ figure they are. Two traps in particular:
 | 12 | `figure12_cost_vs_quality.png` | **none** | none, see below |
 | 13 | `figure13_cicids2017_audit.png` | `figE2_cicids2017_audit.png` | regen_e2.py |
 | 14 | `figure14_per_class_f1_temporal.png` | **none** | none, see below |
+| 15 | `figure15_horizons.png` | `figE4_horizons.png` | regen_e4.py |
 
 ## The five figures with no script
 
@@ -63,3 +64,4 @@ a regeneration path, that is the gap to close.
 - **Figure 12** (1803x1276 px): Inference cost against detection quality, temporal protocol
 - **Figure 13** (2679x1100 px): The audit re-run on CICIDS2017
 - **Figure 14** (2096x1581 px): Per-class F1 under the temporal protocol
+- **Figure 15** (2679x1240 px): Single-feature accuracy against temporal horizon

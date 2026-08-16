@@ -145,9 +145,10 @@ manuscript actually shows are committed alongside it under their figure numbers.
 | `python3 regenerate_figures.py` | 8 conditions and protocols, 9 bootstrap intervals, 11 autoencoder AUROC |
 | `python3 regen_fig6.py` | 6 transferability spectrum, drawn at final page width |
 | `python3 regen_e2.py` | 13 the audit re-run on CICIDS2017, drawn at final page width |
+| `python3 regen_e4.py` | 15 single-feature accuracy against temporal horizon |
 | `make figures` | runs `regen_en.py` and `regen_fig6.py` |
 
-**Five of the fourteen figures have no committed script.** Figures 1, 4, 7, 12 and 14
+**Five of the fifteen figures have no committed script.** Figures 1, 4, 7, 12 and 14
 were rendered while the native Word document was being built and were never written
 back to `paper/figures/`. The images are committed under
 `paper/figures_manuscrit/`, so nothing is lost, and their values were re-checked
