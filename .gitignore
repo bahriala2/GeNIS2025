@@ -8,11 +8,12 @@ paper/legacy-latex/*.log
 paper/legacy-latex/*.out
 paper/legacy-latex/*.blg
 
-# sortie de l'inspection locale
-experiments/inspection_4preprocessed.json
-
-# sorties locales de E1
-experiments/probe_4preprocessed.json
+# Les rapports d'inspection du module 4-preprocessed etaient ignores tant
+# qu'ils n'etaient qu'une sortie locale. Ils ne le sont plus :
+# verify_4preprocessed.py les prend en entree, et la section 3.2 du manuscrit
+# renvoie a ce controle. Un script de verification dont l'entree est ignoree
+# ne verifie rien pour un relecteur. Ce sont des metadonnees de structure,
+# quelques kilo-octets, aucun flux du corpus.
 
 # artefacts LaTeX égarés à la racine
 texput.log
