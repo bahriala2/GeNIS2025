@@ -55,26 +55,57 @@ procédé de remise à l'échelle : aucune classe n'a été arrondie dans le mau
 - 13 sous-catégories, dont `recon-nmap` et `recon-dns` que `2-flows` ne contient pas.
 - Aucune colonne constante, alors que notre tranche 60 s de `2-flows` en écarte 23.
 
-## Ce qui reste non vérifié
+## Les sondes à une feature
 
-`timestamp_probes` est **vide**, et c'est le résultat attendu : le script ne sonde que les
-colonnes positionnelles, et elles ne sont pas là. Les accuracies à une feature citées en
-section 2.4 —
+`probe_4preprocessed.json` est archivé, et `verify_4preprocessed.py` contrôle désormais
+ses chiffres aussi : **32 contrôles sur 32**. Les quatre valeurs citées en section 2.4
+tombent à la décimale.
 
-| feature | accuracy | macro-F1 |
+`timestamp_probes` est vide dans le rapport structurel, et c'est le résultat attendu :
+ce script-là ne sonde que les colonnes positionnelles, et elles ne sont plus dans le
+module.
+
+### Sur les treize sous-catégories (classe majoritaire 0.1785)
+
+| colonne | accuracy | macro-F1 | valeurs |
+|---|---|---|---|
+| `Seq` | 0.1713 | 0.1840 | 67 303 |
+| `Offset` | 0.0672 | 0.1038 | 282 379 |
+| `Dur` | 0.8957 | 0.7144 | 120 941 |
+| `Ssaddr` | 0.6192 | 0.3576 | 85 |
+| `Sdaddr` | **0.9947** | **0.9102** | 76 |
+| `TotBytes` (témoin) | 0.9190 | 0.8699 | 5 805 |
+
+`Seq` et `Offset` classent **sous** le taux de la classe majoritaire : les deux compteurs
+Argus restants ne transmettent pas le raccourci de calendrier.
+
+### Sur la tâche à quatre classes, celle que la baseline évalue réellement
+
+C'est l'apport de ce rapport, et le manuscrit ne l'avait pas. Citer la tâche à treize
+classes revenait à citer une tâche que Silva et al. ne font pas.
+
+| colonne | accuracy | macro-F1 |
 |---|---|---|
-| `Seq` | 0.1713 | — |
-| `Offset` | 0.0672 | — |
-| `Dur` | 0.8957 | — |
-| `Sdaddr` | 0.9947 | 0.9102 |
+| `Sdaddr` | **0.9985** | **0.9950** |
+| `Dport` | 0.9838 | 0.9652 |
+| `TotBytes` (témoin) | 0.9892 | 0.9758 |
 
-— viennent de **`probe_4preprocessed.py`**, dont la sortie n'est pas encore archivée ici.
-Pour fermer ce dernier trou :
+Un compteur de topologie à 76 valeurs distinctes résout donc presque la tâche à quatre
+classes, et le port de destination n'en est pas loin.
 
-```
-python probe_4preprocessed.py "D:\Genis\4-preprocessed\4-preprocessed"
-```
+**La nuance qui doit accompagner ces chiffres**, et qui est maintenant dans le manuscrit :
+le témoin comportemental `TotBytes` obtient 0.9892 / 0.9758 sur la même tâche. Le pouvoir
+prédictif isolé ne sépare donc pas à lui seul un compteur de topologie d'un comportement
+de trafic — c'est exactement ce que la section 6.2 démontre par ailleurs. Ce qui les
+sépare, c'est qu'un compteur de topologie est stable dans le temps et survivrait donc à
+notre propre audit : d'où l'exclusion par nom maintenue comme remède distinct en
+section 9.
 
-et déposer le `probe_4preprocessed.json` produit dans ce dossier. Les chiffres du
-manuscrit ont été mesurés, mais tant que ce fichier manque, ils sont les seuls du papier
-qu'aucun script du dépôt ne peut reproduire.
+## Provenance du rapport de sondage
+
+Le `.json` d'origine a été écrit dans `C:\Users\ASUS` et n'a pas été transmis ; le
+fichier archivé ici est reconstitué **fidèlement** depuis la sortie console du script,
+qui contient chacun de ses champs (accuracy, macro-F1, valeurs distinctes, taux de classe
+majoritaire, nombre de classes). Le fichier porte cette provenance dans une clé
+`_provenance`. Relancer le script écrase la reconstitution par l'original ; les contrôles
+de `verify_4preprocessed.py` doivent alors passer à l'identique.

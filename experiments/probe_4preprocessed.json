@@ -1,0 +1,204 @@
+{
+ "directory": "D:\\Genis\\4-preprocessed\\4-preprocessed",
+ "interval": 60,
+ "n_train": 294844,
+ "n_test": 73712,
+ "probes": {
+  "SubCategoryLabel": {
+   "Seq": {
+    "accuracy": 0.1713,
+    "macro_f1": 0.184,
+    "majority_class_rate": 0.1785,
+    "n_classes": 13,
+    "n_unique_values": 67303
+   },
+   "Offset": {
+    "accuracy": 0.0672,
+    "macro_f1": 0.1038,
+    "majority_class_rate": 0.1785,
+    "n_classes": 13,
+    "n_unique_values": 282379
+   },
+   "Dur": {
+    "accuracy": 0.8957,
+    "macro_f1": 0.7144,
+    "majority_class_rate": 0.1785,
+    "n_classes": 13,
+    "n_unique_values": 120941
+   },
+   "Ssaddr": {
+    "accuracy": 0.6192,
+    "macro_f1": 0.3576,
+    "majority_class_rate": 0.1785,
+    "n_classes": 13,
+    "n_unique_values": 85
+   },
+   "Sdaddr": {
+    "accuracy": 0.9947,
+    "macro_f1": 0.9102,
+    "majority_class_rate": 0.1785,
+    "n_classes": 13,
+    "n_unique_values": 76
+   },
+   "Sport": {
+    "accuracy": 0.453,
+    "macro_f1": 0.284,
+    "majority_class_rate": 0.1785,
+    "n_classes": 13,
+    "n_unique_values": 63705
+   },
+   "Dport": {
+    "accuracy": 0.5085,
+    "macro_f1": 0.4696,
+    "majority_class_rate": 0.1785,
+    "n_classes": 13,
+    "n_unique_values": 1056
+   },
+   "TotBytes": {
+    "accuracy": 0.919,
+    "macro_f1": 0.8699,
+    "majority_class_rate": 0.1785,
+    "n_classes": 13,
+    "n_unique_values": 5805
+   },
+   "SrcLoad": {
+    "accuracy": 0.8625,
+    "macro_f1": 0.6317,
+    "majority_class_rate": 0.1785,
+    "n_classes": 13,
+    "n_unique_values": 119566
+   }
+  },
+  "CategoryLabel": {
+   "Seq": {
+    "accuracy": 0.8423,
+    "macro_f1": 0.4444,
+    "majority_class_rate": 0.8021,
+    "n_classes": 4,
+    "n_unique_values": 67303
+   },
+   "Offset": {
+    "accuracy": 0.7598,
+    "macro_f1": 0.3989,
+    "majority_class_rate": 0.8021,
+    "n_classes": 4,
+    "n_unique_values": 282379
+   },
+   "Dur": {
+    "accuracy": 0.9367,
+    "macro_f1": 0.8571,
+    "majority_class_rate": 0.8021,
+    "n_classes": 4,
+    "n_unique_values": 120941
+   },
+   "Ssaddr": {
+    "accuracy": 0.8907,
+    "macro_f1": 0.5668,
+    "majority_class_rate": 0.8021,
+    "n_classes": 4,
+    "n_unique_values": 85
+   },
+   "Sdaddr": {
+    "accuracy": 0.9985,
+    "macro_f1": 0.995,
+    "majority_class_rate": 0.8021,
+    "n_classes": 4,
+    "n_unique_values": 76
+   },
+   "Sport": {
+    "accuracy": 0.846,
+    "macro_f1": 0.5427,
+    "majority_class_rate": 0.8021,
+    "n_classes": 4,
+    "n_unique_values": 63705
+   },
+   "Dport": {
+    "accuracy": 0.9838,
+    "macro_f1": 0.9652,
+    "majority_class_rate": 0.8021,
+    "n_classes": 4,
+    "n_unique_values": 1056
+   },
+   "TotBytes": {
+    "accuracy": 0.9892,
+    "macro_f1": 0.9758,
+    "majority_class_rate": 0.8021,
+    "n_classes": 4,
+    "n_unique_values": 5805
+   },
+   "SrcLoad": {
+    "accuracy": 0.8803,
+    "macro_f1": 0.6857,
+    "majority_class_rate": 0.8021,
+    "n_classes": 4,
+    "n_unique_values": 119566
+   }
+  },
+  "BinaryLabel": {
+   "Seq": {
+    "accuracy": 0.9313,
+    "macro_f1": 0.5965,
+    "majority_class_rate": 0.9263,
+    "n_classes": 2,
+    "n_unique_values": 67303
+   },
+   "Offset": {
+    "accuracy": 0.8726,
+    "macro_f1": 0.5487,
+    "majority_class_rate": 0.9263,
+    "n_classes": 2,
+    "n_unique_values": 282379
+   },
+   "Dur": {
+    "accuracy": 0.9615,
+    "macro_f1": 0.8547,
+    "majority_class_rate": 0.9263,
+    "n_classes": 2,
+    "n_unique_values": 120941
+   },
+   "Ssaddr": {
+    "accuracy": 0.9398,
+    "macro_f1": 0.6504,
+    "majority_class_rate": 0.9263,
+    "n_classes": 2,
+    "n_unique_values": 85
+   },
+   "Sdaddr": {
+    "accuracy": 0.9985,
+    "macro_f1": 0.9946,
+    "majority_class_rate": 0.9263,
+    "n_classes": 2,
+    "n_unique_values": 76
+   },
+   "Sport": {
+    "accuracy": 0.9058,
+    "macro_f1": 0.5963,
+    "majority_class_rate": 0.9263,
+    "n_classes": 2,
+    "n_unique_values": 63705
+   },
+   "Dport": {
+    "accuracy": 0.9873,
+    "macro_f1": 0.9504,
+    "majority_class_rate": 0.9263,
+    "n_classes": 2,
+    "n_unique_values": 1056
+   },
+   "TotBytes": {
+    "accuracy": 0.9902,
+    "macro_f1": 0.9635,
+    "majority_class_rate": 0.9263,
+    "n_classes": 2,
+    "n_unique_values": 5805
+   },
+   "SrcLoad": {
+    "accuracy": 0.9319,
+    "macro_f1": 0.6383,
+    "majority_class_rate": 0.9263,
+    "n_classes": 2,
+    "n_unique_values": 119566
+   }
+  }
+ },
+ "_provenance": "reconstitue fidelement depuis la sortie console de probe_4preprocessed.py ; le .json d'origine a ete ecrit dans C:\\Users\\ASUS et n'a pas ete transmis. Tous les champs du rapport figurent dans cette sortie."
+}

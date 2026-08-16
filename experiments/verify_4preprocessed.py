@@ -16,9 +16,10 @@ croire sur parole, il porte ses propres comptes.
 Entree : experiments/inspection_4preprocessed.json, produit par
          inspect_4preprocessed.py sur la machine qui detient le corpus.
 
-Ce que le script NE verifie PAS : les sondes a une feature de la section 2.4
-(Seq, Offset, Dur, Sdaddr). Elles viennent de probe_4preprocessed.py, dont la
-sortie n'est pas encore archivee ici.
+Il verifie aussi les sondes a une feature des sections 2.4 et 9, depuis
+probe_4preprocessed.json, produit par probe_4preprocessed.py sur la meme
+machine. Ces chiffres accusent le module d'etre exploitable tel quel : ils
+doivent etre reproductibles depuis le depot, pas seulement cites.
 """
 import json
 import pathlib
@@ -105,10 +106,39 @@ chk("sous-categories", len(SUB), 13)
 
 if not D["timestamp_probes"]:
     print("\n  NOTE   timestamp_probes est vide, et c'est le resultat attendu :")
-    print("         StartTime, LastTime et Rank ne sont pas dans le module, donc")
-    print("         il n'y a rien a sonder. Les accuracies de la section 2.4")
-    print("         (Seq, Offset, Dur, Sdaddr) viennent de probe_4preprocessed.py,")
-    print("         dont la sortie n'est pas encore archivee dans experiments/.")
+    print("         StartTime, LastTime et Rank ne sont pas dans le module,")
+    print("         donc il n'y a rien a sonder la. Les sondes de la section 2.4")
+    print("         sont dans probe_4preprocessed.json, verifiees ci-dessous.")
+
+# --- les sondes a une feature des sections 2.4 et 9 ----------------------
+PSRC = HERE / "probe_4preprocessed.json"
+if not PSRC.exists():
+    print(f"\n  {PSRC.name} absent : les sondes ne sont pas verifiees.")
+else:
+    P = json.loads(PSRC.read_text(encoding="utf-8"))["probes"]
+    SUB13, CAT4 = P["SubCategoryLabel"], P["CategoryLabel"]
+    print("\n--- section 2.4 : sondes sur les treize sous-categories ---")
+    chk("taux de classe majoritaire du holdout",
+        SUB13["Seq"]["majority_class_rate"], 0.1785)
+    chk("Seq, accuracy", SUB13["Seq"]["accuracy"], 0.1713)
+    chk("Offset, accuracy", SUB13["Offset"]["accuracy"], 0.0672)
+    chk("Dur, accuracy", SUB13["Dur"]["accuracy"], 0.8957)
+    chk("Sdaddr, accuracy", SUB13["Sdaddr"]["accuracy"], 0.9947)
+    chk("Sdaddr, macro-F1", SUB13["Sdaddr"]["macro_f1"], 0.9102)
+    chk("Sdaddr, valeurs distinctes", SUB13["Sdaddr"]["n_unique_values"], 76)
+    for f in ("Seq", "Offset"):
+        sous = SUB13[f]["accuracy"] < SUB13[f]["majority_class_rate"]
+        ok.append(sous)
+        print(f"  {'OK ' if sous else 'ECART'}  {f + ', sous le hasard':<44} "
+              f"{SUB13[f]['accuracy']:>8}  <       {SUB13[f]['majority_class_rate']}")
+
+    print("\n--- section 2.4 : sondes sur la tache a quatre classes de la baseline ---")
+    chk("Sdaddr, accuracy", CAT4["Sdaddr"]["accuracy"], 0.9985)
+    chk("Sdaddr, macro-F1", CAT4["Sdaddr"]["macro_f1"], 0.9950)
+    chk("Dport, accuracy", CAT4["Dport"]["accuracy"], 0.9838)
+    chk("Dport, macro-F1", CAT4["Dport"]["macro_f1"], 0.9652)
+    chk("TotBytes (temoin), accuracy", CAT4["TotBytes"]["accuracy"], 0.9892)
+    chk("TotBytes (temoin), macro-F1", CAT4["TotBytes"]["macro_f1"], 0.9758)
 
 print(f"\n{sum(ok)}/{len(ok)} controles passes")
 sys.exit(0 if all(ok) else 1)
