@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Figure 14 : l'audit rejoue sur CICIDS2017.
+"""Figure 17 : l'audit rejoue sur CICIDS2017.
 
 Source : experiments/e2/e2_results_cicids2017.json (empreinte 2830743|69|15).
 
 Deux panneaux, qui repondent aux deux questions de la section 7 :
 
   (a) le spectre de transferabilite des 43 features eligibles. Il se lit a cote
-      de la Figure 7, qui est le meme spectre sur GeNIS. Aucune barre ne passe
+      de la Figure 8, qui est le meme spectre sur GeNIS. Aucune barre ne passe
       sous le seuil : l'audit ne fabrique pas de raccourcis la ou il n'y en a
       pas.
   (b) l'importance par permutation contre le pouvoir predictif mono-feature,
@@ -119,7 +119,7 @@ ax[1].legend(handles=[Patch(facecolor=RED, label=f'in an identical pair ({len(du
 
 fig.tight_layout(pad=0.4)
 for out in (HERE / 'figures' / 'figE2_cicids2017_audit.png',
-            HERE / 'figures_manuscrit' / 'figure14_cicids2017_audit.png'):
+            HERE / 'figures_manuscrit' / 'figure17_cicids2017_audit.png'):
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out, dpi=DPI, facecolor='white')
 

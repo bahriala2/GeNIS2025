@@ -154,7 +154,7 @@ Top-level keys of interest:
 Both normalisations of the transferability spectrum are derivable from
 `audit.transfer_table`, which stores the single-feature accuracy under both protocols.
 The raw ratio is tau = acc_temporal / acc_stratified; the chance-corrected form used in
-Figure 7 is tau* = (acc_temporal - p) / (acc_stratified - p), with
+Figure 8 is tau* = (acc_temporal - p) / (acc_stratified - p), with
 p = `audit.chance` = 0.1942.
 
 ## Regenerating the figures
@@ -164,20 +164,23 @@ them from `paper/`, where `article1_results.json` is already present:
 
 The filenames these scripts write date from the LaTeX chain and follow **its**
 numbering, which the Word manuscript reordered. The mapping from manuscript figure
-number to file is in `paper/figures_manuscrit/MAPPING.md`, and the sixteen images the
+number to file is in `paper/figures_manuscrit/MAPPING.md`, and the twenty images the
 manuscript actually shows are committed alongside it under their figure numbers.
 
 | Command | Manuscript figures produced |
 |---|---|
-| `python3 regen_en.py` | 3 capture windows, 4 per-class F1 audited, 6 transferability plane, 11 intervals |
-| `python3 regenerate_figures.py` | 9 conditions and protocols, 10 bootstrap intervals, 12 autoencoder AUROC |
-| `python3 regen_fig6.py` | 7 transferability spectrum, drawn at final page width |
-| `python3 regen_e2.py` | 14 the audit re-run on CICIDS2017, drawn at final page width |
-| `python3 regen_e4.py` | 16 single-feature accuracy against temporal horizon |
+| `python3 regen_en.py` | 3 capture windows, 5 per-class F1 audited, 7 transferability plane, 12 intervals |
+| `python3 regenerate_figures.py` | 10 conditions and protocols, 11 bootstrap intervals, 13 autoencoder AUROC |
+| `python3 regen_fig6.py` | 8 transferability spectrum, drawn at final page width |
+| `python3 regen_e2.py` | 17 the audit re-run on CICIDS2017, drawn at final page width |
+| `python3 regen_e4.py` | 20 single-feature accuracy against temporal horizon |
+| `python3 regen_e4b.py` | 15 rolling origins, 16 leave-one-family-out |
+| `python3 regen_e4c.py` | 19 what the audit threshold costs |
+| `python3 regen_fig_protocols.py` | 4 the four partition schemes |
 | `python3 regen_fig_concept.py` | 1 the chain of argument, drawn at final page width |
 | `make figures` | runs `regen_en.py` and `regen_fig6.py` |
 
-**Five of the sixteen figures have no committed script.** Figures 2, 5, 8, 13 and 15
+**Five of the twenty figures have no committed script.** Figures 2, 6, 9, 14 and 18
 were rendered while the native Word document was being built and were never written
 back to `paper/figures/`. The images are committed under
 `paper/figures_manuscrit/`, so nothing is lost, and their values were re-checked

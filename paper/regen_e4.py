@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figure 16 : decroissance du pouvoir predictif avec l'horizon temporel.
+"""Figure 20 : decroissance du pouvoir predictif avec l'horizon temporel.
 
 Source : experiments/e4a/e4abis_results.json, partie B du notebook E4a-bis.
 
@@ -95,7 +95,7 @@ ax.legend(handles=[Line2D([], [], color=RED, lw=1.1, marker='o', ms=2.4,
 
 fig.tight_layout(pad=0.4)
 for out in (HERE / 'figures' / 'figE4_horizons.png',
-            HERE / 'figures_manuscrit' / 'figure16_horizons.png'):
+            HERE / 'figures_manuscrit' / 'figure20_horizons.png'):
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out, dpi=DPI, facecolor='white')
 
