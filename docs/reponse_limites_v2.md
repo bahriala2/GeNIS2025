@@ -313,15 +313,24 @@ fois et immobile entre les deux bras**. Seul `subsample_for_bin` change, ce qui
 permet d'attribuer l'écart au binning et à rien d'autre — précisément ce que
 les données de GeNIS ne permettent pas.
 
-> **Chiffres en cours de calcul** — `reproduce_binning.py` tourne (32
-> ajustements, ~21 min). Le contraste est déjà établi sur une version
-> allégée : écart-type 0,1141 en binning échantillonné contre **0,0000**
-> en binning déterministe, les seize graines rendant alors la même valeur.
+| bras | moyenne | écart-type | étendue |
+|---|---:|---:|---:|
+| binning échantillonné, couverture de 10 s | 0,3622 | **0,1317** | **0,4498** |
+| binning déterministe | 0,5063 | **0,0000** | **0,0000** |
 
-Deux choses comptent également : **l'amplitude** (le binning seul suffit) et
-**la forme** (des paquets discrets séparés par un trou, pas une dispersion
-autour d'une moyenne — exactement ce qu'on observe sur GeNIS, où aucun run n'a
-scoré entre 0,84 et 0,99).
+13 contrôles sur 13. Les seize graines du bras déterministe rendent
+**exactement** 0,5063 : la graine ne pilote alors plus rien, ce qui démontre
+que c'est le binning qui portait toute la variance.
+
+Trois lectures :
+
+- **l'amplitude** — 0,45 d'écart d'une graine à l'autre, découpage identique ;
+- **la forme** — un trou de 0,130 entre paquets, contre un écart médian de
+  0,022 entre valeurs voisines. Ce n'est pas une dispersion autour d'une
+  moyenne, et c'est exactement ce qu'on observe sur GeNIS, où aucun run n'a
+  scoré entre 0,84 et 0,99 ;
+- **le déterministe est aussi le meilleur** — 0,5063 contre 0,3622 de moyenne.
+  Poser les bornes sur toutes les lignes ne fait pas que stabiliser.
 
 ### Ce que cela reste, et comment trancher
 

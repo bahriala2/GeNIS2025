@@ -1,6 +1,6 @@
 # E6 — pourquoi une graine de LightGBM s'effondre à 10 s
 
-**Demande.** Un relecteur objecte que le manuscrit qualifie l'effondrement
+**Demande.** Un rapport de limites objecte que le manuscrit qualifie l'effondrement
 — une graine sur cinq à macro-F1 0,8374 à l'intervalle de 10 s, les quatre
 autres au-dessus de 0,9999 — sans dire quel mécanisme algorithmique le
 produit, et suggère trois pistes : artéfacts de binning d'histogrammes,
@@ -28,9 +28,9 @@ peut les séparer.
 
 ## Ce que le script établit
 
-`reproduce_binning.py`, 14 contrôles.
+`reproduce_binning.py`, 13 contrôles, tous passés.
 
-### A. Deux des trois pistes du relecteur sont hors de cause
+### A. Deux des trois pistes du rapport sont hors de cause
 
 La campagne fixe `n_estimators=300`, `num_leaves=63`, `learning_rate=0.1`
 (`DEFAULTS_SK` du pipeline) et laisse le reste aux défauts de la librairie.
@@ -46,7 +46,7 @@ subsample_for_bin = 200 000                     ->  bins poses sur un tirage
 ```
 
 Le sous-échantillonnage de lignes et de colonnes est donc **éliminé**. Reste
-le binning, qui était la première piste du relecteur.
+le binning, qui était la première piste du rapport.
 
 ### B. La couverture du tirage suit l'intervalle, et le seul intervalle sans incident est le seul où elle est complète
 
@@ -93,20 +93,39 @@ Une classe rare à 0,23 % du corpus, séparée par un intervalle d'un millième
 de l'axe, découpage calculé une fois et **immobile** entre les deux bras.
 Seul `subsample_for_bin` change.
 
-| bras | écart-type sur 16 graines | étendue |
-|---|---:|---:|
-| binning échantillonné, couverture de 10 s | *en cours* | *en cours* |
-| binning déterministe | **0,0000** | **0,0000** |
+| bras | moyenne | écart-type sur 16 graines | étendue |
+|---|---:|---:|---:|
+| binning échantillonné, couverture de 10 s | 0,3622 | **0,1317** | **0,4498** |
+| binning déterministe | 0,5063 | **0,0000** | **0,0000** |
 
-Deux choses comptent autant l'une que l'autre :
+Valeurs mesurées :
 
-- **l'amplitude** — le binning seul suffit à faire varier la classe rare ;
-- **la forme** — les valeurs se groupent en paquets discrets séparés par un
-  trou, et non autour d'une moyenne. C'est exactement ce qu'on observe sur
-  GeNIS, où aucun run n'a scoré entre 0,84 et 0,99.
+```
+bras A, echantillonne   moyenne 0.3622  ecart-type 0.1317  etendue 0.4498
+  0.092 0.116 0.246 0.273 0.331 0.337 0.353 0.378
+  0.378 0.389 0.404 0.462 0.467 0.489 0.538 0.542
 
-Binning déterministe : les seize graines rendent la même valeur, au dernier
-chiffre. La graine ne pilote alors plus rien du tout.
+bras B, deterministe    moyenne 0.5063  ecart-type 0.0000  etendue 0.0000
+  0.506 x 16
+```
+
+Trois lectures, et la troisième n'était pas attendue :
+
+- **l'amplitude** — le binning seul fait varier le F1 de la classe rare de
+  **0,45** d'une graine à l'autre, découpage identique ;
+- **la forme** — les valeurs se groupent en paquets séparés par un trou de
+  **0,130**, contre un écart médian de 0,022 entre valeurs voisines. Ce n'est
+  pas une dispersion autour d'une moyenne. C'est exactement ce qu'on observe
+  sur GeNIS, où aucun run n'a scoré entre 0,84 et 0,99 ;
+- **le binning déterministe est aussi le meilleur** : 0,5063 contre une
+  moyenne de 0,3622 en échantillonné, et au-dessus des seize valeurs sauf
+  deux. Poser les bornes sur toutes les lignes ne fait pas que stabiliser, ça
+  améliore la classe rare.
+
+Binning déterministe : les seize graines rendent **exactement** la même
+valeur. La graine ne pilote alors plus rien du tout, ce qui est la
+démonstration que c'est bien le binning qui portait la variance et rien
+d'autre.
 
 ## Ce que le script n'établit pas
 
@@ -137,10 +156,10 @@ mécanisme et le démontre, avec une recommandation concrète ; dans l'autre ell
 
 ## Ce que le manuscrit dit aujourd'hui
 
-Deux paragraphes sont prêts et entrent dès que `e6_results.json` existe, car
-ils lisent leurs chiffres dedans : « What makes one fit fail and not the
-others » en §6.4, et « One run-to-run failure is narrowed but not resolved »
-en §9. Ils énoncent ce qui précède, y compris ce qui reste indéterminé.
+Deux paragraphes portent ce qui précède, y compris ce qui reste indéterminé,
+et lisent leurs chiffres dans `e6_results.json` : « What makes one fit fail and
+not the others » en §6.4 (bloc 148) et « One run-to-run failure is narrowed but
+not resolved » en §9 (bloc 252).
 
 **Défaut trouvé en chemin, que le rapport ne signalait pas :** la §8 décrivait
 encore l'effondrement comme « one LightGBM seed out of three … while the other
