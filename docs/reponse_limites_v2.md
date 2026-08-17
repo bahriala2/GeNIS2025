@@ -13,7 +13,7 @@ apparaître un défaut que le rapport ne signalait pas.
 
 | # | Point | Verdict | Action |
 |---|---|---|---|
-| 2 | §8 tronquée, §9 absente | **Faux** — §9 existe (blocs 234–254) | Fournir la preuve |
+| 2 | §8 tronquée, §9 absente | **Faux** — §9 existe (blocs 234–254) | Relire en deux moitiés |
 | 1 | Fuite par l'audit sur le test | **Déjà traité** — §4.3 et §9 | Rendre la réponse plus difficile à manquer |
 | 3 | Seuil τ heuristique, 8 → 13 | **Déjà traité et mesuré** — §9, Fig. 19 | Renvoi depuis §4.3 |
 | 4 | Découpage par classe = étiquettes | **Déjà traité** — §4.2, Fig. 4, §6.8 | Délimitation théorique explicite |
@@ -50,16 +50,33 @@ endroit.
 
 La coupure tombe au bloc 216 sur 300, soit **72 % du document**. C'est la
 signature d'une lecture tronquée par une limite de contexte, pas d'un défaut
-du fichier. Le lecteur du rapport n'a donc jamais vu la fin de la §8, ni la
-§9, ni la conclusion.
+du fichier. Ce qui a produit ce rapport n'a donc jamais vu la fin de la §8, ni
+la §9, ni la conclusion.
 
 **Or la §9 s'intitule « Threats to validity » et répond nommément aux points 1
 et 3.** Le rapport signale comme découvertes deux limites que le manuscrit
-déclare lui-même, dans la section qui manquait à sa copie.
+déclare lui-même, dans la section qu'il n'a pas lue.
 
-*À faire :* vérifier quel fichier a été transmis, et le retransmettre. Si le
-rapport a été produit par un outil automatique, lui donner le document en deux
-moitiés.
+**Provenance.** Le manuscrit n'a été transmis à personne : ce rapport n'est
+pas une relecture externe. Il vient donc d'un outil auquel le document a été
+donné localement, et c'est cohérent — 22 500 mots dans un .docx, une lecture
+qui s'arrête aux trois quarts. Il n'y a par conséquent aucun relecteur à qui
+renvoyer quoi que ce soit.
+
+*À faire :* relancer la critique sur le texte complet, **en deux moitiés**.
+Le manuscrit fait 21 749 mots et la coupure naturelle est le début de la §7,
+qui est une unité autonome — la validation externe sur CICIDS2017 :
+
+| moitié | sections | mots | part |
+|---|---|---:|---:|
+| 1 | §1 à §6 | 13 594 | 62,5 % |
+| 2 | §7 à §12 | 8 155 | 37,5 % |
+
+La lecture qui a produit ce rapport s'est arrêtée à **74,5 %** du texte, au
+milieu de la §8. Les points 1, 3 et 4 devraient donc disparaître d'eux-mêmes
+sur la seconde moitié, puisqu'ils y sont traités. C'est aussi le seul moyen de
+savoir si cette seconde moitié appelle des critiques que personne n'a encore
+formulées : elle n'a jamais été relue.
 
 ---
 
@@ -340,4 +357,4 @@ refuse de conclure.
 | 4 | §4.2 : nommer les trois questions de généralisation | **fait** |
 | 5 | §6.4 et §9 : le mécanisme de binning | rédigé, entre avec `e6_results.json` |
 | 6 | Notebook E6 : la preuve décisive | **fait**, à exécuter sur Colab |
-| 7 | Retransmettre le fichier complet à l'auteur du rapport | **vous** |
+| 7 | Relancer la critique en deux moitiés, coupure après la §6 | **vous** |
