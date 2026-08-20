@@ -164,6 +164,43 @@ for m in ("logreg", "knn"):
     b = RUNS[f"{m}|corrigee|strat_seed1"]["fpr"]
     print(f"     {m:<8} stratifie {a:.4f} -> {b:.4f}  (x{b / a:.0f})")
 
+# =========================================================================
+# E. Ce que la bande d'environnement autorise a attribuer
+# =========================================================================
+# Ajoute apres coup, et c'est une correction de ma part : le temoin d'E7 ne
+# comparait QUE le bras stratifie. Le bras temporel, qui porte le resultat,
+# n'a jamais ete controle. On le controle ici, et la conclusion se resserre.
+print("\n\nE. Ce qui est attribuable a la correction, et ce qui ne l'est pas\n")
+MODP = R["models"]
+env = {}
+for m in MODS:
+    k = f"{m}|audited|temporal"
+    if k in MODP:
+        env[m] = abs(MODP[k]["macro_f1"] - mf1(m, "publiee", "temporal"))
+DET = ("logreg", "nb", "knn", "rf", "xgboost", "lightgbm")
+print(f"   {'detecteur':<11}{'cout mesure':>13}{'ecart au publie':>17}   verdict")
+solides = []
+for m in sorted(MODS, key=lambda x: -abs(d_t.get(x, 0))):
+    if m not in env:
+        continue
+    cout, e = abs(d_t[m]), env[m]
+    det = m in DET
+    sur = det or cout > 2 * e
+    if sur and m != "nb":
+        solides.append(m)
+    print(f"   {m:<11}{d_t[m]:>+13.4f}{e:>17.4f}   "
+          + ("deterministe, sur" if det else
+             "au-dessus du bruit" if sur else "DANS LE BRUIT"))
+chk("les quatre plus gros couts portent sur des modeles deterministes",
+    all(m in DET for m in sorted(MODS, key=lambda x: -abs(d_t.get(x, 0)))[:4]))
+chk("le cout de LightGBM, le plus grand, est sur un modele qui se rejoue exactement",
+    env["lightgbm"] < 0.0001, f"ecart au publie {env['lightgbm']:.4f}")
+neuro_dans_bruit = [m for m in ("dnn", "rnn", "cnn") if m in env and abs(d_t[m]) < 2 * env[m]]
+print(f"\n   reseaux dont le cout ne se distingue pas du bruit : {neuro_dans_bruit}")
+print("   Ce n'est pas un probleme pour la conclusion : les quatre ecarts les")
+print("   plus grands sont sur lightgbm, knn, rf et xgboost, qui se rejouent")
+print("   au quatrieme chiffre. Le resultat repose sur le sol le plus ferme.")
+
 print(f"\n\n{sum(ok)}/{len(ok)} controles passes")
 if all(ok):
     print("\nLECTURE. IdleTime est un identifiant de fichier, demontre directement.\n"

@@ -497,30 +497,133 @@ print("=" * 72, flush=True)
 campagne(["publiee"], ["temporal", "strat_seed1"], CONFIGS)
 ''')
 
+md("""
+## Le témoin, et pourquoi il doit être en deux parties
+
+Le premier jet de ce notebook posait un seuil unique de 0,01 sur toutes les
+configurations. Il a échoué, et **il avait raison d'échouer** — mais pas pour la raison
+qu'il annonçait. Ce que la mesure montre :
+
+| famille | écart au publié, E7 | écart au publié, E8 |
+|---|---:|---:|
+| `xgboost`, `lightgbm`, `rf` | **0,0000** | < 0,0025 |
+| `logreg`, `knn` | 0,0002 – 0,0007 | < 0,0025 |
+| `cnn`, `dnn`, `rnn` | 0,0002 – **0,0156** | jusqu'à **0,0114** |
+
+Les modèles d'arbres et linéaires se rejouent **au quatrième chiffre**. Le chemin des
+données — découpages, colonnes, scaler, étiquettes — est donc démontré correct. Ce qui ne
+se rejoue pas, ce sont les réseaux, et l'écart le plus grand jamais observé vient d'E7
+(`dnn` temporel, **0,0156**), pas d'E8.
+
+**La dispersion sur les graines ne borne pas la dispersion sur l'environnement.** Le CNN
+a un écart-type de 0,00069 sur cinq graines publiées, et se déplace de 0,0114 d'une
+session Colab à l'autre à graine identique : la sélection d'algorithme cuDNN et l'ordre
+des réductions sur GPU bougent plus que la graine. Un seuil calibré sur la dispersion des
+graines ne pouvait pas être tenu.
+
+> **Correction du protocole, et non du seuil.** Desserrer une constante pour passer un
+> verrou serait exactement le geste que ce papier reproche. Le verrou est donc scindé :
+>
+> - **partie dure** — les modèles quasi déterministes doivent se rejouer à 0,003. Ce sont
+>   eux qui prouvent le chemin des données. S'ils échouent, on s'arrête ;
+> - **partie mesurée** — la bande de reproductibilité des réseaux est *mesurée* dans cette
+>   session, en rejouant trois fois la même configuration à graine identique. Aucune
+>   différence inférieure à cette bande ne pourra être attribuée à la correction.
+
+Cette bande est un chiffre que le papier doit publier de toute façon : il ne quantifie
+nulle part la reproductibilité de ses détecteurs neuronaux d'un environnement à l'autre.
+""")
+
 code(r'''
-# --- 7. Le temoin, avant d'aller plus loin ------------------------------
+# --- 7. Le temoin, en deux parties --------------------------------------
+DETERMINISTES = ["majority", "logreg", "nb", "knn", "rf", "xgboost", "lightgbm"]
+TOL_DUR = 0.003
 MOD = R["models"]
-ec = {}
+
+def ecart(cfg, proto):
+    kp, kn = f"{cfg}|audited|{proto}", f"{cfg}|publiee|{proto}"
+    if kp in MOD and kn in STATE["runs"]:
+        return abs(MOD[kp]["macro_f1"] - STATE["runs"][kn]["macro_f1"])
+    return None
+
+durs, mous = {}, {}
 for cfg in CONFIGS:
-    for proto, suf in (("strat_seed1", "strat_seed1"), ("temporal", "temporal")):
-        kp, kn = f"{cfg}|audited|{suf}", f"{cfg}|publiee|{proto}"
-        if kp in MOD and kn in STATE["runs"]:
-            ec[f"{cfg}|{proto}"] = abs(MOD[kp]["macro_f1"]
-                                       - STATE["runs"][kn]["macro_f1"])
-if ec:
-    pire = max(ec, key=ec.get); emax = ec[pire]
-    print(f"{len(ec)} comparaisons, ecart maximal {emax:.4f} sur {pire}")
-    for k in sorted(ec, key=ec.get, reverse=True)[:6]:
-        print(f"   {k:34s} {ec[k]:.4f}")
-    STATE["temoin"] = {"ecart_max": emax, "pire": pire, "valide": bool(emax < 0.01)}
+    for proto in ("strat_seed1", "temporal"):
+        e = ecart(cfg, proto)
+        if e is None:
+            continue
+        (durs if cfg.split("#")[0] in DETERMINISTES else mous)[f"{cfg}|{proto}"] = e
+
+print("PARTIE DURE — le chemin des donnees\n")
+for k in sorted(durs, key=durs.get, reverse=True):
+    print(f"   {k:34s} {durs[k]:.4f}")
+if durs:
+    ed = max(durs.values())
+    print(f"\n   ecart maximal {ed:.4f}, tolerance {TOL_DUR}")
+    STATE["temoin_dur"] = {"ecart_max": ed, "tolerance": TOL_DUR,
+                           "valide": bool(ed < TOL_DUR), "par_cle": durs}
     save_state(STATE)
-    if emax >= 0.01:
-        print("\nARRET. Le temoin ne rejoue pas le tableau 2 : ce qui suit ne")
-        print("mesurerait pas la correction mais l'environnement.")
-        sys.exit("temoin invalide")
-    print("\nTEMOIN VALIDE — la comparaison porte bien sur la correction.")
+    if ed >= TOL_DUR:
+        print("\n   ARRET. Un modele deterministe ne se rejoue pas : les decoupages,")
+        print("   les colonnes ou le scaler different. Rien de ce qui suit n'aurait")
+        print("   de sens.")
+        sys.exit("chemin des donnees invalide")
+    print("   OK — decoupages, colonnes, scaler et etiquettes sont les bons.\n")
+
+print("\nPARTIE MESUREE — les reseaux, ecart au publie\n")
+for k in sorted(mous, key=mous.get, reverse=True):
+    print(f"   {k:34s} {mous[k]:.4f}")
+STATE["temoin_reseaux"] = mous
+save_state(STATE)
+''')
+
+code(r'''
+# --- 7bis. La bande de reproductibilite, mesuree ici --------------------
+# On rejoue TROIS fois la meme configuration, meme graine, meme donnees. Tout
+# ecart observe ne peut alors venir que de l'environnement : selection de
+# noyaux cuDNN, ordre des reductions sur GPU, non-determinisme des kernels.
+# C'est la seule facon honnete de savoir ce qu'une difference de 0.01 vaut.
+N_REPEAT = 3
+SONDES = [c for c in ("cnn", "dnn", "rnn", "ftt") if c in CONFIGS]
+tr_, va_, te_ = SPLITS["strat_seed1"]
+ci = [FEATS.index(c) for c in COLS["publiee"]]
+sc = RobustScaler().fit(X[tr_][:, ci])
+g = lambda ix: np.nan_to_num(sc.transform(X[ix][:, ci]), nan=0., posinf=0.,
+                             neginf=0.).astype("float32")
+Xtr, Xva, Xte = g(tr_), g(va_), g(te_)
+
+BANDE = {}
+print(f"{'config':<8}" + "".join(f"{'essai '+str(i+1):>12}" for i in range(N_REPEAT))
+      + f"{'etendue':>12}")
+for cfg in SONDES:
+    vals = []
+    for _ in range(N_REPEAT):
+        _, pt = fit_predict(cfg, Xtr, y[tr_], Xva, y[va_], Xte, 1)
+        vals.append(evalue(y[te_], pt)["macro_f1"])
+        gc.collect()
+    BANDE[cfg] = {"runs": vals, "etendue": float(max(vals) - min(vals)),
+                  "ecart_type": float(np.std(vals))}
+    print(f"{cfg:<8}" + "".join(f"{v:>12.4f}" for v in vals)
+          + f"{BANDE[cfg]['etendue']:>12.4f}")
+
+BANDE_MAX = max(b["etendue"] for b in BANDE.values()) if BANDE else 0.0
+STATE["bande_environnement"] = {"par_config": BANDE, "max": BANDE_MAX,
+                                "n_repeat": N_REPEAT}
+save_state(STATE)
+print(f"\nBANDE DE REPRODUCTIBILITE DES RESEAUX : {BANDE_MAX:.4f}")
+print("Aucune difference inferieure a cette valeur, sur un reseau, ne pourra")
+print("etre attribuee a la correction. Les modeles d'arbres et lineaires ne")
+print("sont pas concernes : ils se rejouent au quatrieme chiffre.")
+
+reste = {k: v for k, v in mous.items() if v > max(BANDE_MAX, 0.02)}
+if reste:
+    print(f"\nAVERTISSEMENT : {len(reste)} ecart(s) au publie depassent la bande")
+    print("ET 0.02. Ceux-la demandent une explication, la bande ne les couvre pas :")
+    for k in sorted(reste, key=reste.get, reverse=True):
+        print(f"   {k:34s} {reste[k]:.4f}")
 else:
-    print("aucune comparaison possible : verifie les cles de R['models'].")
+    print("\nTous les ecarts au publie tiennent dans la bande ou sous 0.02.")
+del Xtr, Xva, Xte; gc.collect()
 ''')
 
 code(r'''
@@ -645,6 +748,31 @@ if F2:
     ms, mt = (max(abs(d_s[c]) for c in F2), max(abs(d_t[c]) for c in F2))
     print(f"\necart maximal hors bayesien naif : stratifie {ms:.4f}, temporel {mt:.4f}")
     STATE["ecart_max"] = {"stratifie": ms, "temporel": mt}
+
+# Ce que la bande d'environnement autorise a conclure, detecteur par
+# detecteur. Sur un reseau, une difference plus petite que la bande n'est pas
+# attribuable a la correction, et le dire est la moitie du resultat.
+B = STATE.get("bande_environnement", {}).get("max", 0.0)
+DET = ("majority", "logreg", "nb", "knn", "rf", "xgboost", "lightgbm")
+print(f"\nATTRIBUABLE A LA CORRECTION ? (bande d'environnement {B:.4f})\n")
+print(f"{'configuration':<17}{'delta temporel':>16}   verdict")
+attrib = {}
+for cfg in sorted(d_t, key=lambda c: -abs(d_t[c])):
+    det = cfg.split("#")[0] in DET
+    ok_ = det or abs(d_t[cfg]) > B
+    attrib[cfg] = bool(ok_)
+    quoi = ("OUI, modele deterministe" if det and abs(d_t[cfg]) > 0.001 else
+            "oui, au-dessus de la bande" if ok_ else
+            "NON, sous la bande d'environnement")
+    print(f"{cfg:<17}{d_t[cfg]:>+16.4f}   {quoi}")
+STATE["attribuable"] = attrib
+solides = [c for c in d_t if attrib[c] and c.split("#")[0] in DET]
+if solides:
+    m_sol = max(abs(d_t[c]) for c in solides)
+    print(f"\nSur les seuls modeles deterministes, ou la mesure est sure :")
+    print(f"   ecart temporel maximal {m_sol:.4f} "
+          f"({max(solides, key=lambda c: abs(d_t[c]))})")
+    STATE["ecart_max_deterministe"] = m_sol
 
 # La question qu'E7 ne pouvait pas poser, faute de FT-Transformer.
 ftts = [c for c in cc if c.split("#")[0] == "ftt"]

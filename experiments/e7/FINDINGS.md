@@ -170,6 +170,39 @@ comporte comme ses pairs.
 Prix à écrire : le taux de faux positifs stratifié de la régression logistique
 passe de 0,0006 à 0,0167 (×28), et celui de k-NN de 0,0006 à 0,0171 (×29).
 
+## 7bis. Ce que le témoin d'E7 ne contrôlait pas — correction
+
+**Le témoin d'E7 ne comparait que le bras stratifié.** Le bras **temporel**, qui
+porte tout le résultat, n'a jamais été contrôlé. C'est une faiblesse de ma
+conception, trouvée en préparant E8.
+
+Contrôlé après coup, l'écart au publié sur le bras temporel :
+
+| détecteur | coût mesuré | écart au publié | attribuable ? |
+|---|---:|---:|---|
+| lightgbm | −0,0320 | **0,0000** | oui, se rejoue exactement |
+| knn | −0,0263 | 0,0002 | oui |
+| rf | −0,0243 | 0,0000 | oui |
+| xgboost | −0,0222 | 0,0000 | oui |
+| cnn | −0,0161 | 0,0010 | oui |
+| **dnn** | −0,0154 | **0,0156** | **non, dans le bruit** |
+| logreg | −0,0068 | 0,0005 | oui |
+| **rnn** | −0,0050 | 0,0041 | **non, dans le bruit** |
+
+**Les coûts mesurés sur le DNN et le RNN ne se distinguent pas du bruit
+d'environnement** et ne doivent pas être rapportés comme des effets.
+
+Ce n'est pas un problème pour la conclusion, et c'est même rassurant : **les
+quatre écarts les plus grands portent sur `lightgbm`, `knn`, `rf` et `xgboost`,
+qui se rejouent au quatrième chiffre.** Le résultat repose sur le sol le plus
+ferme du jeu de détecteurs.
+
+**La leçon de méthode**, que le papier doit publier : la dispersion sur les
+graines ne borne pas la dispersion sur l'environnement. Le CNN a un écart-type
+de 0,00069 sur cinq graines publiées et se déplace de 0,0114 d'une session
+Colab à l'autre **à graine identique**. E8 mesure cette bande explicitement, en
+rejouant trois fois la même configuration.
+
 ## 8. Les conclusions du papier tiennent, et l'une se renforce
 
 | conclusion | sous la liste corrigée |
