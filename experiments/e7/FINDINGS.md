@@ -103,7 +103,95 @@ Elle échoue donc dans les deux sens. Et la cécité du critère de transférabi
 **rapportée par les auteurs**, est une limite mesurée de la méthode — le registre
 que le papier adopte déjà ailleurs.
 
-## 6. Ce qui reste à faire, et qui ne peut pas se faire ici
+## 6. MESURÉ — le notebook a tourné, `verify_e7_correction.py` : 20/20
+
+### La preuve directe
+
+| fichier | flux | valeurs distinctes |
+|---|---:|---:|
+| `attack-bruteforce-{ftp,smb,ssh}` | 18 033 | **1**, la même pour les trois |
+| `attack-dos-{pushack,slowloris,udp}` | 183 071 | **1**, la même pour les trois |
+| `attack-dos-icmp` | 65 536 | 2 |
+| `attack-dos-hulk` | 47 033 | 1 |
+| `benign-{admin,user}` | 16 864 | 1 chacun |
+| `benign-background` | 8 283 | 2 |
+
+**Maximum deux valeurs par fichier.** Toutes sont des multiples exacts de 128 —
+le pas du `float32`. Toutes tombent en février 2025. Le fossé entre le dernier
+bénin et la première attaque est de **40,9 h**.
+
+### Le plafond n'est pas approché, il est atteint
+
+Le socle imposé par la structure (bénin + `bruteforce-smb` + `dos-pushack` +
+`dos-hulk`) vaut 0,4368. Il manque 62 403 flux pour atteindre le 0,6209 mesuré,
+soit **95,2 % de `dos-icmp`** — la part de ce fichier posée sur sa valeur propre
+1739380224. L'arbre fait donc exactement ce que la structure permet, ni plus ni
+moins.
+
+*Comptabilité : ma prédiction initiale de 0,6302 avait le bon ordre de grandeur
+avec un groupement qui n'était pas le vrai. Le plafond exact vaut 0,6209.*
+
+### L'AUC binaire
+
+| colonne | AUC binaire | arbre binaire | arbre 9 classes |
+|---|---:|---:|---:|
+| **`IdleTime`** | **1,0000** | **1,0000** | 0,6209 |
+| `Offset` | 0,9379 | 0,8960 | 0,0601 |
+| `SIntPktMin` | 0,9165 | 0,9865 | 0,9392 |
+| `DstBytes` | 0,6272 | 0,9946 | 0,9604 |
+
+`IdleTime` sépare **parfaitement** bénin et attaque tout en plafonnant à 0,62 en
+neuf classes. C'est le point de méthode : une mesure de pouvoir prédictif isolé
+conduite en multiclasse peut masquer une colonne qui résout parfaitement la
+tâche binaire.
+
+## 7. Ce que la correction coûte
+
+Témoin validé : le bras publié rejoue le Tableau 2 à **0,0021** près.
+
+| détecteur | strat. publiée | strat. corrigée | Δ | temp. publiée | temp. corrigée | Δ |
+|---|---:|---:|---:|---:|---:|---:|
+| logreg | 0,9997 | 0,9967 | −0,0030 | 0,9949 | 0,9881 | −0,0068 |
+| knn | 0,9965 | 0,9927 | −0,0038 | 0,9837 | 0,9574 | −0,0263 |
+| rf | 0,9999 | 0,9999 | −0,0001 | 0,9775 | 0,9532 | −0,0243 |
+| xgboost | 1,0000 | 0,9998 | −0,0002 | 0,9888 | 0,9666 | −0,0222 |
+| **lightgbm** | 0,9999 | 0,9999 | −0,0000 | 0,9897 | **0,9577** | **−0,0320** |
+| dnn | 0,9979 | 0,9954 | −0,0026 | 0,9887 | 0,9733 | −0,0154 |
+| cnn | 0,9958 | 0,9949 | −0,0009 | 0,9939 | 0,9778 | −0,0161 |
+| rnn | 0,9979 | 0,9970 | −0,0009 | 0,9942 | 0,9892 | −0,0050 |
+| nb | 0,5347 | 0,4387 | −0,0961 | 0,4994 | 0,4843 | −0,0151 |
+
+**Toutes les pertes sont négatives : les modèles s'en servaient.** Le coût
+stratifié reste faible (≤ 0,0038) et le coût temporel est **8× plus grand**
+(jusqu'à 0,0320). C'est exactement la signature des douze autres raccourcis :
+peu cher sous découpage aléatoire, cher sous protocole temporel. `IdleTime` se
+comporte comme ses pairs.
+
+Prix à écrire : le taux de faux positifs stratifié de la régression logistique
+passe de 0,0006 à 0,0167 (×28), et celui de k-NN de 0,0006 à 0,0171 (×29).
+
+## 8. Les conclusions du papier tiennent, et l'une se renforce
+
+| conclusion | sous la liste corrigée |
+|---|---|
+| corpus saturé en stratifié | **tient** — les trois ensembles ≥ 0,9998 |
+| les boostés quittent le sommet en temporel | **renforcée** — LightGBM passe de 4ᵉ à **6ᵉ** |
+| la calibration s'effondre en temporel | **tient** — médiane ×35, max ×994 |
+
+Ordre temporel publié : `logreg > rnn > cnn > lightgbm > xgboost > dnn > knn > rf`
+Ordre corrigé : `rnn > logreg > cnn > dnn > xgboost > lightgbm > knn > rf`
+
+## 9. La décision : republier, pas commenter
+
+**0,0320 dépasse ce que le papier traite comme du bruit.** Il écrit que le
+groupe de tête est statistiquement indiscernable sur des écarts de 0,0022 à
+0,0069 ; un déplacement de 0,032 ne peut pas être rangé là.
+
+La condition auditée doit donc être **republiée sur la liste à treize entrées**,
+pas seulement commentée en section 9. Les chiffres d'E7 sont sur la graine 1 :
+une republication du Tableau 2 demande les cinq graines.
+
+## 10. Ce qui restait à faire — fait
 
 La preuve directe — compter les valeurs distinctes, mesurer l'AUC binaire — et
 la réparation demandent le corpus brut. `colab/e7_idletime.ipynb` :
@@ -114,9 +202,10 @@ la réparation demandent le corpus brut. `colab/e7_idletime.ipynb` :
 3. mesure l'AUC binaire, la mesure que l'audit n'a jamais faite ;
 4. réentraîne sous la liste corrigée, avec le bras publié en **témoin**.
 
-**Le manuscrit ne doit pas être soumis avant ce résultat.**
+**Le manuscrit ne doit pas être soumis avant la republication de la
+condition auditée.**
 
-## 7. ⚠️ Le papier 1
+## 11. ⚠️ Le papier 1
 
 `docs/preliminary_findings.md` §3 portait l'action « réintégrer `IdleTime` dans
 BAg-IDS avant soumission ». Corrigé (voir le fichier, section barrée).

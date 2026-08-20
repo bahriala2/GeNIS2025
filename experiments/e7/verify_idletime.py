@@ -93,6 +93,11 @@ print(f"   plafond si les 4 classes DoS partagent 1 valeur        : {p1:.4f}")
 print(f"   plafond si elles se separent en 2 valeurs              : {p2:.4f}")
 chk("le plafond a deux valeurs colle a la mesure", abs(p2 - mesure) < 0.02,
     f"ecart {abs(p2 - mesure):.4f}")
+# Honnetete de comptabilite : ce test a donne le bon ordre de grandeur avec un
+# groupement qui n'etait pas le vrai. Le notebook a depuis mesure la structure
+# reelle -- dos-icmp seul sur sa propre valeur a 95 %, les trois autres DoS
+# groupes -- et le plafond exact vaut alors 0.6209, soit la mesure au chiffre
+# pres. Voir verify_e7_correction.py, section A.
 chk("le plafond a une seule valeur ne colle pas, la note dit bien 1 a 2",
     abs(p1 - mesure) > 0.10, f"ecart {abs(p1 - mesure):.4f}")
 chk("la mesure est SOUS le plafond, comme un ajustement doit l'etre",
