@@ -53,16 +53,34 @@ prévoir.
 
 ---
 
-## 3. `IdleTime` : la feature la plus importante, et elle transfère bien
+## 3. `IdleTime` : ~~la feature la plus importante~~ — RETIRÉ, c'est un raccourci
 
-Importance par permutation **0,2278** — sept fois la suivante (`dTtl`, 0,0338) — avec un
-ratio de transférabilité de 0,94. C'est un signal comportemental légitime et dominant.
+> **Cette section était fausse et son action était dangereuse.** Elle est conservée
+> barrée plutôt que supprimée, parce que l'action qu'elle portait a pu être lue.
+> Voir `docs/audit_idletime.md` et `experiments/e7/verify_idletime.py` (17/17).
 
-**Point de provenance** : le pipeline BAg-IDS initial supprimait `IdleTime` par accident
-(le motif de filtrage `"id"` capturait `IdleTime`, `SIntPktIdl`, `DIntPktIdl`…). Les
-détecteurs GeNIS de BAg-IDS §6.9 ont donc été entraînés **sans leur feature la plus
-informative**. À corriger dans BAg-IDS avant soumission, et à mentionner ici comme
-illustration du risque des filtres par motif de chaîne.
+Ce qui était écrit ici : importance par permutation **0,2278**, sept fois la suivante,
+transférabilité 0,94, donc « un signal comportemental légitime et dominant ».
+
+**Les deux premiers chiffres sont exacts ; la conclusion ne l'est pas.** `IdleTime` ne
+prend qu'une ou deux valeurs distinctes par fichier de capture, et ces valeurs sont des
+horodatages Unix absolus. C'est un **identifiant de fichier de capture**. Sa
+transférabilité vaut 0,94 précisément parce qu'une valeur figée par fichier garde le
+même pouvoir prédictif des deux côtés d'un changement de protocole : le critère est
+structurellement aveugle à ce type de fuite.
+
+> ### ⚠️ L'action qui était portée ici ne doit PAS être exécutée
+>
+> Il était écrit : « le pipeline BAg-IDS initial supprimait `IdleTime` par accident (le
+> motif `"id"`) … **à corriger dans BAg-IDS avant soumission** ».
+>
+> **Réintégrer `IdleTime` dans BAg-IDS y injecterait une fuite à AUC binaire 1,000**, à
+> la veille d'une soumission Q1. L'exclusion accidentelle a protégé le papier 1. Il faut
+> la rendre **volontaire et documentée**, pas la défaire.
+
+Ce qui reste vrai du point de provenance : un filtre par motif de chaîne (`"id"`) est
+un mauvais instrument, ici parce qu'il a écarté `SIntPktIdl` et `DIntPktIdl` en même
+temps. Mais sur `IdleTime` il a eu raison par accident.
 
 ---
 
