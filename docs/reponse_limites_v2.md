@@ -17,7 +17,7 @@ apparaître un défaut que le rapport ne signalait pas.
 | 1 | Fuite par l'audit sur le test | **Déjà traité** — §4.3 et §9 | Rendre la réponse plus difficile à manquer |
 | 3 | Seuil τ heuristique, 8 → 13 | **Déjà traité et mesuré** — §9, Fig. 19 | Renvoi depuis §4.3 |
 | 4 | Découpage par classe = étiquettes | **Déjà traité** — §4.2, Fig. 4, §6.8 | Délimitation théorique explicite |
-| 5 | Effondrement LightGBM à 10 s | **Ouvert** | Mécanisme + expérience E6 |
+| 5 | Effondrement LightGBM à 10 s | **Réel** | Candidat éliminé, limite assumée |
 
 ---
 
@@ -319,8 +319,9 @@ les données de GeNIS ne permettent pas.
 | binning déterministe | 0,5063 | **0,0000** | **0,0000** |
 
 13 contrôles sur 13. Les seize graines du bras déterministe rendent
-**exactement** 0,5063 : la graine ne pilote alors plus rien, ce qui démontre
-que c'est le binning qui portait toute la variance.
+**exactement** 0,5063 : la graine ne pilote alors plus rien — sur ces données
+synthétiques, où le binning est le seul aléa restant. C'est une preuve de
+**suffisance** : ce mécanisme *peut* produire la forme observée.
 
 Trois lectures :
 
@@ -332,27 +333,54 @@ Trois lectures :
 - **le déterministe est aussi le meilleur** — 0,5063 contre 0,3622 de moyenne.
   Poser les bornes sur toutes les lignes ne fait pas que stabiliser.
 
-### Ce que cela reste, et comment trancher
+### L'expérience décisive : faite, et elle élimine le candidat
 
-Je n'ai **pas** montré que c'est ce qui est arrivé à la graine 3. Sur GeNIS,
-composition du découpage et grille d'histogramme bougent ensemble.
+`colab/e6_binning_deterministe.ipynb` a tourné. Cinq ajustements à 10 s, mêmes
+cinq découpages, `subsample_for_bin` porté à 883 281 pour 883 279 lignes.
+`verify_e6_deterministe.py` : **20 contrôles sur 20**.
 
-L'expérience qui les sépare coûte **cinq ajustements**, ~45 min :
-`colab/e6_binning_deterministe.ipynb` refait les cinq découpages à 10 s avec
-`subsample_for_bin` porté au-delà de la taille du jeu d'entraînement.
+**Le témoin d'abord.** Une graine saine rejouée avec le binning d'origine rend
+`0.9998729764672524`, la valeur publiée au dernier chiffre. La comparaison est
+donc valide : ce qui suit vient du binning, pas de l'environnement Colab.
 
-| résultat | conclusion |
-|---|---|
-| l'effondrement disparaît | c'est la grille d'histogramme |
-| l'effondrement persiste | c'est la composition du découpage |
-| liste modifiée sans disparaître | le binning module sans causer seul |
+| graine | publié | déterministe | |
+|---|---:|---:|---|
+| 1 | 0,9999 | 1,0000 | |
+| 2 | 1,0000 | **0,4193** | ← s'effondre |
+| 3 | **0,8374** | 1,0000 | ← guérit |
+| 4 | 1,0000 | **0,8106** | ← s'effondre |
+| 5 | 1,0000 | 1,0000 | |
 
-Le notebook rejoue aussi une graine **saine** avec le binning d'origine. Sans ce
-témoin, une différence entre les deux colonnes pourrait venir de
-l'environnement plutôt que du binning ; s'il ne reproduit pas, le notebook
-refuse de conclure.
+**C'est la troisième issue du tableau, et plus tranchée que prévu.**
+L'effondrement ne disparaît pas : il se déplace, il y en a **deux au lieu
+d'un**, et le pire tombe à 0,4193 contre 0,8374.
 
-**Aucune des trois issues n'affaiblit le papier.**
+La graine 2 est à **0,5143 de ROC-AUC** — le hasard — avec 95,7 % de faux
+positifs et trois classes à exactement zéro. Et **aucun des deux nouveaux
+échecs n'a l'ajustement allongé** (336 s contre 291 s) qui signait l'échec
+publié : ce n'est pas le même phénomène déplacé.
+
+### Ce que ça change pour le papier
+
+Le binning **n'est pas la cause**. La §6.4 ne nomme donc aucun mécanisme, et
+la §9 s'intitule maintenant « One run-to-run failure resists explanation ».
+
+Ce que ça aurait coûté de s'arrêter au volet synthétique : nous aurions
+recommandé de fixer `subsample_for_bin`. Sur ce corpus, ce correctif fait
+passer de un effondrement à deux et abaisse le pire de 0,84 à 0,42. **La
+recommandation aurait empiré les choses.**
+
+Deux propriétés survivent aux deux réglages, et ce sont elles que le papier
+retient :
+
+- la perte est **discrète**, aucun run des deux bras entre 0,84 et 0,99, donc
+  invisible à l'inspection d'un écart-type ;
+- une **moyenne sur graines la dissimule** (0,9675 et 0,8460), ce qui est la
+  raison pour laquelle le Tableau 6 rapporte des runs.
+
+Aucune des deux ne dépend de connaître le mécanisme. C'est un argument pour la
+thèse du papier lui-même : un résultat qui tient sur un seul essai ne tient
+pas.
 
 ---
 
@@ -364,6 +392,6 @@ refuse de conclure.
 | 2 | §4.3 bloc 83 : donner la conclusion dès la déclaration | **fait** |
 | 3 | §4.3 bloc 60 : renvoyer à la §9 depuis le seuil | **fait** |
 | 4 | §4.2 : nommer les trois questions de généralisation | **fait** |
-| 5 | §6.4 et §9 : le mécanisme de binning | rédigé, entre avec `e6_results.json` |
-| 6 | Notebook E6 : la preuve décisive | **fait**, à exécuter sur Colab |
+| 5 | §6.4 et §9 : le résultat négatif sur le binning | **fait** |
+| 6 | Notebook E6, exécuté : le candidat est éliminé | **fait**, 20/20 |
 | 7 | Relancer la critique en deux moitiés, coupure après la §6 | **vous** |

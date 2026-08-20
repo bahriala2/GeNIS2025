@@ -1,0 +1,184 @@
+{
+ "meta": {
+  "version": "v1",
+  "build": "2026-08-17"
+ },
+ "reference": {
+  "1": 0.9998729764672524,
+  "2": 0.9999638930738409,
+  "3": 0.8374316326683519,
+  "4": 1.0,
+  "5": 1.0
+ },
+ "runs": {
+  "det|seed1": {
+   "accuracy": 0.9999966035723626,
+   "macro_f1": 0.9999638930738409,
+   "mcc": 0.999995590910473,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9997118985883031,
+    "dos-hulk": 0.9999631390762652,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "fpr": 0.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 243.4,
+   "predict_time_s": 22.577,
+   "n_test": 294427,
+   "n_train": 883279,
+   "subsample_for_bin": 883281
+  },
+  "det|seed2": {
+   "accuracy": 0.8446915534241085,
+   "macro_f1": 0.4193263016097321,
+   "mcc": 0.7986801159019634,
+   "per_class_f1": {
+    "benign": 0.05253940455341506,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.0,
+    "bruteforce-ssh": 0.0,
+    "dos-hulk": 0.15947001064710753,
+    "dos-icmp": 0.96501762426241,
+    "dos-pushack": 0.8352904253492269,
+    "dos-slowloris": 0.8536058111900319,
+    "dos-udp": 0.9080134384853976
+   },
+   "binary": {
+    "fpr": 0.9571489787173261,
+    "roc_auc": 0.5142601880887495
+   },
+   "fit_time_s": 229.12,
+   "predict_time_s": 18.982,
+   "n_test": 294427,
+   "n_train": 883279,
+   "subsample_for_bin": 883281
+  },
+  "det|seed3": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "fpr": 0.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 231.82,
+   "predict_time_s": 23.151,
+   "n_test": 294427,
+   "n_train": 883279,
+   "subsample_for_bin": 883281
+  },
+  "det|seed4": {
+   "accuracy": 0.9635699171611299,
+   "macro_f1": 0.8105775497758573,
+   "mcc": 0.9526105737719434,
+   "per_class_f1": {
+    "benign": 0.9236567881161777,
+    "bruteforce-ftp": 0.7887931034482759,
+    "bruteforce-smb": 0.8739837398373984,
+    "bruteforce-ssh": 0.0,
+    "dos-hulk": 0.8351187887891844,
+    "dos-icmp": 0.9857929688729424,
+    "dos-pushack": 0.9807825944129278,
+    "dos-slowloris": 0.9306077902157721,
+    "dos-udp": 0.9764621742900361
+   },
+   "binary": {
+    "fpr": 0.10741322668190259,
+    "roc_auc": 0.9458045651884789
+   },
+   "fit_time_s": 230.75,
+   "predict_time_s": 23.311,
+   "n_test": 294427,
+   "n_train": 883279,
+   "subsample_for_bin": 883281
+  },
+  "det|seed5": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "fpr": 0.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 234.22,
+   "predict_time_s": 21.671,
+   "n_test": 294427,
+   "n_train": 883279,
+   "subsample_for_bin": 883281
+  },
+  "temoin|ech": {
+   "accuracy": 0.9999932071447252,
+   "macro_f1": 0.9998729764672524,
+   "mcc": 0.9999911818217542,
+   "per_class_f1": {
+    "benign": 0.9999285765302478,
+    "bruteforce-ftp": 0.9992531740104555,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9997118985883031,
+    "dos-hulk": 0.9999631390762652,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "fpr": 0.00014283673760891302,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 227.87,
+   "predict_time_s": 23.036,
+   "n_test": 294427,
+   "n_train": 883279,
+   "subsample_for_bin": null,
+   "graine": 1
+  }
+ },
+ "verdict": {
+  "temoin_reproduit": true,
+  "effondrements_avant": [
+   3
+  ],
+  "effondrements_apres": [
+   2,
+   4
+  ],
+  "deterministe": {
+   "1": 0.9999638930738409,
+   "2": 0.4193263016097321,
+   "3": 1.0,
+   "4": 0.8105775497758573,
+   "5": 1.0
+  },
+  "conclusion": "mixte"
+ }
+}
