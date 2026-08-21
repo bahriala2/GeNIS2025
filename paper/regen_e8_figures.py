@@ -1,19 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Figures 5, 10 et 18, redessinees sur la condition auditee CORRIGEE.
+"""Figures 5, 10, 14 et 18, redessinees sur la condition auditee CORRIGEE.
 
 E7 a montre qu'IdleTime est un identifiant de fichier de capture ; E8 a refait
 la campagne sans lui. Ces trois figures dependent de la condition auditee et
 doivent donc etre redessinees. Ce sont les seules que l'on puisse refaire sans
 les matrices de probabilites : les figures 9 (McNemar) et 11 (bootstrap) en
-ont besoin, et la figure 14 attend la mesure de cout.
+ont besoin.
+
+La figure 14 est un cas mixte, et c'est pour ca qu'elle etait restee de cote.
+Son axe vertical est le macro-F1 temporel, qui a change pour les neuf
+detecteurs ; son axe horizontal est le debit, mesure sur 55 colonnes et pas
+remesure. Laisser la figure telle quelle affichait neuf points a la mauvaise
+hauteur, ce qui est pire qu'un axe dont la provenance est ecrite : la legende
+nomme desormais la condition de chaque axe, comme le fait le tableau 10.
+Elle n'avait par ailleurs aucun script de regeneration -- MAPPING.md la
+listait comme un manque -- et en voici un.
 
 Rien n'est recopie : chaque valeur vient de experiments/e8/e8_results.json,
 condition "corrigee". Les colonnes full et clean de la figure 10 viennent de
 article1_results.json et ne changent pas -- elles n'ont jamais utilise la
 liste noire.
 
-Sorties : paper/figures_manuscrit/figure{05,10,18}_*.png
+Sorties : paper/figures_manuscrit/figure{05,10,14,18}_*.png
 """
 import json
 import pathlib
@@ -220,4 +229,63 @@ plt.savefig(OUT / "figure18_per_class_f1_temporal.png", dpi=285)
 plt.close()
 print(f"figure 18 : ordre temporel {ORD_T}")
 print(f"            cellule la plus basse {pire[1]} / {pire[2]} = {pire[0]:.4f}")
-print("\nles trois figures sont ecrites dans", OUT)
+
+# =========================================================================
+# Figure 14 — cout d'inference contre qualite, protocole temporel
+# =========================================================================
+# Debit : article1_results.json, mesure sur 55 colonnes, inchange.
+# Qualite : E8, condition corrigee, protocole temporel.
+COUT = R["cost"]
+PROFOND = {"ftt", "rnn", "cnn", "dnn"}
+P14 = sorted(((COUT[m]["throughput_512"], run(m, "temporal")["macro_f1"], m)
+              for m in ORD if m != "nb"), key=lambda t: -t[1])
+# Decalages d'etiquette, en points. Le defaut place au-dessus a droite ; les
+# exceptions sont les seuls points ou ca chevauchait un voisin ou le cadre.
+DEC = {"logreg": (-8, 8, "right"), "rf": (8, -12, "left"),
+       "dnn": (8, -12, "left"), "lightgbm": (-8, -12, "right"),
+       "cnn": (-6, 10, "right"), "rnn": (9, 4, "left")}
+
+# La figure remplace l'image d'origine EN PLACE dans le document, sous son nom
+# de hachage : on garde donc ses 1803 x 1276 pixels, pour que l'extent declare
+# dans le .docx reste juste et que rien ne soit etire.
+fig, ax = plt.subplots(figsize=(1803 / 285, 1276 / 285))
+for deb, q, m in P14:
+    creux = m in PROFOND
+    ax.scatter(deb, q, s=95 if creux else 105,
+               marker="^" if creux else "o",
+               color="#c23b34" if creux else "#4a72b0", zorder=3)
+    dx, dy, ha = DEC.get(m, (8, 8, "left"))
+    ax.annotate(m, (deb, q), textcoords="offset points", xytext=(dx, dy),
+                ha=ha, fontsize=9.5, color="#3b4046")
+ax.set_xscale("log")
+ax.set_xlabel("CPU throughput (flows/s, batch 512, log scale)", fontsize=10)
+ax.set_ylabel("macro-F1, temporal protocol", fontsize=10)
+ax.set_title("Inference cost versus detection quality", fontsize=12)
+ax.grid(alpha=.25, color="#c9cdd2")
+ax.set_axisbelow(True)
+qs = [q for _, q, _ in P14]
+marge = (max(qs) - min(qs)) * .12
+ax.set_ylim(min(qs) - marge, max(qs) + marge)
+ax.scatter([], [], s=105, marker="o", color="#4a72b0", label="classical / tree")
+ax.scatter([], [], s=95, marker="^", color="#c23b34", label="deep")
+ax.legend(loc="lower right", fontsize=9.5, framealpha=.95)
+plt.tight_layout()
+plt.savefig(OUT / "figure14_cost_vs_quality.png", dpi=285)
+plt.close()
+
+# Les trois affirmations que porte la legende, recalculees et non recopiees :
+# l'etendue du debit, l'ecart entre le meilleur et son voisin a haut debit, et
+# la domination du DNN sur les deux axes.
+etendue = max(d for d, _, _ in P14) / min(d for d, _, _ in P14)
+tete = P14[0]
+second = P14[1]
+rapport = second[0] / tete[0]
+d_dnn, q_dnn, _ = next(t for t in P14 if t[2] == "dnn")
+domine = [m for d, q, m in P14 if d > d_dnn and q > q_dnn]
+print(f"figure 14 : debit sur {etendue:.0f}x, soit "
+      f"{len(str(int(etendue))) - 1} ordres de grandeur")
+print(f"            {tete[2]} mene a {tete[1]:.4f}, {second[2]} a "
+      f"{second[1] - tete[1]:+.4f} pour {rapport:.0f}x le debit")
+print(f"            dnn domine sur les deux axes par : {domine}")
+
+print("\nles quatre figures sont ecrites dans", OUT)

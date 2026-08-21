@@ -38,7 +38,7 @@ entered at 15, 16 and 19. If you are reading an older draft, this table is the m
 | 11 | `figure11_bootstrap_ci.png` | `fig7_ranking_ci.png` | regenerate_figures.py |
 | 12 | `figure12_intervals_per_class.png` | `fig3_interval_heatmap.png` | regen_en.py |
 | 13 | `figure13_autoencoder_auroc.png` | `fig10_autoencoder.png` | regenerate_figures.py |
-| 14 | `figure14_cost_vs_quality.png` | **none** | none, see below |
+| 14 | `figure14_cost_vs_quality.png` | **none** | regen_e8_figures.py |
 | 15 | `figure15_rolling_origins.png` | `figE4b_origines.png` | regen_e4b.py |
 | 16 | `figure16_leave_one_family_out.png` | `figE4b_lofo.png` | regen_e4b.py |
 | 17 | `figure17_cicids2017_audit.png` | `figE2_cicids2017_audit.png` | regen_e2.py |
@@ -46,16 +46,23 @@ entered at 15, 16 and 19. If you are reading an older draft, this table is the m
 | 19 | `figure19_threshold_cost.png` | `figE4c_seuil.png` | regen_e4c.py |
 | 20 | `figure20_horizons.png` | `figE4_horizons.png` | regen_e4.py |
 
-## The five figures with no script
+## The figures with no script
 
 Figures 2, 6, 9, 14 and 18 were rendered while the native Word document was being
 built and were never written back to `paper/figures/`. The images here are the ones
-the manuscript shows, extracted from the document itself, so nothing is lost. Their
-underlying values were re-checked against `article1_results.json`: Figure 14's nine
-points match `cost.<model>.throughput_512` and the temporal macro-F1 exactly.
+the manuscript shows, extracted from the document itself, so nothing is lost.
 
-They cannot currently be regenerated from a committed script. If a reviewer asks for
-a regeneration path, that is the gap to close.
+**Two of the five now have one.** `regen_e8_figures.py` draws Figures 14 and 18 (and
+redraws 5 and 10) on the audited condition as corrected in Section 9. Figure 14 is
+the mixed case: its quality axis comes from `experiments/e8/e8_results.json` over 54
+columns, its throughput axis from `article1_results.json` `cost.<model>.throughput_512`
+over 55, measured before the correction and not re-measured. The caption says so.
+
+**Three remain: 2, 6 and 9.** Figure 9 (pairwise McNemar) needs the stored probability
+matrices, which are not committed — as does redrawing Figure 11 on the corrected
+condition, though that one does have a script. Figure 2 (class distribution) and
+Figure 6 (importance versus transferability) read only `article1_results.json` and
+could be scripted at any time; that is the gap left to close.
 
 ## Captions
 
