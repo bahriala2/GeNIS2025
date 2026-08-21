@@ -141,3 +141,51 @@ colonne de celui d'un nouveau réglage — mais le papier doit le dire.
 
 - `experiments/e8/e8_results.json`
 - `paper/article1_results.json`
+
+
+---
+
+## 7. Un bug dans le notebook E8 : l'objectif du calage de température
+
+Trouvé en republiant les Tableaux 7 et 8. Le pipeline ajuste la température en
+minimisant la **NLL** sur une grille de 80 points
+(`colab/e3_calibration_residual.py`, fonction `temperature`) ; la fonction
+que j'ai écrite dans E8 minimise l'**ECE** sur une grille de 100 points au pas
+de 0,05. **Objectif différent.**
+
+La preuve : sur le bras `publiee`, qui devrait reproduire le Tableau 7, E8
+donne pour naive Bayes T = 0,150 là où le papier a 5,821 et où E3-A avait
+retrouvé 5,000. Les deux extrémités opposées de la grille — ce n'est pas un
+artefact de grille.
+
+| colonne | républiable depuis E8 ? |
+|---|---|
+| Tableau 7, `ECEraw` | **oui** — l'ECE brut ne dépend pas de la température |
+| Tableau 7, `T` et `ECEcal` | **non** |
+| Tableau 8, `ECE stratified`, `ECE temporal`, `ratio` | **oui** |
+| Tableau 8, `T temporal`, `ECE temporal, calibrated` | **non** |
+
+**Décision : les Tableaux 7 et 8 sont laissés en l'état.** Un tableau dont
+certaines colonnes viennent de la liste à treize et d'autres de la liste à
+douze induirait plus en erreur qu'un tableau non touché. Seul le Tableau 2 est
+republié.
+
+**Le correctif ne demande aucun réentraînement** : les matrices de
+probabilités d'E8 sont conservées dans `e8_probs/`, et la température se
+recalcule dessus avec l'objectif du pipeline.
+
+### Ce que la recomputation changera, et qu'il faut anticiper
+
+Les ECE bruts, eux, sont déjà mesurés et ils déplacent deux affirmations du
+manuscrit :
+
+- **§6.5 : « expected calibration error is at most 0.0009 for every model
+  except naive Bayes ».** Sous la liste corrigée le maximum est **0,0084**, et
+  il est porté par la régression logistique — dont l'ECE stratifié est passé de
+  0,000313 à 0,008429, soit ×27.
+- **§6.5 et conclusion : « ten of the eleven detectors » se dégradent sous le
+  protocole temporel.** Ce sont maintenant **neuf sur onze** : la régression
+  logistique **s'améliore** (rapport 0,4×), parce que c'est son bras stratifié
+  qui s'est dégradé, pas son bras temporel qui a progressé.
+- Les rapports des trois mieux calibrés passent de « 241 à 457 » à
+  **« 146 à 1403 »**.
