@@ -189,3 +189,51 @@ manuscrit :
   qui s'est dégradé, pas son bras temporel qui a progressé.
 - Les rapports des trois mieux calibrés passent de « 241 à 457 » à
   **« 146 à 1403 »**.
+
+
+---
+
+## 8. Ce qui est entré dans le manuscrit, et ce qui attend
+
+### Entré
+
+| élément | source |
+|---|---|
+| **Tableau 2** | E8, condition corrigée, entièrement |
+| **Tableau 13**, colonne macro-F1 et ordre des lignes | E8 |
+| **Figures 5, 10, 18** | redessinées, `paper/regen_e8_figures.py` |
+| légendes des Figures 5, 10, 18 | recalculées |
+| prose des §6.1, §6.3, §8 citant le Tableau 2 | recalculée |
+
+Les Figures 5, 10 et 18 sont les seules que l'on puisse refaire sans les
+matrices de probabilités. Elles remplacent les images d'origine **en place** :
+le document les portait sous des noms de hachage, qu'on écrase sans toucher
+aux relations ni aux `extent` déclarés.
+
+### En attente, et pourquoi les cases sont vides plutôt que périmées
+
+Le Tableau 13 a **deux colonnes vides** : le débit demande une mesure de coût
+sur 54 colonnes, la température demande le recalage avec l'objectif du
+pipeline. Une case vide n'induit personne en erreur ; une valeur de la
+condition à douze posée à côté d'une valeur de la condition à treize, si.
+
+| bloqué par | débloque |
+|---|---|
+| recalage des températures (NLL) | Tableaux 7, 8, 13 (température), §6.5 |
+| mesure de coût (54 colonnes) | Tableau 10, 13 (débit), Figure 14, §8 |
+| `e8_probs/` | Figures 9 (McNemar) et 11 (bootstrap) |
+| `ftt` graine 5 | le *n* = 4 du Tableau 2 |
+
+### Ce que la Figure 18 montre maintenant
+
+C'est le changement le plus visible du manuscrit. Sous la liste publiée, la
+perte se dispersait : « chaque détecteur perd ailleurs ». Sous la liste
+corrigée elle **se concentre sur `dos-hulk` et `dos-slowloris`**, où le DNN,
+XGBoost, LightGBM, k-NN et la forêt aléatoire tombent tous sous 0,93. La
+cellule la plus basse est la forêt aléatoire sur `dos-hulk` à **0,814**, contre
+0,957 pour la pire classe du détecteur de tête — et **onze de ces douze
+cellules étaient au-dessus de 0,93** sous la liste publiée.
+
+L'échelle de couleur a dû descendre de 0,90 à 0,80 : la légende publiée
+affirmait que toute valeur montrée était au-dessus de 0,90, ce qui n'est plus
+vrai.
