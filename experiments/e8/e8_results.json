@@ -1,7 +1,8 @@
 {
  "meta": {
   "version": "v1",
-  "build": "2026-08-20"
+  "build": "2026-08-20",
+  "note_cpu": "quatre ajustements de la graine 5 corrigee ont ete faits sur CPU et releves depuis la console ; seul macro_f1 en a ete conserve"
  },
  "runs": {
   "majority|publiee|temporal": {
@@ -4074,6 +4075,18 @@
    "ece_calibree": 0.1259072406233902,
    "seconds": 3.5,
    "n_features": 54
+  },
+  "knn#tuned|corrigee|strat_seed5": {
+   "macro_f1": 0.9945,
+   "n_features": 54,
+   "source": "console, session CPU du 2026-08-21",
+   "partiel": true
+  },
+  "dnn#tuned|corrigee|strat_seed5": {
+   "macro_f1": 0.9836,
+   "n_features": 54,
+   "source": "console, session CPU du 2026-08-21",
+   "partiel": true
   }
  },
  "offset": {

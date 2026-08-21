@@ -98,13 +98,44 @@ Cette non-reproductibilité inter-session du `ftt` est elle-même à rapporter :
 le papier ne quantifie nulle part la reproductibilité de ses détecteurs
 neuronaux d'un environnement à l'autre.
 
-## 6. Runs manquants
+## 6. État des runs
 
-`dnn#tuned`, `ftt` et `knn#tuned`, graine 5, liste corrigée — le GPU a été
-retiré au runtime. Toutes les moyennes ci-dessus sont calculées sur les
-**graines communes aux deux listes**, donc sur une base identique de part et
-d'autre. Reste à décider avant soumission : finir ces trois ajustements pour
-un tableau uniforme à cinq graines, ou ramener tout le tableau à quatre.
+**179 sur 180.** Il ne manque que `ftt|corrigee|strat_seed5`, qui demande un
+GPU — le FT-Transformer coûte 228 à 610 s par ajustement sur GPU et des heures
+sur CPU.
+
+Les quatre autres manquants ont été faits sur CPU et relevés depuis la console
+(`logreg#tuned` 0,9956, `nb#tuned` 0,5019, `knn#tuned` 0,9945, `dnn#tuned`
+0,9836). Ils sont marqués `"source": "console, session CPU"` dans le JSON :
+seul le macro-F1 en a été conservé, et la provenance doit rester traçable.
+
+*Note de comptabilité :* j'avais signalé `nb#tuned` comme hors plage avec une
+tolérance de 0,004. C'était un faux positif — l'étendue de `nb#tuned` sur cinq
+graines dans la campagne publiée est de **0,0362**, dix fois celle des autres
+modèles, et `GaussianNB` n'a de toute façon aucun générateur aléatoire.
+
+**14 configurations sur 15 ont désormais leurs cinq graines**, `ftt` étant la
+seule à quatre. Sa dispersion stratifiée est de 0,00008 sur ces quatre
+(0,9998 / 0,9998 / 0,9998 / 1,0000), donc la cinquième ne déplacera pas sa
+moyenne au quatrième chiffre — mais le tableau doit dire *n* = 4 tant qu'elle
+manque.
+
+## 6bis. Ce que la republication demande encore
+
+| élément | disponible ? |
+|---|---|
+| Tableau 2, colonnes `full` et `clean` | **inchangées** — elles n'utilisent pas la liste noire |
+| Tableau 2, colonnes auditées | oui, sauf le *n* de `ftt` |
+| Tableau 7 (calibration + recherche) | ECE et température : oui. Essais, temps et Δval : **inchangés**, voir ci-dessous |
+| Tableau 8 (ECE sous les deux protocoles) | oui, entièrement |
+| Tableau 10 (coût d'inférence) | **non — la cellule de coût n'a jamais tourné** |
+
+**Une réserve à écrire pour le bras réglé.** E8 applique à la condition
+corrigée les `best_params` de la campagne publiée, qui avaient été cherchés sur
+la condition à douze colonnes. Le bras `#tuned` mesure donc *les
+hyperparamètres publiés appliqués à la condition corrigée*, et non un
+réajustement sur celle-ci. C'est défendable — ça isole l'effet du retrait de la
+colonne de celui d'un nouveau réglage — mais le papier doit le dire.
 
 ## Entrées
 
