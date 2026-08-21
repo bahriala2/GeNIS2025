@@ -288,3 +288,92 @@ cellules étaient au-dessus de 0,93** sous la liste publiée.
 L'échelle de couleur a dû descendre de 0,90 à 0,80 : la légende publiée
 affirmait que toute valeur montrée était au-dessus de 0,90, ce qui n'est plus
 vrai.
+
+---
+
+## 11. La mesure de coût **a tourné** — et elle ne peut pas être recopiée
+
+Je l'avais notée comme bloquante. Elle ne l'est pas : `cout_corrige` porte les
+dix détecteurs sur 54 colonnes. Ce qui bloque est autre chose, et c'est plus
+sérieux.
+
+| | débit publié (55 col.) | débit E8 (54 col.) | rapport |
+|---|---:|---:|---:|
+| FT-Transformer | 430 | 5 758 | **13,4×** |
+| forêt aléatoire | 7 738 | 94 024 | **12,2×** |
+| 1D CNN | 3 134 | 21 770 | 7,0× |
+| RNN | 3 803 | 14 937 | 3,9× |
+| DNN | 5 269 | 15 242 | 2,9× |
+| bayésien naïf | 228 377 | 482 664 | 2,1× |
+| XGBoost | 46 317 | 53 803 | 1,2× |
+| LightGBM | 6 281 | 4 973 | 0,8× |
+| régression logistique | 1 139 252 | 635 460 | 0,6× |
+| k-NN | 1 875 | 778 | **0,4×** |
+
+De 0,4× à 13,4×, **dans les deux sens**. Une colonne retirée sur 55 ne produit
+pas ça.
+
+### Une des causes est un artefact de mesure, et elle se mesure
+
+`verify_cout_protocole.py`. Les deux campagnes n'emploient pas le même
+protocole de débit :
+
+```
+papier   for _ in range(20): predict_proba(lot_de_512)
+E8       predict_proba(lot_de_10240)          # un seul appel
+```
+
+Sur un estimateur parallèle, chaque appel paie un démarrage du backend
+joblib ; la boucle du papier le paie **vingt fois**. Mesuré ici, machine
+identique, modèle identique, données identiques :
+
+| modèle | 20 × 512 | 1 × 10 240 | rapport |
+|---|---:|---:|---:|
+| forêt aléatoire | 5 411 f/s | 30 262 f/s | **5,6×** |
+| k-NN | 15 726 f/s | 19 071 f/s | 1,2× |
+
+Le protocole seul vaut **5,6×** sur la forêt aléatoire — l'essentiel de son
+12,2× — et presque rien sur le k-NN, qui est justement celui qui va dans
+l'autre sens. L'effet est propre à l'estimateur, comme les écarts observés.
+
+La même remarque vaut pour les quatre modèles Keras, dont chaque appel à
+`predict()` paie un surcoût d'API que **le manuscrit chiffre lui-même à
+77 ms**. Le papier fait vingt appels de 512 lignes ; E8 en fait un de 10 240,
+découpé en interne.
+
+### Ce que ça met en cause dans le manuscrit
+
+La légende publiée du Tableau 10 affirme que la colonne de débit
+
+> amortises that overhead and is the one on which we base the comparison.
+
+Pour tout estimateur qui a un surcoût par appel, c'est **l'inverse** : la
+boucle le paie à chaque tour. La phrase est à revoir, et avec elle la lecture
+que la §8 en fait — « a hundred times faster than the FT-Transformer » vient
+de cette colonne.
+
+### Ce que le script n'établit pas
+
+Que le protocole explique **tout** l'écart. Les deux sessions n'ont pas tourné
+sur la même machine, et le k-NN va dans l'autre sens pour une raison qui n'est
+pas mesurée ici. Ce qui est établi suffit à la décision : **on ne peut ni
+recopier une colonne dans l'autre, ni les mélanger.**
+
+### La décision revient à l'auteur
+
+Trois options, et je ne tranche pas seul parce que la troisième change le
+propos de la §8 :
+
+1. **garder les débits publiés**, la légende nommant leur condition — c'est
+   l'état actuel du document, et c'est cohérent ;
+2. **republier les débits d'E8** sur 54 colonnes : condition homogène avec le
+   reste du tableau, mais il faut réécrire les affirmations de coût de la §8,
+   dont la recommandation — sous ce protocole, la forêt aléatoire (94 024)
+   dépasse XGBoost (53 803), et le FT-Transformer n'est plus 100× plus lent
+   mais 9× ;
+3. **remesurer les deux conditions dans une seule session, sous le protocole
+   qui amortit**, ce qui est la seule façon d'avoir une colonne à la fois
+   homogène et conforme à ce que la légende annonce. Coût : une cellule, une
+   dizaine de minutes.
+
+La troisième est la bonne si le temps le permet.
