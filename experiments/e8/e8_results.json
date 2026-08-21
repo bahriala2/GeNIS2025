@@ -4725,6 +4725,8 @@
  },
  "temoin_temperature": {
   "ecart_max": 0.8209999999999997,
-  "valide": false
+  "valide": false,
+  "mesure": "ecart maximal sur T contre le tableau 7 publie",
+  "perime": "Ce controle portait sur T, un parametre intermediaire pose sur une surface plate, et le comparait au tableau 7 publie dont le T du bayesien naif (5.821) est hors de la grille, bornee a 5. Les 0.821 sont donc entierement un plafond de grille. Le controle valide est verify_e8.py section F : il compare l'ECE APRES calage a E3-A et ecarte les T poses sur une borne."
  }
 }

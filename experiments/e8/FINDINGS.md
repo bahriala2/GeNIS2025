@@ -203,6 +203,7 @@ maintenant — avec les deux chiffres, pas avec une formule prudente.
 | **Tableau 7** (T, ECEraw, ECEcal) | E8 recalé, condition corrigée |
 | **Tableau 8**, entièrement | E8 recalé, condition corrigée |
 | **Tableau 10**, colonne macro-F1 | E8, condition corrigée |
+| **Figure 14** | redessinée, axe qualité depuis E8 |
 | **Tableau 13**, macro-F1, ordre des lignes, température | E8 recalé |
 | **Figures 5, 10, 18** | redessinées, `paper/regen_e8_figures.py` |
 | légendes des Figures 5, 10, 18 | recalculées |
@@ -261,11 +262,18 @@ posée à côté d'une valeur de la condition à treize, si.
 partout et le marqueur *n* = 4 a disparu de lui-même : il était calculé, pas
 écrit à la main.
 
-**La Figure 14 reste à redessiner.** Son axe vertical est le macro-F1
-temporel, qui a changé pour tous les détecteurs ; son axe horizontal est le
-débit, qui n'est pas remesuré. Sa légende est déjà juste au chiffre près
-(0,0020 pour l'écart logistique–FT-Transformer), mais les points, eux, sont
-encore placés à l'ancienne hauteur.
+**La Figure 14 est redessinée**, et elle n'avait aucun script de régénération
+— `MAPPING.md` la listait comme un manque. Elle en a un maintenant
+(`paper/regen_e8_figures.py`). C'est le cas mixte du manuscrit : axe qualité
+sur 54 colonnes, axe débit sur 55 et non remesuré, la légende nommant la
+provenance de chacun. Ses trois affirmations sont recalculées et non
+recopiées — l'étendue de débit tient trois ordres de grandeur, l'écart
+logistique–FT-Transformer est de 0,0020 à 2 600 fois le débit, et le DNN
+reste dominé sur les deux axes, par la seule régression logistique.
+
+Il reste trois figures sans script : la 9 attend les matrices de
+probabilités, la 2 et la 6 ne lisent que `article1_results.json` et pourraient
+être scriptées à tout moment.
 
 ## 10. Ce que la Figure 18 montre maintenant
 
