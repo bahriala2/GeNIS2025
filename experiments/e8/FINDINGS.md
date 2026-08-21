@@ -376,4 +376,12 @@ propos de la §8 :
    homogène et conforme à ce que la légende annonce. Coût : une cellule, une
    dizaine de minutes.
 
-La troisième est la bonne si le temps le permet.
+La troisième est la bonne si le temps le permet, et la cellule est écrite :
+`colab/e8ter_cout_deux_conditions.py`. Elle mesure les deux conditions dans
+une session, sous **les deux protocoles** — sans garder celui du papier à
+côté, on ne saurait pas si un écart au Tableau 10 vient de la machine ou de
+la mesure. Son témoin le tranche : si la condition publiée sous le protocole
+du papier retrouve l'ordre de grandeur du Tableau 10, l'écart est bien le
+protocole et la colonne amortie peut le remplacer ; sinon la machine diffère,
+les deux conditions restent comparables entre elles et rien ne peut être
+comparé à la campagne publiée.
