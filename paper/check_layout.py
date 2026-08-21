@@ -44,7 +44,14 @@ if not shutil.which("soffice"):
 
 
 def norm(s):
-    return re.sub(r"\s+", " ", s).strip()
+    # LibreOffice peut couper une ligne APRES le trait d'union d'un compose,
+    # et l'extraction rend alors "near- deterministic". Ce n'est pas un defaut
+    # de mise en page, c'est du rendu : la legende du tableau 8 tenait bien sur
+    # une seule page quand ce faux positif est apparu. On recolle, mais
+    # seulement ce motif -- lettre, trait d'union, espace, minuscule --, pour
+    # ne pas souder un tiret d'incise, qui est espace des deux cotes.
+    s = re.sub(r"\s+", " ", s).strip()
+    return re.sub(r"(?<=[A-Za-z])- (?=[a-z])", "-", s)
 
 
 # --- rendu ----------------------------------------------------------------

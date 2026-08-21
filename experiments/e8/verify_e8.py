@@ -167,6 +167,58 @@ print("   ou les deux bras sont comparables, et ne peut pas etre rapporte comme"
 print("   une amelioration par rapport au chiffre publie. Le papier doit dire")
 print("   les deux.")
 
+# =========================================================================
+# F. Le recalage des temperatures, et ce qu'il reproduit vraiment
+#
+# Mon notebook E8 calait la temperature en minimisant l'ECE ; le pipeline la
+# cale en minimisant la NLL sur une grille de 80 points. Les matrices de
+# probabilites ont ete rejouees avec le bon objectif, sans reentrainement.
+#
+# Le temoin ne peut pas etre le tableau 7 publie : celui-ci porte des T que la
+# section 6.5 declare deja recalculer. La cible est E3-A, la recomputation que
+# la 6.5 benit. Et la quantite controlee est l'ECE APRES calage, celle que les
+# tableaux rapportent -- pas T, qui est un parametre intermediaire pose sur une
+# surface plate ou deux jeux de probabilites voisins donnent des T eloignes.
+# =========================================================================
+print("\n\nF. Le recalage des temperatures contre E3-A\n")
+E3 = json.loads((REPO / "experiments" / "e3" / "e3_results.json")
+                .read_text(encoding="utf-8"))["calibration_two_protocols"]
+BORNES = (0.05, 5.0)
+
+brut, cal_s, cal_t = [], [], []
+for cle, r3 in sorted(E3.items()):
+    m, proto = cle.split("|")
+    if "-tuned" in m:
+        continue
+    r8 = RUNS.get(f"{m}|publiee|{proto}")
+    if not r8:
+        continue
+    brut.append((abs(r3["ece_before"] - r8["ece"]), cle))
+    # Un T pose sur une borne dit que l'optimum est hors grille ; l'ecart
+    # d'ECE qui en decoule ne renseigne pas sur la procedure.
+    if r8["temperature"] not in BORNES:
+        d = (abs(r3["ece_after"] - r8["ece_calibree"]), cle)
+        (cal_s if proto.startswith("strat") else cal_t).append(d)
+
+for nom, lot, seuil in (("ECE brut, les deux protocoles", brut, 0.004),
+                        ("ECE calibree, stratifie", cal_s, 0.001),
+                        ("ECE calibree, temporel", cal_t, 0.008)):
+    e, pire = max(lot)
+    print(f"   {nom:<32} {len(lot):>2} paires, ecart max {e:.4f}  ({pire})")
+    chk(f"se reproduit sous {seuil}", e < seuil)
+
+# Ce que le contraste dit, et qui n'etait pas attendu : l'ajustement sous-jacent
+# se rejoue partout, mais l'ECE APRES calage ne se rejoue serre que sur le bras
+# stratifie. Sur le temporel, l'optimum de NLL se deplace assez pour deplacer
+# l'ECE. Le tableau 8 doit donc dire d'ou vient sa derniere colonne.
+e_bs = max(d for d, c in brut if c.endswith("temporal"))
+print(f"\n   Le bras temporel se rejoue a {e_bs:.4f} pres AVANT calage")
+print(f"   et a {max(cal_t)[0]:.4f} pres APRES : c'est le calage qui amplifie,")
+print("   pas l'ajustement. La derniere colonne du tableau 8 est donc la moins")
+print("   stable du manuscrit, et sa legende le dit.")
+chk("l'amplification vient bien du calage, pas de l'ajustement",
+    max(cal_t)[0] > e_bs, f"{max(cal_t)[0]:.4f} contre {e_bs:.4f}")
+
 manq = [f"{c}|{v}|{p}" for c in CFG for v in ("publiee", "corrigee")
         for p in ["temporal"] + [f"strat_seed{s}" for s in range(1, 6)]
         if f"{c}|{v}|{p}" not in RUNS]

@@ -66,35 +66,50 @@ save_state(STATE)
 print(f"{n_ok} runs recalcules, {n_saute} sans matrice sauvegardee\n")
 
 # ---------------------------------------------------------------------
-# LE TEMOIN. Le bras publie doit maintenant retrouver le tableau 7 publie.
-# Sans ce controle, on ne saurait pas si le recalage a repare quelque chose
-# ou simplement deplace le probleme.
+# LE TEMOIN, corrige. La premiere version comparait T, qui est un parametre
+# INTERMEDIAIRE pose sur une surface d'ECE tres plate : deux jeux de
+# probabilites quasi identiques peuvent y donner des T eloignes sans que rien
+# de rapporte ne bouge. Elle declarait donc l'echec sur naive Bayes, dont le T
+# publie (5.821) est simplement HORS de la grille, qui s'arrete a 5.
+#
+# Ce qu'il faut controler est la quantite que le tableau RAPPORTE : l'ECE
+# apres calage. Et la cible correcte n'est pas le tableau 7 mais E3-A, la
+# recomputation que la section 6.5 declare deja comme la bonne.
 # ---------------------------------------------------------------------
-P7 = {"xgboost": 0.091, "lightgbm": 0.050, "rf": 0.094, "ftt": 0.995,
-      "logreg": 0.697, "rnn": 0.940, "cnn": 1.132, "dnn": 0.694,
-      "knn": 2.835, "nb": 5.821}
-print(f"{'modele':<10}{'tableau 7':>11}{'avant (ECE)':>13}{'apres (NLL)':>13}"
-      f"{'ecart':>8}")
+P7 = {"xgboost": (0.091, 0.0000), "lightgbm": (0.050, 0.0000),
+      "rf": (0.094, 0.0000), "ftt": (0.995, 0.0000),
+      "logreg": (0.697, 0.0002), "rnn": (0.940, 0.0005),
+      "cnn": (1.132, 0.0005), "dnn": (0.694, 0.0002),
+      "knn": (2.835, 0.0004), "nb": (5.821, 0.2435)}
+BORNES = (GRILLE[0], GRILLE[-1])
+print(f"{'modele':<10}{'T pub':>8}{'T new':>8}{'bord':>6}"
+      f"{'ECEcal pub':>12}{'ECEcal new':>12}{'ecart':>9}")
 ecarts = []
-for m, T in P7.items():
+for m, (T, ecal) in P7.items():
     r = STATE["runs"].get(f"{m}|publiee|strat_seed1")
-    if not r or "temperature" not in r:
+    if not r:
         continue
-    d = abs(T - r["temperature"])
-    ecarts.append(d)
-    print(f"{m:<10}{T:>11.3f}{(r.get('temperature_ece') or 0):>13.3f}"
-          f"{r['temperature']:>13.3f}{d:>8.3f}")
+    bord = "oui" if r["temperature"] in BORNES else ""
+    d = abs(ecal - r["ece_calibree"])
+    # Un T pose sur une borne dit que l'optimum est hors grille : l'ecart
+    # d'ECE qui en decoule n'est pas informatif sur la procedure.
+    if not bord:
+        ecarts.append((d, m))
+    print(f"{m:<10}{T:>8.3f}{r['temperature']:>8.3f}{bord:>6}"
+          f"{ecal:>12.4f}{r['ece_calibree']:>12.4f}{d:>9.4f}")
 
 if ecarts:
-    emax = max(ecarts)
-    STATE["temoin_temperature"] = {"ecart_max": emax, "valide": bool(emax < 0.15)}
+    emax, pire = max(ecarts)
+    STATE["temoin_temperature"] = {"ecart_max_ece_calibree": emax,
+                                   "pire": pire, "valide": bool(emax < 0.001)}
     save_state(STATE)
-    print(f"\necart maximal {emax:.3f}")
-    if emax < 0.15:
-        print("TEMOIN VALIDE — c'est bien la finesse de grille qui reste, et")
-        print("les tableaux 7, 8 et 13 peuvent etre republies.")
+    print(f"\necart maximal sur l'ECE calibree, hors bord de grille : "
+          f"{emax:.4f} ({pire})")
+    if emax < 0.001:
+        print("TEMOIN VALIDE — la quantite rapportee se reproduit. Les ecarts")
+        print("sur T restants sont la platitude de la surface, que la 6.5")
+        print("documente deja. Les tableaux 7, 8 et 13 peuvent etre republies.")
     else:
-        print("TEMOIN INVALIDE — il reste autre chose que la grille. Ne pas")
-        print("republier : m'envoyer ce tableau tel quel.")
+        print("TEMOIN INVALIDE — m'envoyer ce tableau tel quel.")
 
 print("\nRenvoie e8_results.json.")

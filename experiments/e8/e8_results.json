@@ -1,8 +1,7 @@
 {
  "meta": {
   "version": "v1",
-  "build": "2026-08-20",
-  "note_cpu": "quatre ajustements de la graine 5 corrigee ont ete faits sur CPU et releves depuis la console ; seul macro_f1 en a ete conserve"
+  "build": "2026-08-20"
  },
  "runs": {
   "majority|publiee|temporal": {
@@ -24,9 +23,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774915854571916,
+   "ece_calibree": 0.7749157352264849,
    "seconds": 1.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 5.0
   },
   "logreg|publiee|temporal": {
    "macro_f1": 0.9948830697566198,
@@ -46,10 +46,11 @@
     "dos-slowloris": 0.9881457208943716,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 0.0036443119720776817,
+   "temperature": 1.1512820512820514,
+   "ece_calibree": 0.003443372569047395,
    "seconds": 276.4,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8500000000000001
   },
   "nb|publiee|temporal": {
    "macro_f1": 0.49940450267736913,
@@ -69,10 +70,11 @@
     "dos-slowloris": 0.4116710875331565,
     "dos-udp": 0.9525124441376304
    },
-   "temperature": 0.1,
-   "ece_calibree": 0.20596695175593646,
+   "temperature": 5.0,
+   "ece_calibree": 0.2905835940470605,
    "seconds": 1.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.1
   },
   "knn|publiee|temporal": {
    "macro_f1": 0.9836890053978173,
@@ -92,10 +94,11 @@
     "dos-slowloris": 0.9570987942798392,
     "dos-udp": 1.0
    },
-   "temperature": 3.65,
-   "ece_calibree": 0.007523468634129707,
+   "temperature": 3.5820512820512818,
+   "ece_calibree": 0.008076243693262613,
    "seconds": 48.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 3.65
   },
   "rf|publiee|temporal": {
    "macro_f1": 0.9758145544983804,
@@ -115,10 +118,11 @@
     "dos-slowloris": 0.9445545467115269,
     "dos-udp": 1.0
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.025521834875391405,
+   "temperature": 0.1717948717948718,
+   "ece_calibree": 0.024326516908609257,
    "seconds": 44.7,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.15000000000000002
   },
   "xgboost|publiee|temporal": {
    "macro_f1": 0.9888238165532466,
@@ -141,7 +145,8 @@
    "temperature": 0.05,
    "ece_calibree": 0.006743496288863615,
    "seconds": 65.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.05
   },
   "lightgbm|publiee|temporal": {
    "macro_f1": 0.9905974698145131,
@@ -161,10 +166,11 @@
     "dos-slowloris": 0.978950885399265,
     "dos-udp": 1.0
    },
-   "temperature": 0.55,
-   "ece_calibree": 0.00637019748601686,
+   "temperature": 0.6102564102564103,
+   "ece_calibree": 0.006257221221670495,
    "seconds": 60.4,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.55
   },
   "dnn|publiee|temporal": {
    "macro_f1": 0.9886875865226917,
@@ -184,10 +190,11 @@
     "dos-slowloris": 0.9678090285984401,
     "dos-udp": 1.0
    },
-   "temperature": 0.5,
-   "ece_calibree": 0.0088192350186929,
+   "temperature": 0.5858974358974359,
+   "ece_calibree": 0.00851789958786364,
    "seconds": 72.4,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.5
   },
   "cnn|publiee|temporal": {
    "macro_f1": 0.9829993267775939,
@@ -207,10 +214,11 @@
     "dos-slowloris": 0.9888615651670766,
     "dos-udp": 1.0
    },
-   "temperature": 0.55,
-   "ece_calibree": 0.004810735684670758,
+   "temperature": 0.6346153846153847,
+   "ece_calibree": 0.004582619547965294,
    "seconds": 51.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.55
   },
   "rnn|publiee|temporal": {
    "macro_f1": 0.9891994686428668,
@@ -230,10 +238,11 @@
     "dos-slowloris": 0.9852550157118685,
     "dos-udp": 0.9903668165161875
    },
-   "temperature": 0.8,
-   "ece_calibree": 0.006497883793525599,
+   "temperature": 0.8294871794871795,
+   "ece_calibree": 0.00611290257641191,
    "seconds": 64.7,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8
   },
   "ftt|publiee|temporal": {
    "macro_f1": 0.9778909793092466,
@@ -256,7 +265,8 @@
    "temperature": 0.05,
    "ece_calibree": 0.0334918380388745,
    "seconds": 546.8,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.05
   },
   "logreg#tuned|publiee|temporal": {
    "macro_f1": 0.9949861153516283,
@@ -276,10 +286,11 @@
     "dos-slowloris": 0.9861999326825984,
     "dos-udp": 1.0
    },
-   "temperature": 0.8,
-   "ece_calibree": 0.00434206158988563,
+   "temperature": 0.8294871794871795,
+   "ece_calibree": 0.004340089676725575,
    "seconds": 244.3,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8
   },
   "nb#tuned|publiee|temporal": {
    "macro_f1": 0.7140385597470014,
@@ -299,10 +310,11 @@
     "dos-slowloris": 0.4655683463155718,
     "dos-udp": 0.9525124441376304
    },
-   "temperature": 1.4500000000000002,
-   "ece_calibree": 0.11850184569629776,
+   "temperature": 4.088461538461538,
+   "ece_calibree": 0.21074404215460524,
    "seconds": 1.6,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.4500000000000002
   },
   "knn#tuned|publiee|temporal": {
    "macro_f1": 0.9851462915409108,
@@ -322,10 +334,11 @@
     "dos-slowloris": 0.9599550372347899,
     "dos-udp": 1.0
    },
-   "temperature": 3.65,
-   "ece_calibree": 0.007996537114374805,
+   "temperature": 3.6833333333333336,
+   "ece_calibree": 0.007706454259789319,
    "seconds": 51.6,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 3.65
   },
   "dnn#tuned|publiee|temporal": {
    "macro_f1": 0.9773694610657648,
@@ -345,10 +358,11 @@
     "dos-slowloris": 0.9855086418564345,
     "dos-udp": 0.9958594491927826
    },
-   "temperature": 0.6000000000000001,
-   "ece_calibree": 0.00731343274250623,
+   "temperature": 0.6833333333333333,
+   "ece_calibree": 0.007656117125820797,
    "seconds": 32.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.6000000000000001
   },
   "majority|publiee|strat_seed1": {
    "macro_f1": 0.036140459272989395,
@@ -369,9 +383,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 1.3,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 5.0
   },
   "logreg|publiee|strat_seed1": {
    "macro_f1": 0.9997018736432697,
@@ -391,10 +406,11 @@
     "dos-slowloris": 0.9999516698081291,
     "dos-udp": 1.0
    },
-   "temperature": 0.8,
-   "ece_calibree": 6.079101704031692e-05,
+   "temperature": 0.8294871794871795,
+   "ece_calibree": 4.850931896180584e-05,
    "seconds": 244.8,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8
   },
   "nb|publiee|strat_seed1": {
    "macro_f1": 0.5347451463514131,
@@ -414,10 +430,11 @@
     "dos-slowloris": 0.3918563245084378,
     "dos-udp": 0.9723293768545994
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.16700581340288193,
+   "temperature": 5.0,
+   "ece_calibree": 0.2553721059382676,
    "seconds": 1.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|publiee|strat_seed1": {
    "macro_f1": 0.9965407945650715,
@@ -437,10 +454,11 @@
     "dos-slowloris": 0.9978255617298865,
     "dos-udp": 1.0
    },
-   "temperature": 1.0,
-   "ece_calibree": 0.0004102473209927314,
+   "temperature": 2.670512820512821,
+   "ece_calibree": 0.00037426717848080036,
    "seconds": 57.6,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.0
   },
   "rf|publiee|strat_seed1": {
    "macro_f1": 0.999988723897189,
@@ -460,10 +478,11 @@
     "dos-slowloris": 0.9999516698081291,
     "dos-udp": 1.0
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 9.940807479590652e-06,
+   "temperature": 0.09871794871794873,
+   "ece_calibree": 1.6646779320272533e-05,
    "seconds": 59.3,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.15000000000000002
   },
   "xgboost|publiee|strat_seed1": {
    "macro_f1": 0.9999903915231741,
@@ -486,7 +505,8 @@
    "temperature": 0.05,
    "ece_calibree": 1.4757098164230875e-05,
    "seconds": 72.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.05
   },
   "lightgbm|publiee|strat_seed1": {
    "macro_f1": 0.9999903915231741,
@@ -507,9 +527,10 @@
     "dos-udp": 0.9999618539004387
    },
    "temperature": 0.05,
-   "ece_calibree": 1.4373036983594822e-05,
+   "ece_calibree": 1.428026100602775e-05,
    "seconds": 76.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.05
   },
   "dnn|publiee|strat_seed1": {
    "macro_f1": 0.9979238570746369,
@@ -529,10 +550,11 @@
     "dos-slowloris": 0.9998550234378776,
     "dos-udp": 1.0
    },
-   "temperature": 0.9500000000000001,
-   "ece_calibree": 0.00017504755830435322,
+   "temperature": 0.926923076923077,
+   "ece_calibree": 0.00018515827984261657,
    "seconds": 93.3,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.9500000000000001
   },
   "cnn|publiee|strat_seed1": {
    "macro_f1": 0.9984296461519256,
@@ -552,10 +574,11 @@
     "dos-slowloris": 0.9985036443500507,
     "dos-udp": 0.9999618539004387
    },
-   "temperature": 1.0,
-   "ece_calibree": 0.0004657315354505845,
+   "temperature": 1.05,
+   "ece_calibree": 0.0004554402438733086,
    "seconds": 36.7,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.0
   },
   "rnn|publiee|strat_seed1": {
    "macro_f1": 0.9987999911259501,
@@ -575,10 +598,11 @@
     "dos-slowloris": 0.9991780689455108,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 0.00018347164756831542,
+   "temperature": 0.9025641025641026,
+   "ece_calibree": 0.00034835828692169176,
    "seconds": 166.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8500000000000001
   },
   "ftt|publiee|strat_seed1": {
    "macro_f1": 0.9997894562639222,
@@ -598,10 +622,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 1.0,
-   "ece_calibree": 4.3988218168768295e-05,
+   "temperature": 0.9756410256410257,
+   "ece_calibree": 3.771746192379926e-05,
    "seconds": 271.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.0
   },
   "logreg#tuned|publiee|strat_seed1": {
    "macro_f1": 0.9992649991061062,
@@ -621,10 +646,11 @@
     "dos-slowloris": 0.9999516698081291,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 6.249341475612975e-05,
+   "temperature": 0.8294871794871795,
+   "ece_calibree": 5.6938708204991764e-05,
    "seconds": 223.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8500000000000001
   },
   "nb#tuned|publiee|strat_seed1": {
    "macro_f1": 0.7216192213141256,
@@ -644,10 +670,11 @@
     "dos-slowloris": 0.7458320794462835,
     "dos-udp": 0.9723293768545994
    },
-   "temperature": 1.85,
-   "ece_calibree": 0.0625559241791585,
+   "temperature": 5.0,
+   "ece_calibree": 0.1088593113387034,
    "seconds": 1.8,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.85
   },
   "knn#tuned|publiee|strat_seed1": {
    "macro_f1": 0.9986511876579404,
@@ -667,10 +694,11 @@
     "dos-slowloris": 0.9988399071925754,
     "dos-udp": 1.0
    },
-   "temperature": 2.7,
-   "ece_calibree": 0.0003984249009316274,
+   "temperature": 2.7717948717948717,
+   "ece_calibree": 0.0004149196902221129,
    "seconds": 44.7,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.7
   },
   "dnn#tuned|publiee|strat_seed1": {
    "macro_f1": 0.9917838309564484,
@@ -690,10 +718,11 @@
     "dos-slowloris": 0.9992749770409396,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 0.0006426583407556903,
+   "temperature": 1.05,
+   "ece_calibree": 0.000751084811951592,
    "seconds": 27.8,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8500000000000001
   },
   "majority|corrigee|temporal": {
    "macro_f1": 0.03614052574277951,
@@ -714,9 +743,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774915854571916,
+   "ece_calibree": 0.7749157352264849,
    "seconds": 1.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 5.0
   },
   "logreg|corrigee|temporal": {
    "macro_f1": 0.9881093936221446,
@@ -736,10 +766,11 @@
     "dos-slowloris": 0.982837528604119,
     "dos-udp": 1.0
    },
-   "temperature": 0.8,
-   "ece_calibree": 0.003971406793864259,
+   "temperature": 0.9512820512820513,
+   "ece_calibree": 0.0036155437403433636,
    "seconds": 209.3,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.8
   },
   "nb|corrigee|temporal": {
    "macro_f1": 0.48429735068447005,
@@ -759,10 +790,11 @@
     "dos-slowloris": 0.34892228037593565,
     "dos-udp": 0.9496830284368774
    },
-   "temperature": 0.1,
-   "ece_calibree": 0.17850606930768131,
+   "temperature": 5.0,
+   "ece_calibree": 0.2699700280726919,
    "seconds": 1.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.1
   },
   "knn|corrigee|temporal": {
    "macro_f1": 0.9573845867760008,
@@ -782,10 +814,11 @@
     "dos-slowloris": 0.9135625810490542,
     "dos-udp": 1.0
    },
-   "temperature": 4.05,
-   "ece_calibree": 0.018111971470885307,
+   "temperature": 4.18974358974359,
+   "ece_calibree": 0.01601174208453287,
    "seconds": 57.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 4.05
   },
   "rf|corrigee|temporal": {
    "macro_f1": 0.9529887086216028,
@@ -805,10 +838,11 @@
     "dos-slowloris": 0.9023423740753787,
     "dos-udp": 1.0
    },
-   "temperature": 0.3,
-   "ece_calibree": 0.04167907681183247,
+   "temperature": 0.31794871794871793,
+   "ece_calibree": 0.040999298227174734,
    "seconds": 56.1,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.3
   },
   "xgboost|corrigee|temporal": {
    "macro_f1": 0.966619329810206,
@@ -828,10 +862,11 @@
     "dos-slowloris": 0.8971283488005604,
     "dos-udp": 1.0
    },
-   "temperature": 0.35000000000000003,
-   "ece_calibree": 0.03535602492936364,
+   "temperature": 0.36666666666666664,
+   "ece_calibree": 0.03525175779970395,
    "seconds": 73.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.35000000000000003
   },
   "lightgbm|corrigee|temporal": {
    "macro_f1": 0.9649254293180367,
@@ -851,10 +886,11 @@
     "dos-slowloris": 0.8933240369531114,
     "dos-udp": 1.0
    },
-   "temperature": 0.5,
-   "ece_calibree": 0.03936895378648029,
+   "temperature": 0.7320512820512821,
+   "ece_calibree": 0.04179082366563858,
    "seconds": 79.1,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.5
   },
   "dnn|corrigee|temporal": {
    "macro_f1": 0.9773200464695668,
@@ -874,10 +910,11 @@
     "dos-slowloris": 0.9216929789052309,
     "dos-udp": 1.0
    },
-   "temperature": 1.1500000000000001,
-   "ece_calibree": 0.019276603834057927,
+   "temperature": 1.353846153846154,
+   "ece_calibree": 0.018289310644835646,
    "seconds": 99.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.1500000000000001
   },
   "cnn|corrigee|temporal": {
    "macro_f1": 0.9847928229305306,
@@ -897,10 +934,11 @@
     "dos-slowloris": 0.9808106426759822,
     "dos-udp": 1.0
    },
-   "temperature": 0.5,
-   "ece_calibree": 0.006768965210037444,
+   "temperature": 0.5858974358974359,
+   "ece_calibree": 0.006520394565616892,
    "seconds": 112.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.5
   },
   "rnn|corrigee|temporal": {
    "macro_f1": 0.9837182410001132,
@@ -920,10 +958,11 @@
     "dos-slowloris": 0.9876567020250723,
     "dos-udp": 0.9994281575235409
    },
-   "temperature": 0.8,
-   "ece_calibree": 0.008596301440281867,
+   "temperature": 0.8294871794871795,
+   "ece_calibree": 0.008415299747060855,
    "seconds": 136.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.8
   },
   "ftt|corrigee|temporal": {
    "macro_f1": 0.9901290090172989,
@@ -946,7 +985,8 @@
    "temperature": 0.05,
    "ece_calibree": 0.013501145662765541,
    "seconds": 391.0,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.05
   },
   "logreg#tuned|corrigee|temporal": {
    "macro_f1": 0.9928252533576379,
@@ -966,10 +1006,11 @@
     "dos-slowloris": 0.9830783164116498,
     "dos-udp": 1.0
    },
-   "temperature": 0.6500000000000001,
-   "ece_calibree": 0.003515527027626287,
+   "temperature": 0.8294871794871795,
+   "ece_calibree": 0.003966832276519522,
    "seconds": 197.2,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.6500000000000001
   },
   "nb#tuned|corrigee|temporal": {
    "macro_f1": 0.5268282061337695,
@@ -989,10 +1030,11 @@
     "dos-slowloris": 0.35302542069459364,
     "dos-udp": 0.9496830284368774
    },
-   "temperature": 1.8,
-   "ece_calibree": 0.15839320598433254,
+   "temperature": 5.0,
+   "ece_calibree": 0.23182493430842818,
    "seconds": 2.0,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.8
   },
   "knn#tuned|corrigee|temporal": {
    "macro_f1": 0.9603266408802617,
@@ -1012,10 +1054,11 @@
     "dos-slowloris": 0.9158451335364761,
     "dos-udp": 1.0
    },
-   "temperature": 4.2,
-   "ece_calibree": 0.01915185459189744,
+   "temperature": 4.291025641025641,
+   "ece_calibree": 0.01767291374661008,
    "seconds": 54.5,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 4.2
   },
   "dnn#tuned|corrigee|temporal": {
    "macro_f1": 0.9615671441451951,
@@ -1035,10 +1078,11 @@
     "dos-slowloris": 0.9125361794500724,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 0.025451282586432783,
+   "temperature": 0.8782051282051283,
+   "ece_calibree": 0.025289382114095073,
    "seconds": 31.3,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.8500000000000001
   },
   "majority|corrigee|strat_seed1": {
    "macro_f1": 0.036140459272989395,
@@ -1059,9 +1103,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 1.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 5.0
   },
   "logreg|corrigee|strat_seed1": {
    "macro_f1": 0.9966539035014963,
@@ -1081,10 +1126,11 @@
     "dos-slowloris": 0.9945060240963856,
     "dos-udp": 1.0
    },
-   "temperature": 0.5,
-   "ece_calibree": 0.0013152704946203888,
+   "temperature": 0.6833333333333333,
+   "ece_calibree": 0.0016377316884043855,
    "seconds": 192.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.5
   },
   "nb|corrigee|strat_seed1": {
    "macro_f1": 0.43867962218908707,
@@ -1104,10 +1150,11 @@
     "dos-slowloris": 0.35332958696262995,
     "dos-udp": 0.9705653670998556
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.1316740307407628,
+   "temperature": 5.0,
+   "ece_calibree": 0.223955935515192,
    "seconds": 2.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|corrigee|strat_seed1": {
    "macro_f1": 0.9927071959301621,
@@ -1127,10 +1174,11 @@
     "dos-slowloris": 0.9900309717382888,
     "dos-udp": 1.0
    },
-   "temperature": 3.05,
-   "ece_calibree": 0.0010564087576097278,
+   "temperature": 3.0756410256410254,
+   "ece_calibree": 0.0009877873685451585,
    "seconds": 51.0,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.05
   },
   "rf|corrigee|strat_seed1": {
    "macro_f1": 0.9998243942883072,
@@ -1150,10 +1198,11 @@
     "dos-slowloris": 0.9999516698081291,
     "dos-udp": 1.0
    },
-   "temperature": 0.35000000000000003,
-   "ece_calibree": 4.9966225629091964e-05,
+   "temperature": 0.391025641025641,
+   "ece_calibree": 4.684858758138992e-05,
    "seconds": 62.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.35000000000000003
   },
   "xgboost|corrigee|strat_seed1": {
    "macro_f1": 0.9998093525980809,
@@ -1173,10 +1222,11 @@
     "dos-slowloris": 0.9999516698081291,
     "dos-udp": 1.0
    },
-   "temperature": 0.6500000000000001,
-   "ece_calibree": 4.668205010699366e-05,
+   "temperature": 0.8538461538461539,
+   "ece_calibree": 4.159521095366626e-05,
    "seconds": 72.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.6500000000000001
   },
   "lightgbm|corrigee|strat_seed1": {
    "macro_f1": 0.9999498954289591,
@@ -1196,10 +1246,11 @@
     "dos-slowloris": 0.9999516698081291,
     "dos-udp": 1.0
    },
-   "temperature": 1.55,
-   "ece_calibree": 2.2076724594931372e-05,
+   "temperature": 1.4551282051282053,
+   "ece_calibree": 2.1671270382611015e-05,
    "seconds": 99.0,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.55
   },
   "dnn|corrigee|strat_seed1": {
    "macro_f1": 0.9962061385691116,
@@ -1219,10 +1270,11 @@
     "dos-slowloris": 0.9932898959447632,
     "dos-udp": 1.0
    },
-   "temperature": 1.2500000000000002,
-   "ece_calibree": 0.0011609098900695553,
+   "temperature": 1.353846153846154,
+   "ece_calibree": 0.0011618677886245823,
    "seconds": 97.7,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.2500000000000002
   },
   "cnn|corrigee|strat_seed1": {
    "macro_f1": 0.9964313741071571,
@@ -1242,10 +1294,11 @@
     "dos-slowloris": 0.9948216619077578,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 0.0008118187758092248,
+   "temperature": 0.9756410256410257,
+   "ece_calibree": 0.0012617415958154632,
    "seconds": 45.3,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.8500000000000001
   },
   "rnn|corrigee|strat_seed1": {
    "macro_f1": 0.9958072421229353,
@@ -1265,10 +1318,11 @@
     "dos-slowloris": 0.9987432327919566,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 0.0006894860477122149,
+   "temperature": 0.926923076923077,
+   "ece_calibree": 0.0006566991452645889,
    "seconds": 99.7,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.8500000000000001
   },
   "ftt|corrigee|strat_seed1": {
    "macro_f1": 0.9998000538434795,
@@ -1288,10 +1342,11 @@
     "dos-slowloris": 0.9995164877671405,
     "dos-udp": 1.0
    },
-   "temperature": 0.9500000000000001,
-   "ece_calibree": 0.00010433443782113074,
+   "temperature": 0.926923076923077,
+   "ece_calibree": 0.00011498376847604935,
    "seconds": 227.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.9500000000000001
   },
   "logreg#tuned|corrigee|strat_seed1": {
    "macro_f1": 0.996081047474854,
@@ -1311,10 +1366,11 @@
     "dos-slowloris": 0.994883182081483,
     "dos-udp": 1.0
    },
-   "temperature": 0.6000000000000001,
-   "ece_calibree": 0.0008489700061154032,
+   "temperature": 0.7320512820512821,
+   "ece_calibree": 0.0011759503183197879,
    "seconds": 211.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.6000000000000001
   },
   "nb#tuned|corrigee|strat_seed1": {
    "macro_f1": 0.4881012735850171,
@@ -1334,10 +1390,11 @@
     "dos-slowloris": 0.3667281294816636,
     "dos-udp": 0.9708529313729121
    },
-   "temperature": 2.45,
-   "ece_calibree": 0.1574805589986249,
+   "temperature": 5.0,
+   "ece_calibree": 0.2594329152997526,
    "seconds": 3.1,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 2.45
   },
   "knn#tuned|corrigee|strat_seed1": {
    "macro_f1": 0.9960690193248394,
@@ -1357,10 +1414,11 @@
     "dos-slowloris": 0.993952295708549,
     "dos-udp": 1.0
    },
-   "temperature": 3.1,
-   "ece_calibree": 0.001111130419471796,
+   "temperature": 3.176923076923077,
+   "ece_calibree": 0.001043895031135626,
    "seconds": 54.3,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.1
   },
   "dnn#tuned|corrigee|strat_seed1": {
    "macro_f1": 0.9942838687327067,
@@ -1380,10 +1438,11 @@
     "dos-slowloris": 0.9918446601941747,
     "dos-udp": 1.0
    },
-   "temperature": 1.0,
-   "ece_calibree": 0.0009522996488826066,
+   "temperature": 1.05,
+   "ece_calibree": 0.0010023646847844305,
    "seconds": 41.5,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.0
   },
   "majority|publiee|strat_seed2": {
    "macro_f1": 0.036140459272989395,
@@ -1404,9 +1463,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 2.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 5.0
   },
   "logreg|publiee|strat_seed2": {
    "macro_f1": 0.9994870047568172,
@@ -1426,10 +1486,11 @@
     "dos-slowloris": 0.9997583023154638,
     "dos-udp": 1.0
    },
-   "temperature": 1.05,
-   "ece_calibree": 8.111977625808713e-05,
+   "temperature": 1.2525641025641026,
+   "ece_calibree": 0.00040864714972565244,
    "seconds": 276.7,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.05
   },
   "nb|publiee|strat_seed2": {
    "macro_f1": 0.5345538003935979,
@@ -1449,10 +1510,11 @@
     "dos-slowloris": 0.3850400435424928,
     "dos-udp": 0.97258190182911
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.16866487780309308,
+   "temperature": 5.0,
+   "ece_calibree": 0.2566718729625739,
    "seconds": 2.4,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|publiee|strat_seed2": {
    "macro_f1": 0.9952561264270696,
@@ -1472,10 +1534,11 @@
     "dos-slowloris": 0.997677793904209,
     "dos-udp": 1.0
    },
-   "temperature": 2.65,
-   "ece_calibree": 0.000239019411562375,
+   "temperature": 2.670512820512821,
+   "ece_calibree": 0.00022108375464971106,
    "seconds": 56.7,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.65
   },
   "rf|publiee|strat_seed2": {
    "macro_f1": 0.9999296969964697,
@@ -1495,10 +1558,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.3,
-   "ece_calibree": 1.5438180634440508e-05,
+   "temperature": 0.2448717948717949,
+   "ece_calibree": 1.3624609913498453e-05,
    "seconds": 58.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.3
   },
   "xgboost|publiee|strat_seed2": {
    "macro_f1": 1.0,
@@ -1518,10 +1582,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.3,
-   "ece_calibree": 9.912179244126841e-07,
+   "temperature": 0.391025641025641,
+   "ece_calibree": 1.7305850264919276e-06,
    "seconds": 77.7,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.3
   },
   "lightgbm|publiee|strat_seed2": {
    "macro_f1": 1.0,
@@ -1541,10 +1606,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 1.2000000000000002,
-   "ece_calibree": 9.603012002257216e-07,
+   "temperature": 1.05,
+   "ece_calibree": 1.1920928955078125e-07,
    "seconds": 89.1,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.2000000000000002
   },
   "dnn|publiee|strat_seed2": {
    "macro_f1": 0.9842252792855,
@@ -1564,10 +1630,11 @@
     "dos-slowloris": 0.996138623419249,
     "dos-udp": 1.0
    },
-   "temperature": 0.6000000000000001,
-   "ece_calibree": 0.0009230797634616321,
+   "temperature": 0.7807692307692308,
+   "ece_calibree": 0.0026746341889044077,
    "seconds": 48.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.6000000000000001
   },
   "cnn|publiee|strat_seed2": {
    "macro_f1": 0.9861117474014738,
@@ -1587,10 +1654,11 @@
     "dos-slowloris": 0.9991293412015091,
     "dos-udp": 1.0
    },
-   "temperature": 1.1,
-   "ece_calibree": 0.0009641060989916808,
+   "temperature": 1.2525641025641026,
+   "ece_calibree": 0.0013535263062009022,
    "seconds": 44.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.1
   },
   "rnn|publiee|strat_seed2": {
    "macro_f1": 0.9976174940411562,
@@ -1610,10 +1678,11 @@
     "dos-slowloris": 0.9975822050290135,
     "dos-udp": 1.0
    },
-   "temperature": 0.6000000000000001,
-   "ece_calibree": 0.00041216139081703935,
+   "temperature": 0.6589743589743591,
+   "ece_calibree": 0.00016013142997997146,
    "seconds": 169.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.6000000000000001
   },
   "ftt|publiee|strat_seed2": {
    "macro_f1": 0.9997892738296016,
@@ -1636,7 +1705,8 @@
    "temperature": 0.05,
    "ece_calibree": 4.4271294492692626e-05,
    "seconds": 610.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.05
   },
   "logreg#tuned|publiee|strat_seed2": {
    "macro_f1": 0.999517780839832,
@@ -1656,10 +1726,11 @@
     "dos-slowloris": 0.9999033442876474,
     "dos-udp": 1.0
    },
-   "temperature": 1.1,
-   "ece_calibree": 4.225155601346277e-05,
+   "temperature": 1.353846153846154,
+   "ece_calibree": 0.0003480755312089119,
    "seconds": 276.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.1
   },
   "nb#tuned|publiee|strat_seed2": {
    "macro_f1": 0.7235196821564179,
@@ -1679,10 +1750,11 @@
     "dos-slowloris": 0.7420541583740425,
     "dos-udp": 0.97258190182911
    },
-   "temperature": 2.5,
-   "ece_calibree": 0.059979021868668256,
+   "temperature": 5.0,
+   "ece_calibree": 0.11962057518414404,
    "seconds": 3.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.5
   },
   "knn#tuned|publiee|strat_seed2": {
    "macro_f1": 0.9972976889852022,
@@ -1702,10 +1774,11 @@
     "dos-slowloris": 0.9987428681945654,
     "dos-udp": 1.0
    },
-   "temperature": 2.7,
-   "ece_calibree": 0.00048596960789079797,
+   "temperature": 2.7717948717948717,
+   "ece_calibree": 0.00040293030573184546,
    "seconds": 58.6,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.7
   },
   "dnn#tuned|publiee|strat_seed2": {
    "macro_f1": 0.9926748997884667,
@@ -1725,10 +1798,11 @@
     "dos-slowloris": 0.9984997338237429,
     "dos-udp": 1.0
    },
-   "temperature": 1.1,
-   "ece_calibree": 0.0007099345041435931,
+   "temperature": 1.2525641025641026,
+   "ece_calibree": 0.0007014827015872936,
    "seconds": 33.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.1
   },
   "majority|corrigee|strat_seed2": {
    "macro_f1": 0.036140459272989395,
@@ -1749,9 +1823,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 2.1,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 5.0
   },
   "logreg|corrigee|strat_seed2": {
    "macro_f1": 0.9967111811632405,
@@ -1771,10 +1846,11 @@
     "dos-slowloris": 0.9943524641598687,
     "dos-udp": 1.0
    },
-   "temperature": 0.7000000000000001,
-   "ece_calibree": 0.0007980705420684638,
+   "temperature": 0.7320512820512821,
+   "ece_calibree": 0.0009434672901435455,
    "seconds": 214.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.7000000000000001
   },
   "nb|corrigee|strat_seed2": {
    "macro_f1": 0.4402050350063321,
@@ -1794,10 +1870,11 @@
     "dos-slowloris": 0.3459885891385504,
     "dos-udp": 0.9707091279392706
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.13178810569273705,
+   "temperature": 5.0,
+   "ece_calibree": 0.22553593317614867,
    "seconds": 2.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|corrigee|strat_seed2": {
    "macro_f1": 0.9908440588761473,
@@ -1817,10 +1894,11 @@
     "dos-slowloris": 0.9898558462359851,
     "dos-udp": 1.0
    },
-   "temperature": 3.05,
-   "ece_calibree": 0.0009494038682331416,
+   "temperature": 3.0756410256410254,
+   "ece_calibree": 0.0008814814695395409,
    "seconds": 61.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.05
   },
   "rf|corrigee|strat_seed2": {
    "macro_f1": 0.9999296969964697,
@@ -1840,10 +1918,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.5,
-   "ece_calibree": 4.91585488594157e-05,
+   "temperature": 0.5615384615384615,
+   "ece_calibree": 6.0249737250425624e-05,
    "seconds": 75.3,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.5
   },
   "xgboost|corrigee|strat_seed2": {
    "macro_f1": 0.9999296969964697,
@@ -1863,10 +1942,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 1.0,
-   "ece_calibree": 3.8106732220416384e-05,
+   "temperature": 0.9756410256410257,
+   "ece_calibree": 3.36177541123013e-05,
    "seconds": 87.3,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.0
   },
   "lightgbm|corrigee|strat_seed2": {
    "macro_f1": 1.0,
@@ -1886,10 +1966,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 1.35,
-   "ece_calibree": 1.026456536854039e-05,
+   "temperature": 1.353846153846154,
+   "ece_calibree": 1.044652937829484e-05,
    "seconds": 100.5,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.35
   },
   "dnn|corrigee|strat_seed2": {
    "macro_f1": 0.997949389185129,
@@ -1909,10 +1990,11 @@
     "dos-slowloris": 0.9972891857875883,
     "dos-udp": 1.0
    },
-   "temperature": 0.9500000000000001,
-   "ece_calibree": 0.00038700949557454094,
+   "temperature": 1.353846153846154,
+   "ece_calibree": 0.000718100961469469,
    "seconds": 101.0,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.9500000000000001
   },
   "cnn|corrigee|strat_seed2": {
    "macro_f1": 0.98532471474155,
@@ -1932,10 +2014,11 @@
     "dos-slowloris": 0.9960863893317872,
     "dos-udp": 1.0
    },
-   "temperature": 0.7000000000000001,
-   "ece_calibree": 0.0016452106380291953,
+   "temperature": 0.8538461538461539,
+   "ece_calibree": 0.0017203508423989547,
    "seconds": 60.7,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.7000000000000001
   },
   "rnn|corrigee|strat_seed2": {
    "macro_f1": 0.9969585225408325,
@@ -1955,10 +2038,11 @@
     "dos-slowloris": 0.9978725461754182,
     "dos-udp": 1.0
    },
-   "temperature": 0.6000000000000001,
-   "ece_calibree": 0.0004483619935185634,
+   "temperature": 0.6833333333333333,
+   "ece_calibree": 0.00042423635297245507,
    "seconds": 122.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.6000000000000001
   },
   "ftt|corrigee|strat_seed2": {
    "macro_f1": 0.9998374359926913,
@@ -1978,10 +2062,11 @@
     "dos-slowloris": 0.9998550234378776,
     "dos-udp": 1.0
    },
-   "temperature": 1.05,
-   "ece_calibree": 4.3890343373253105e-05,
+   "temperature": 0.9756410256410257,
+   "ece_calibree": 4.830125684790061e-05,
    "seconds": 433.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.05
   },
   "logreg#tuned|corrigee|strat_seed2": {
    "macro_f1": 0.9958341693294712,
@@ -2001,10 +2086,11 @@
     "dos-slowloris": 0.9935869617628622,
     "dos-udp": 1.0
    },
-   "temperature": 0.7000000000000001,
-   "ece_calibree": 0.0007115399578193008,
+   "temperature": 0.7076923076923077,
+   "ece_calibree": 0.0007110486120085419,
    "seconds": 270.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.7000000000000001
   },
   "nb#tuned|corrigee|strat_seed2": {
    "macro_f1": 0.4899326134095266,
@@ -2024,10 +2110,11 @@
     "dos-slowloris": 0.3625907161440504,
     "dos-udp": 0.9708169765202578
    },
-   "temperature": 2.45,
-   "ece_calibree": 0.15950862931736026,
+   "temperature": 5.0,
+   "ece_calibree": 0.26132988554294867,
    "seconds": 2.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 2.45
   },
   "knn#tuned|corrigee|strat_seed2": {
    "macro_f1": 0.9944350857890749,
@@ -2047,10 +2134,11 @@
     "dos-slowloris": 0.9938448117093975,
     "dos-udp": 1.0
    },
-   "temperature": 3.15,
-   "ece_calibree": 0.0010639873941274956,
+   "temperature": 3.176923076923077,
+   "ece_calibree": 0.0009731467467793459,
    "seconds": 61.2,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.15
   },
   "dnn#tuned|corrigee|strat_seed2": {
    "macro_f1": 0.9939258168264572,
@@ -2070,10 +2158,11 @@
     "dos-slowloris": 0.991013746539078,
     "dos-udp": 1.0
    },
-   "temperature": 0.9500000000000001,
-   "ece_calibree": 0.0010319966584273347,
+   "temperature": 1.1512820512820514,
+   "ece_calibree": 0.0016150822088172327,
    "seconds": 40.5,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.9500000000000001
   },
   "majority|publiee|strat_seed3": {
    "macro_f1": 0.036140459272989395,
@@ -2094,9 +2183,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 2.1,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 5.0
   },
   "logreg|publiee|strat_seed3": {
    "macro_f1": 0.9994741671804088,
@@ -2116,10 +2206,11 @@
     "dos-slowloris": 0.9997099487576139,
     "dos-udp": 1.0
    },
-   "temperature": 0.9000000000000001,
-   "ece_calibree": 6.673631447286137e-05,
+   "temperature": 0.7564102564102565,
+   "ece_calibree": 0.00014913710854870966,
    "seconds": 225.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.9000000000000001
   },
   "nb|publiee|strat_seed3": {
    "macro_f1": 0.5387139199825588,
@@ -2139,10 +2230,11 @@
     "dos-slowloris": 0.39819004524886875,
     "dos-udp": 0.9721851357365376
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.164368552609632,
+   "temperature": 5.0,
+   "ece_calibree": 0.22261441096053922,
    "seconds": 2.7,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|publiee|strat_seed3": {
    "macro_f1": 0.9961858812280282,
@@ -2162,10 +2254,11 @@
     "dos-slowloris": 0.9972446463962875,
     "dos-udp": 1.0
    },
-   "temperature": 0.9500000000000001,
-   "ece_calibree": 0.0005614116344697295,
+   "temperature": 2.670512820512821,
+   "ece_calibree": 0.00047158760735901506,
    "seconds": 61.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.9500000000000001
   },
   "rf|publiee|strat_seed3": {
    "macro_f1": 1.0,
@@ -2186,9 +2279,10 @@
     "dos-udp": 1.0
    },
    "temperature": 0.05,
-   "ece_calibree": 2.8708822985556992e-08,
+   "ece_calibree": 0.0,
    "seconds": 65.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.05
   },
   "xgboost|publiee|strat_seed3": {
    "macro_f1": 1.0,
@@ -2211,7 +2305,8 @@
    "temperature": 0.05,
    "ece_calibree": 0.0,
    "seconds": 85.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.05
   },
   "lightgbm|publiee|strat_seed3": {
    "macro_f1": 1.0,
@@ -2234,7 +2329,8 @@
    "temperature": 0.05,
    "ece_calibree": 0.0,
    "seconds": 92.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.05
   },
   "dnn|publiee|strat_seed3": {
    "macro_f1": 0.9982527462922057,
@@ -2254,10 +2350,11 @@
     "dos-slowloris": 0.9992746965814032,
     "dos-udp": 1.0
    },
-   "temperature": 1.1500000000000001,
-   "ece_calibree": 0.00015809634749569616,
+   "temperature": 1.2525641025641026,
+   "ece_calibree": 0.00015947877389678808,
    "seconds": 96.6,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.1500000000000001
   },
   "cnn|publiee|strat_seed3": {
    "macro_f1": 0.9953694657975765,
@@ -2277,10 +2374,11 @@
     "dos-slowloris": 0.9986453797774553,
     "dos-udp": 1.0
    },
-   "temperature": 0.45,
-   "ece_calibree": 0.00020920079546479033,
+   "temperature": 0.48846153846153845,
+   "ece_calibree": 0.0006210398898482786,
    "seconds": 45.8,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.45
   },
   "rnn|publiee|strat_seed3": {
    "macro_f1": 0.9988188539002453,
@@ -2300,10 +2398,11 @@
     "dos-slowloris": 0.999322951929587,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 0.00011471701561292513,
+   "temperature": 0.926923076923077,
+   "ece_calibree": 0.0002934627741140218,
    "seconds": 188.4,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8500000000000001
   },
   "ftt|publiee|strat_seed3": {
    "macro_f1": 0.9999611832248662,
@@ -2323,10 +2422,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.6500000000000001,
-   "ece_calibree": 1.3546777492106844e-05,
+   "temperature": 0.7564102564102565,
+   "ece_calibree": 1.4075847877731897e-05,
    "seconds": 302.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.6500000000000001
   },
   "logreg#tuned|publiee|strat_seed3": {
    "macro_f1": 0.9990733857911821,
@@ -2346,10 +2446,11 @@
     "dos-slowloris": 0.9996132650101518,
     "dos-udp": 1.0
    },
-   "temperature": 0.8,
-   "ece_calibree": 8.602918002195455e-05,
+   "temperature": 0.7320512820512821,
+   "ece_calibree": 0.00014315844971906418,
    "seconds": 271.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8
   },
   "nb#tuned|publiee|strat_seed3": {
    "macro_f1": 0.7198728691948152,
@@ -2369,10 +2470,11 @@
     "dos-slowloris": 0.7392773892773893,
     "dos-udp": 0.9721851357365376
    },
-   "temperature": 2.4,
-   "ece_calibree": 0.0405219753821599,
+   "temperature": 5.0,
+   "ece_calibree": 0.12785421853155984,
    "seconds": 3.3,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.4
   },
   "knn#tuned|publiee|strat_seed3": {
    "macro_f1": 0.9978334204308896,
@@ -2392,10 +2494,11 @@
     "dos-slowloris": 0.9979211989364274,
     "dos-udp": 1.0
    },
-   "temperature": 2.75,
-   "ece_calibree": 0.00030091283431257906,
+   "temperature": 2.7717948717948717,
+   "ece_calibree": 0.0002840841142298738,
    "seconds": 60.8,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.75
   },
   "dnn#tuned|publiee|strat_seed3": {
    "macro_f1": 0.9960140102584722,
@@ -2415,10 +2518,11 @@
     "dos-slowloris": 0.9984027878611877,
     "dos-udp": 1.0
    },
-   "temperature": 0.7500000000000001,
-   "ece_calibree": 0.00019560304915817284,
+   "temperature": 0.8782051282051283,
+   "ece_calibree": 0.000708043612229663,
    "seconds": 45.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.7500000000000001
   },
   "majority|corrigee|strat_seed3": {
    "macro_f1": 0.036140459272989395,
@@ -2439,9 +2543,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 2.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 5.0
   },
   "logreg|corrigee|strat_seed3": {
    "macro_f1": 0.9971690261004971,
@@ -2461,10 +2566,11 @@
     "dos-slowloris": 0.9955564142194745,
     "dos-udp": 1.0
    },
-   "temperature": 0.7000000000000001,
-   "ece_calibree": 0.0006146037697694192,
+   "temperature": 0.7320512820512821,
+   "ece_calibree": 0.0008062013331421693,
    "seconds": 196.3,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.7000000000000001
   },
   "nb|corrigee|strat_seed3": {
    "macro_f1": 0.43922798234710686,
@@ -2484,10 +2590,11 @@
     "dos-slowloris": 0.35951934430784194,
     "dos-udp": 0.970313888066331
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.13196975278366097,
+   "temperature": 5.0,
+   "ece_calibree": 0.2134781984298881,
    "seconds": 2.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|corrigee|strat_seed3": {
    "macro_f1": 0.9926145653585804,
@@ -2507,10 +2614,11 @@
     "dos-slowloris": 0.9891483383393082,
     "dos-udp": 1.0
    },
-   "temperature": 3.05,
-   "ece_calibree": 0.0005897625968207328,
+   "temperature": 3.0756410256410254,
+   "ece_calibree": 0.0006203943061213666,
    "seconds": 61.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.05
   },
   "rf|corrigee|strat_seed3": {
    "macro_f1": 0.9999610343188964,
@@ -2530,10 +2638,11 @@
     "dos-slowloris": 0.9998550374486591,
     "dos-udp": 1.0
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 3.834197133938109e-05,
+   "temperature": 0.2935897435897436,
+   "ece_calibree": 3.624803379866768e-05,
    "seconds": 70.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.15000000000000002
   },
   "xgboost|corrigee|strat_seed3": {
    "macro_f1": 1.0,
@@ -2553,10 +2662,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.4,
-   "ece_calibree": 1.6280035364340036e-06,
+   "temperature": 0.5858974358974359,
+   "ece_calibree": 3.3376701156375727e-06,
    "seconds": 88.0,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.4
   },
   "lightgbm|corrigee|strat_seed3": {
    "macro_f1": 1.0,
@@ -2577,9 +2687,10 @@
     "dos-udp": 1.0
    },
    "temperature": 0.05,
-   "ece_calibree": 2.3655968850455622e-08,
+   "ece_calibree": 0.0,
    "seconds": 98.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.05
   },
   "dnn|corrigee|strat_seed3": {
    "macro_f1": 0.9954216666821376,
@@ -2599,10 +2710,11 @@
     "dos-slowloris": 0.9977251827113887,
     "dos-udp": 1.0
    },
-   "temperature": 1.0,
-   "ece_calibree": 0.0004071186029300797,
+   "temperature": 1.1512820512820514,
+   "ece_calibree": 0.0006276116871958836,
    "seconds": 106.1,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.0
   },
   "cnn|corrigee|strat_seed3": {
    "macro_f1": 0.9971642312217289,
@@ -2622,10 +2734,11 @@
     "dos-slowloris": 0.9957475596791341,
     "dos-udp": 0.9994281139197072
    },
-   "temperature": 0.7000000000000001,
-   "ece_calibree": 0.0004638319931931915,
+   "temperature": 0.9512820512820513,
+   "ece_calibree": 0.001613680162245963,
    "seconds": 54.7,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.7000000000000001
   },
   "rnn|corrigee|strat_seed3": {
    "macro_f1": 0.9983859690085519,
@@ -2645,10 +2758,11 @@
     "dos-slowloris": 0.9985982889458166,
     "dos-udp": 0.9999618539004387
    },
-   "temperature": 0.9000000000000001,
-   "ece_calibree": 0.00039432929321567495,
+   "temperature": 0.9025641025641026,
+   "ece_calibree": 0.00040388855040617727,
    "seconds": 169.2,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.9000000000000001
   },
   "ftt|corrigee|strat_seed3": {
    "macro_f1": 0.9998300058805173,
@@ -2668,10 +2782,11 @@
     "dos-slowloris": 0.9999033442876474,
     "dos-udp": 1.0
    },
-   "temperature": 0.05,
-   "ece_calibree": 3.7680763603247486e-05,
+   "temperature": 0.43974358974358974,
+   "ece_calibree": 2.5989664895019194e-05,
    "seconds": 343.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.05
   },
   "logreg#tuned|corrigee|strat_seed3": {
    "macro_f1": 0.9966448840193353,
@@ -2691,10 +2806,11 @@
     "dos-slowloris": 0.9945945945945946,
     "dos-udp": 1.0
    },
-   "temperature": 0.55,
-   "ece_calibree": 0.0013976229649042588,
+   "temperature": 0.6589743589743591,
+   "ece_calibree": 0.0017665045710925041,
    "seconds": 191.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.55
   },
   "nb#tuned|corrigee|strat_seed3": {
    "macro_f1": 0.4915640802390956,
@@ -2714,10 +2830,11 @@
     "dos-slowloris": 0.37604286780166857,
     "dos-udp": 0.9704935026470697
    },
-   "temperature": 3.1,
-   "ece_calibree": 0.1556768209377882,
+   "temperature": 5.0,
+   "ece_calibree": 0.2618418087289252,
    "seconds": 3.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.1
   },
   "knn#tuned|corrigee|strat_seed3": {
    "macro_f1": 0.9950873551340992,
@@ -2737,10 +2854,11 @@
     "dos-slowloris": 0.9929853417831745,
     "dos-udp": 1.0
    },
-   "temperature": 3.15,
-   "ece_calibree": 0.001020677738606039,
+   "temperature": 3.176923076923077,
+   "ece_calibree": 0.000929707726250896,
    "seconds": 59.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.15
   },
   "dnn#tuned|corrigee|strat_seed3": {
    "macro_f1": 0.9869442693952671,
@@ -2760,10 +2878,11 @@
     "dos-slowloris": 0.984637964774951,
     "dos-udp": 1.0
    },
-   "temperature": 0.9000000000000001,
-   "ece_calibree": 0.0022077512051664775,
+   "temperature": 0.9512820512820513,
+   "ece_calibree": 0.0017274089738551067,
    "seconds": 39.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.9000000000000001
   },
   "majority|publiee|strat_seed4": {
    "macro_f1": 0.036140459272989395,
@@ -2784,9 +2903,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 2.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 5.0
   },
   "logreg|publiee|strat_seed4": {
    "macro_f1": 0.9985088527327002,
@@ -2806,10 +2926,11 @@
     "dos-slowloris": 0.9997583256803132,
     "dos-udp": 1.0
    },
-   "temperature": 0.8,
-   "ece_calibree": 0.00018357231461609772,
+   "temperature": 0.7564102564102565,
+   "ece_calibree": 0.00024677939098605015,
    "seconds": 345.1,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8
   },
   "nb|publiee|strat_seed4": {
    "macro_f1": 0.5842429336729418,
@@ -2829,10 +2950,11 @@
     "dos-slowloris": 0.39294554455445546,
     "dos-udp": 0.9716107034319176
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.15010045960318205,
+   "temperature": 5.0,
+   "ece_calibree": 0.25343607161975823,
    "seconds": 3.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|publiee|strat_seed4": {
    "macro_f1": 0.995303066367987,
@@ -2852,10 +2974,11 @@
     "dos-slowloris": 0.9975845410628019,
     "dos-udp": 1.0
    },
-   "temperature": 2.9,
-   "ece_calibree": 0.0004993063023454704,
+   "temperature": 2.873076923076923,
+   "ece_calibree": 0.0004508225366558089,
    "seconds": 62.7,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.9
   },
   "rf|publiee|strat_seed4": {
    "macro_f1": 1.0,
@@ -2875,10 +2998,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.2,
-   "ece_calibree": 5.455214066673028e-06,
+   "temperature": 0.3423076923076923,
+   "ece_calibree": 1.1214838562182852e-05,
    "seconds": 68.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.2
   },
   "xgboost|publiee|strat_seed4": {
    "macro_f1": 1.0,
@@ -2898,10 +3022,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.7500000000000001,
-   "ece_calibree": 7.152557373046875e-07,
+   "temperature": 0.48846153846153845,
+   "ece_calibree": 0.0,
    "seconds": 83.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.7500000000000001
   },
   "lightgbm|publiee|strat_seed4": {
    "macro_f1": 1.0,
@@ -2921,10 +3046,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 1.1500000000000001,
-   "ece_calibree": 8.708411750613038e-06,
+   "temperature": 0.6833333333333333,
+   "ece_calibree": 3.268652961214855e-06,
    "seconds": 91.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.1500000000000001
   },
   "dnn|publiee|strat_seed4": {
    "macro_f1": 0.9987625574388586,
@@ -2944,10 +3070,11 @@
     "dos-slowloris": 0.9994682136814117,
     "dos-udp": 1.0
    },
-   "temperature": 1.2500000000000002,
-   "ece_calibree": 0.0002030369900811558,
+   "temperature": 1.353846153846154,
+   "ece_calibree": 0.00025378482127217435,
    "seconds": 110.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.2500000000000002
   },
   "cnn|publiee|strat_seed4": {
    "macro_f1": 0.9968755348607061,
@@ -2967,10 +3094,11 @@
     "dos-slowloris": 0.9998549954081879,
     "dos-udp": 1.0
    },
-   "temperature": 1.2500000000000002,
-   "ece_calibree": 0.0002119330954618322,
+   "temperature": 1.353846153846154,
+   "ece_calibree": 0.0002746494124866576,
    "seconds": 62.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.2500000000000002
   },
   "rnn|publiee|strat_seed4": {
    "macro_f1": 0.999164424042913,
@@ -2990,10 +3118,11 @@
     "dos-slowloris": 0.9992263804274248,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 0.0001449193595453125,
+   "temperature": 0.8782051282051283,
+   "ece_calibree": 0.00020008737510640806,
    "seconds": 168.4,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8500000000000001
   },
   "ftt|publiee|strat_seed4": {
    "macro_f1": 0.9999611810281992,
@@ -3013,10 +3142,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.9500000000000001,
-   "ece_calibree": 1.9405971950654625e-05,
+   "temperature": 0.8538461538461539,
+   "ece_calibree": 1.0511900185764656e-05,
    "seconds": 247.4,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.9500000000000001
   },
   "logreg#tuned|publiee|strat_seed4": {
    "macro_f1": 0.9982345946543556,
@@ -3036,10 +3166,11 @@
     "dos-slowloris": 0.9996132650101518,
     "dos-udp": 1.0
    },
-   "temperature": 0.8,
-   "ece_calibree": 0.00012181492258121189,
+   "temperature": 0.7320512820512821,
+   "ece_calibree": 0.00020454226112388634,
    "seconds": 314.4,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8
   },
   "nb#tuned|publiee|strat_seed4": {
    "macro_f1": 0.725622675710492,
@@ -3059,10 +3190,11 @@
     "dos-slowloris": 0.7439340116804143,
     "dos-udp": 0.9716107034319176
    },
-   "temperature": 2.05,
-   "ece_calibree": 0.059772766720044584,
+   "temperature": 5.0,
+   "ece_calibree": 0.10291385297170888,
    "seconds": 3.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.05
   },
   "knn#tuned|publiee|strat_seed4": {
    "macro_f1": 0.9967810463680679,
@@ -3082,10 +3214,11 @@
     "dos-slowloris": 0.998743961352657,
     "dos-udp": 1.0
    },
-   "temperature": 2.9,
-   "ece_calibree": 0.00040119241433812607,
+   "temperature": 2.873076923076923,
+   "ece_calibree": 0.000349942367172333,
    "seconds": 60.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.9
   },
   "dnn#tuned|publiee|strat_seed4": {
    "macro_f1": 0.9980877994497005,
@@ -3105,10 +3238,11 @@
     "dos-slowloris": 0.9990811934813095,
     "dos-udp": 1.0
    },
-   "temperature": 1.1500000000000001,
-   "ece_calibree": 0.0003295261090708224,
+   "temperature": 1.1512820512820514,
+   "ece_calibree": 0.000332604769368143,
    "seconds": 31.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.1500000000000001
   },
   "majority|corrigee|strat_seed4": {
    "macro_f1": 0.036140459272989395,
@@ -3129,9 +3263,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 2.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 5.0
   },
   "logreg|corrigee|strat_seed4": {
    "macro_f1": 0.9958059514975454,
@@ -3151,10 +3286,11 @@
     "dos-slowloris": 0.993873908639236,
     "dos-udp": 0.9999618568104665
    },
-   "temperature": 0.7000000000000001,
-   "ece_calibree": 0.0008168990882614877,
+   "temperature": 0.9025641025641026,
+   "ece_calibree": 0.0018172075637825828,
    "seconds": 249.2,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.7000000000000001
   },
   "nb|corrigee|strat_seed4": {
    "macro_f1": 0.4383483957400588,
@@ -3174,10 +3310,11 @@
     "dos-slowloris": 0.35301569427827434,
     "dos-udp": 0.9696700695369137
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.1412006196138061,
+   "temperature": 5.0,
+   "ece_calibree": 0.2244032238136814,
    "seconds": 2.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|corrigee|strat_seed4": {
    "macro_f1": 0.9921788878011656,
@@ -3197,10 +3334,11 @@
     "dos-slowloris": 0.9912866686029626,
     "dos-udp": 0.9999618568104665
    },
-   "temperature": 3.2,
-   "ece_calibree": 0.0012957017435019694,
+   "temperature": 3.278205128205128,
+   "ece_calibree": 0.0016326014867049537,
    "seconds": 63.0,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.2
   },
   "rf|corrigee|strat_seed4": {
    "macro_f1": 0.9998479262800477,
@@ -3220,10 +3358,11 @@
     "dos-slowloris": 0.9999516744792926,
     "dos-udp": 1.0
    },
-   "temperature": 0.5,
-   "ece_calibree": 4.861955547783195e-05,
+   "temperature": 0.4641025641025641,
+   "ece_calibree": 4.371981607137312e-05,
    "seconds": 71.8,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.5
   },
   "xgboost|corrigee|strat_seed4": {
    "macro_f1": 1.0,
@@ -3243,10 +3382,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 1.05,
-   "ece_calibree": 4.919503449507049e-05,
+   "temperature": 1.0,
+   "ece_calibree": 3.553440354662869e-05,
    "seconds": 82.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.05
   },
   "lightgbm|corrigee|strat_seed4": {
    "macro_f1": 0.9999887244162071,
@@ -3266,10 +3406,11 @@
     "dos-slowloris": 0.9999516744792926,
     "dos-udp": 1.0
    },
-   "temperature": 1.55,
-   "ece_calibree": 2.0045877406026024e-05,
+   "temperature": 1.4551282051282053,
+   "ece_calibree": 1.3288225061381216e-05,
    "seconds": 99.5,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.55
   },
   "dnn|corrigee|strat_seed4": {
    "macro_f1": 0.9983178291524079,
@@ -3289,10 +3430,11 @@
     "dos-slowloris": 0.9975358747644586,
     "dos-udp": 0.9999618568104665
    },
-   "temperature": 1.05,
-   "ece_calibree": 0.00041906592271156486,
+   "temperature": 1.1512820512820514,
+   "ece_calibree": 0.0006539393100924656,
    "seconds": 104.2,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.05
   },
   "cnn|corrigee|strat_seed4": {
    "macro_f1": 0.994664836215681,
@@ -3312,10 +3454,11 @@
     "dos-slowloris": 0.9973887814313346,
     "dos-udp": 0.9999618568104665
    },
-   "temperature": 0.7500000000000001,
-   "ece_calibree": 0.0007575386697001843,
+   "temperature": 0.8538461538461539,
+   "ece_calibree": 0.0012885690980913827,
    "seconds": 44.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.7500000000000001
   },
   "rnn|corrigee|strat_seed4": {
    "macro_f1": 0.9988372599348548,
@@ -3335,10 +3478,11 @@
     "dos-slowloris": 0.9987421383647799,
     "dos-udp": 1.0
    },
-   "temperature": 0.9500000000000001,
-   "ece_calibree": 0.00014643557490657424,
+   "temperature": 0.9756410256410257,
+   "ece_calibree": 0.00015010132213164902,
    "seconds": 129.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.9500000000000001
   },
   "ftt|corrigee|strat_seed4": {
    "macro_f1": 1.0,
@@ -3358,10 +3502,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 1.1,
-   "ece_calibree": 3.686065790919358e-05,
+   "temperature": 1.0,
+   "ece_calibree": 1.9195259627172275e-05,
    "seconds": 479.7,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.1
   },
   "logreg#tuned|corrigee|strat_seed4": {
    "macro_f1": 0.9960525937986806,
@@ -3381,10 +3526,11 @@
     "dos-slowloris": 0.99479618386817,
     "dos-udp": 0.9999618568104665
    },
-   "temperature": 0.6500000000000001,
-   "ece_calibree": 0.0006109392008926985,
+   "temperature": 0.7076923076923077,
+   "ece_calibree": 0.0007792501884349968,
    "seconds": 181.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.6500000000000001
   },
   "nb#tuned|corrigee|strat_seed4": {
    "macro_f1": 0.49108081310181295,
@@ -3404,10 +3550,11 @@
     "dos-slowloris": 0.36709814396274226,
     "dos-udp": 0.9698135543060077
    },
-   "temperature": 2.65,
-   "ece_calibree": 0.16802828410659498,
+   "temperature": 5.0,
+   "ece_calibree": 0.24081759446689072,
    "seconds": 3.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 2.65
   },
   "knn#tuned|corrigee|strat_seed4": {
    "macro_f1": 0.9946237014361152,
@@ -3427,10 +3574,11 @@
     "dos-slowloris": 0.9945328753205284,
     "dos-udp": 0.9999618568104665
    },
-   "temperature": 3.25,
-   "ece_calibree": 0.0010377010038327855,
+   "temperature": 3.278205128205128,
+   "ece_calibree": 0.001179201073791112,
    "seconds": 52.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.25
   },
   "dnn#tuned|corrigee|strat_seed4": {
    "macro_f1": 0.9940737650111269,
@@ -3450,10 +3598,11 @@
     "dos-slowloris": 0.9912573057044872,
     "dos-udp": 0.9999618568104665
    },
-   "temperature": 0.8,
-   "ece_calibree": 0.001402168227333816,
+   "temperature": 0.9512820512820513,
+   "ece_calibree": 0.0023880386012048987,
    "seconds": 31.1,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.8
   },
   "majority|publiee|strat_seed5": {
    "macro_f1": 0.036140459272989395,
@@ -3474,9 +3623,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 2.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 5.0
   },
   "logreg|publiee|strat_seed5": {
    "macro_f1": 0.9991328769146062,
@@ -3496,10 +3646,11 @@
     "dos-slowloris": 0.9998549954081879,
     "dos-udp": 1.0
    },
-   "temperature": 0.9000000000000001,
-   "ece_calibree": 0.0001716365074106912,
+   "temperature": 0.8782051282051283,
+   "ece_calibree": 0.00010771305028664288,
    "seconds": 294.2,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.9000000000000001
   },
   "nb|publiee|strat_seed5": {
    "macro_f1": 0.5537727898201985,
@@ -3519,10 +3670,11 @@
     "dos-slowloris": 0.39975276211079347,
     "dos-udp": 0.9718628359592215
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.1784705475665841,
+   "temperature": 5.0,
+   "ece_calibree": 0.2813066588841709,
    "seconds": 3.1,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|publiee|strat_seed5": {
    "macro_f1": 0.9949553759190733,
@@ -3542,10 +3694,11 @@
     "dos-slowloris": 0.9978243001498815,
     "dos-udp": 1.0
    },
-   "temperature": 1.05,
-   "ece_calibree": 0.000558308815712847,
+   "temperature": 2.670512820512821,
+   "ece_calibree": 0.0006494526162838051,
    "seconds": 64.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.05
   },
   "rf|publiee|strat_seed5": {
    "macro_f1": 0.999929692604009,
@@ -3565,10 +3718,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.35000000000000003,
-   "ece_calibree": 2.0658037115417755e-05,
+   "temperature": 0.48846153846153845,
+   "ece_calibree": 2.97777219699945e-05,
    "seconds": 64.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.35000000000000003
   },
   "xgboost|publiee|strat_seed5": {
    "macro_f1": 1.0,
@@ -3588,10 +3742,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.6000000000000001,
-   "ece_calibree": 1.0132789611816406e-06,
+   "temperature": 0.6833333333333333,
+   "ece_calibree": 1.8477439880371094e-06,
    "seconds": 81.3,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.6000000000000001
   },
   "lightgbm|publiee|strat_seed5": {
    "macro_f1": 1.0,
@@ -3611,10 +3766,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.6500000000000001,
-   "ece_calibree": 9.764973177620017e-06,
+   "temperature": 0.7320512820512821,
+   "ece_calibree": 1.028232721952809e-05,
    "seconds": 97.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.6500000000000001
   },
   "dnn|publiee|strat_seed5": {
    "macro_f1": 0.9988567124093749,
@@ -3634,10 +3790,11 @@
     "dos-slowloris": 0.9999516744792926,
     "dos-udp": 1.0
    },
-   "temperature": 1.05,
-   "ece_calibree": 0.00018677231018700508,
+   "temperature": 1.5564102564102564,
+   "ece_calibree": 0.00022535953954628654,
    "seconds": 116.1,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.05
   },
   "cnn|publiee|strat_seed5": {
    "macro_f1": 0.9983450215879542,
@@ -3657,10 +3814,11 @@
     "dos-slowloris": 0.9989356555394291,
     "dos-udp": 1.0
    },
-   "temperature": 0.5,
-   "ece_calibree": 0.00012950136792275326,
+   "temperature": 0.5371794871794872,
+   "ece_calibree": 0.00028546904262927186,
    "seconds": 54.4,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.5
   },
   "rnn|publiee|strat_seed5": {
    "macro_f1": 0.9972324923510136,
@@ -3680,10 +3838,11 @@
     "dos-slowloris": 0.997052428122735,
     "dos-udp": 1.0
    },
-   "temperature": 0.8500000000000001,
-   "ece_calibree": 0.0004367206264791568,
+   "temperature": 0.8782051282051283,
+   "ece_calibree": 0.0002584625513802162,
    "seconds": 157.1,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.8500000000000001
   },
   "ftt|publiee|strat_seed5": {
    "macro_f1": 0.9996412529234431,
@@ -3703,10 +3862,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.9500000000000001,
-   "ece_calibree": 4.682900083579463e-05,
+   "temperature": 0.926923076923077,
+   "ece_calibree": 5.358666116476006e-05,
    "seconds": 361.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.9500000000000001
   },
   "logreg#tuned|publiee|strat_seed5": {
    "macro_f1": 0.9994734725298449,
@@ -3726,10 +3886,11 @@
     "dos-slowloris": 0.9997099487576139,
     "dos-udp": 1.0
    },
-   "temperature": 0.9000000000000001,
-   "ece_calibree": 5.740771112465093e-05,
+   "temperature": 0.7807692307692308,
+   "ece_calibree": 9.742677194171022e-05,
    "seconds": 314.0,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.9000000000000001
   },
   "nb#tuned|publiee|strat_seed5": {
    "macro_f1": 0.6894206093155106,
@@ -3749,10 +3910,11 @@
     "dos-slowloris": 0.5116312361319877,
     "dos-udp": 0.97197093281922
    },
-   "temperature": 1.7500000000000002,
-   "ece_calibree": 0.08223742294104908,
+   "temperature": 5.0,
+   "ece_calibree": 0.2504587028285321,
    "seconds": 3.5,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 1.7500000000000002
   },
   "knn#tuned|publiee|strat_seed5": {
    "macro_f1": 0.9976218341894261,
@@ -3772,10 +3934,11 @@
     "dos-slowloris": 0.9981622980945933,
     "dos-udp": 1.0
    },
-   "temperature": 2.7,
-   "ece_calibree": 0.0004948649645203783,
+   "temperature": 2.670512820512821,
+   "ece_calibree": 0.000524346161624759,
    "seconds": 63.9,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 2.7
   },
   "dnn#tuned|publiee|strat_seed5": {
    "macro_f1": 0.9974485885088966,
@@ -3795,10 +3958,11 @@
     "dos-slowloris": 0.9983557404004255,
     "dos-udp": 1.0
    },
-   "temperature": 0.7500000000000001,
-   "ece_calibree": 0.00038715398960400996,
+   "temperature": 0.926923076923077,
+   "ece_calibree": 0.0005552792737717454,
    "seconds": 38.3,
-   "n_features": 55
+   "n_features": 55,
+   "temperature_ece": 0.7500000000000001
   },
   "majority|corrigee|strat_seed5": {
    "macro_f1": 0.036140459272989395,
@@ -3819,9 +3983,10 @@
     "dos-udp": 0.0
    },
    "temperature": 5.0,
-   "ece_calibree": 0.774916281155683,
+   "ece_calibree": 0.7749162214148967,
    "seconds": 2.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 5.0
   },
   "logreg|corrigee|strat_seed5": {
    "macro_f1": 0.9953510715244452,
@@ -3841,10 +4006,11 @@
     "dos-slowloris": 0.995125247357498,
     "dos-udp": 1.0
    },
-   "temperature": 0.6500000000000001,
-   "ece_calibree": 0.0004916678440050874,
+   "temperature": 0.7076923076923077,
+   "ece_calibree": 0.0004080894024550477,
    "seconds": 289.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.6500000000000001
   },
   "nb|corrigee|strat_seed5": {
    "macro_f1": 0.4753329644709492,
@@ -3864,10 +4030,11 @@
     "dos-slowloris": 0.362603450694347,
     "dos-udp": 0.9702442635085122
    },
-   "temperature": 0.15000000000000002,
-   "ece_calibree": 0.11880305394903343,
+   "temperature": 5.0,
+   "ece_calibree": 0.25871492967341153,
    "seconds": 3.0,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.15000000000000002
   },
   "knn|corrigee|strat_seed5": {
    "macro_f1": 0.9896572836698176,
@@ -3887,10 +4054,11 @@
     "dos-slowloris": 0.9898058252427184,
     "dos-udp": 1.0
    },
-   "temperature": 3.05,
-   "ece_calibree": 0.0007891160287007918,
+   "temperature": 3.0756410256410254,
+   "ece_calibree": 0.0007206286680219343,
    "seconds": 65.1,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.05
   },
   "rf|corrigee|strat_seed5": {
    "macro_f1": 0.9998594461868782,
@@ -3910,10 +4078,11 @@
     "dos-slowloris": 1.0,
     "dos-udp": 1.0
    },
-   "temperature": 0.1,
-   "ece_calibree": 3.63656536989748e-05,
+   "temperature": 0.5371794871794872,
+   "ece_calibree": 5.868867327302176e-05,
    "seconds": 75.3,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.1
   },
   "xgboost|corrigee|strat_seed5": {
    "macro_f1": 0.9997427418856262,
@@ -3933,10 +4102,11 @@
     "dos-slowloris": 0.9999033536290712,
     "dos-udp": 1.0
    },
-   "temperature": 1.1,
-   "ece_calibree": 9.480615500879111e-05,
+   "temperature": 1.0,
+   "ece_calibree": 6.129047178362743e-05,
    "seconds": 88.1,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.1
   },
   "lightgbm|corrigee|strat_seed5": {
    "macro_f1": 0.999814343197228,
@@ -3956,10 +4126,11 @@
     "dos-slowloris": 0.9998067259373792,
     "dos-udp": 1.0
    },
-   "temperature": 1.2500000000000002,
-   "ece_calibree": 6.721848127978652e-05,
+   "temperature": 1.4551282051282053,
+   "ece_calibree": 5.556044095269277e-05,
    "seconds": 102.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.2500000000000002
   },
   "dnn|corrigee|strat_seed5": {
    "macro_f1": 0.9880980287498962,
@@ -3979,10 +4150,11 @@
     "dos-slowloris": 0.9757742137456051,
     "dos-udp": 1.0
    },
-   "temperature": 1.0,
-   "ece_calibree": 0.002749855171447728,
+   "temperature": 1.05,
+   "ece_calibree": 0.0032496097337171063,
    "seconds": 53.5,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 1.0
   },
   "cnn|corrigee|strat_seed5": {
    "macro_f1": 0.9975056379056012,
@@ -4002,10 +4174,11 @@
     "dos-slowloris": 0.9970947123765252,
     "dos-udp": 1.0
    },
-   "temperature": 0.9000000000000001,
-   "ece_calibree": 0.000472184180242337,
+   "temperature": 1.05,
+   "ece_calibree": 0.00041984536752505885,
    "seconds": 502.6,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.9000000000000001
   },
   "rnn|corrigee|strat_seed5": {
    "macro_f1": 0.9983680564327485,
@@ -4025,10 +4198,11 @@
     "dos-slowloris": 0.9983558994197292,
     "dos-udp": 1.0
    },
-   "temperature": 0.7000000000000001,
-   "ece_calibree": 0.00029544642291972375,
+   "temperature": 0.7076923076923077,
+   "ece_calibree": 0.0002718686773386791,
    "seconds": 562.9,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.7000000000000001
   },
   "logreg#tuned|corrigee|strat_seed5": {
    "macro_f1": 0.9956121135286102,
@@ -4048,10 +4222,11 @@
     "dos-slowloris": 0.9940131324835844,
     "dos-udp": 1.0
    },
-   "temperature": 0.7000000000000001,
-   "ece_calibree": 0.0006266040588361002,
+   "temperature": 0.7076923076923077,
+   "ece_calibree": 0.0005886546577397732,
    "seconds": 273.4,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 0.7000000000000001
   },
   "nb#tuned|corrigee|strat_seed5": {
    "macro_f1": 0.5018841157425951,
@@ -4071,22 +4246,83 @@
     "dos-slowloris": 0.3713685921311031,
     "dos-udp": 0.9706034801925213
    },
-   "temperature": 3.1,
-   "ece_calibree": 0.1259072406233902,
+   "temperature": 5.0,
+   "ece_calibree": 0.28113787102388604,
    "seconds": 3.5,
-   "n_features": 54
+   "n_features": 54,
+   "temperature_ece": 3.1
   },
   "knn#tuned|corrigee|strat_seed5": {
-   "macro_f1": 0.9945,
+   "macro_f1": 0.9945132802813033,
+   "accuracy": 0.9970043090726639,
+   "mcc": 0.9964268072941617,
+   "fpr": 0.008948101014118115,
+   "ece": 0.001969198912220154,
+   "brier": 0.004725065067604076,
+   "per_class_f1": {
+    "benign": 0.9879088206144697,
+    "bruteforce-ftp": 0.9902034664657121,
+    "bruteforce-smb": 0.9910224438902743,
+    "bruteforce-ssh": 0.9925053533190579,
+    "dos-hulk": 0.995594245979086,
+    "dos-icmp": 0.9998855704313995,
+    "dos-pushack": 0.9998480589531262,
+    "dos-slowloris": 0.9936515628786043,
+    "dos-udp": 1.0
+   },
+   "temperature": 3.176923076923077,
+   "ece_calibree": 0.0009483578475530591,
+   "seconds": 62.9,
    "n_features": 54,
-   "source": "console, session CPU du 2026-08-21",
-   "partiel": true
+   "temperature_ece": 3.1
   },
   "dnn#tuned|corrigee|strat_seed5": {
-   "macro_f1": 0.9836,
+   "macro_f1": 0.9835746345215676,
+   "accuracy": 0.9949973437223304,
+   "mcc": 0.9940387724298339,
+   "fpr": 0.0027838536488367467,
+   "ece": 0.002979930023412111,
+   "brier": 0.008931035175919533,
+   "per_class_f1": {
+    "benign": 0.9947436278885252,
+    "bruteforce-ftp": 0.9917602996254682,
+    "bruteforce-smb": 0.9573754789272031,
+    "bruteforce-ssh": 0.9236071223434807,
+    "dos-hulk": 0.9928624693725365,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9918227125368946,
+    "dos-udp": 1.0
+   },
+   "temperature": 0.8538461538461539,
+   "ece_calibree": 0.0020500195737283423,
+   "seconds": 39.9,
    "n_features": 54,
-   "source": "console, session CPU du 2026-08-21",
-   "partiel": true
+   "temperature_ece": 0.7000000000000001
+  },
+  "ftt|corrigee|strat_seed5": {
+   "macro_f1": 0.999797389462331,
+   "accuracy": 0.9998967003128505,
+   "mcc": 0.9998767675564536,
+   "fpr": 0.0005965400676078744,
+   "ece": 0.0001235446496257801,
+   "brier": 0.00012288274592719972,
+   "per_class_f1": {
+    "benign": 0.9997016409746395,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9989339019189766,
+    "dos-hulk": 0.9997343110686009,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9998066511987626,
+    "dos-udp": 1.0
+   },
+   "temperature": 1.0,
+   "ece_calibree": 0.0001235446373114978,
+   "seconds": 304.5,
+   "n_features": 54,
+   "temperature_ece": 0.8500000000000001
   }
  },
  "offset": {
@@ -4219,5 +4455,276 @@
   },
   "n_repeat": 3,
   "max": 0.0018702207130615323
+ },
+ "cout_corrige": {
+  "logreg": {
+   "p50_ms": 0.23978899997700864,
+   "p99_ms": 0.4620521199581143,
+   "flows_per_s": 635459.680298393,
+   "n_features": 54
+  },
+  "nb": {
+   "p50_ms": 0.8963039999798639,
+   "p99_ms": 1.4622807999967293,
+   "flows_per_s": 482664.4965610651,
+   "n_features": 54
+  },
+  "knn": {
+   "p50_ms": 17.59769000000233,
+   "p99_ms": 23.847818310002815,
+   "flows_per_s": 778.380513586575,
+   "n_features": 54
+  },
+  "rf": {
+   "p50_ms": 53.30581499993059,
+   "p99_ms": 54.80736340001613,
+   "flows_per_s": 94023.88243343262,
+   "n_features": 54
+  },
+  "xgboost": {
+   "p50_ms": 0.9053735000179586,
+   "p99_ms": 1.4474686998460127,
+   "flows_per_s": 53802.94420532145,
+   "n_features": 54
+  },
+  "lightgbm": {
+   "p50_ms": 3.9428870001074756,
+   "p99_ms": 7.157363369990428,
+   "flows_per_s": 4973.101310908871,
+   "n_features": 54
+  },
+  "dnn": {
+   "p50_ms": 64.87811200008764,
+   "p99_ms": 133.2667685698834,
+   "flows_per_s": 15241.60545694516,
+   "n_features": 54
+  },
+  "cnn": {
+   "p50_ms": 64.34473950014308,
+   "p99_ms": 138.60493256004247,
+   "flows_per_s": 21769.913297381725,
+   "n_features": 54
+  },
+  "rnn": {
+   "p50_ms": 65.66162000001441,
+   "p99_ms": 132.5158823300444,
+   "flows_per_s": 14936.724243577,
+   "n_features": 54
+  },
+  "ftt": {
+   "p50_ms": 67.55853750007645,
+   "p99_ms": 130.24027461993674,
+   "flows_per_s": 5758.23763199027,
+   "n_features": 54
+  }
+ },
+ "plateforme": "Linux-6.6.122+-x86_64-with-glibc2.35",
+ "ecart_max": {
+  "stratifie": 0.0038335986349093965,
+  "temporel": 0.02630441862181654
+ },
+ "attribuable": {
+  "nb#tuned": true,
+  "knn": true,
+  "lightgbm": true,
+  "knn#tuned": true,
+  "rf": true,
+  "xgboost": true,
+  "dnn#tuned": true,
+  "nb": true,
+  "ftt": true,
+  "dnn": true,
+  "logreg": true,
+  "rnn": true,
+  "logreg#tuned": true,
+  "cnn": false,
+  "majority": true
+ },
+ "ecart_max_deterministe": 0.1872103536132319,
+ "table2_corrigee": {
+  "majority": {
+   "strat_mean": 0.036140459272989395,
+   "strat_std": 0.0,
+   "strat_runs": [
+    0.036140459272989395,
+    0.036140459272989395,
+    0.036140459272989395,
+    0.036140459272989395,
+    0.036140459272989395
+   ],
+   "temporal": 0.03614052574277951
+  },
+  "logreg": {
+   "strat_mean": 0.9963382267574449,
+   "strat_std": 0.0006613269615391336,
+   "strat_runs": [
+    0.9966539035014963,
+    0.9967111811632405,
+    0.9971690261004971,
+    0.9958059514975454,
+    0.9953510715244452
+   ],
+   "temporal": 0.9881093936221446
+  },
+  "nb": {
+   "strat_mean": 0.44635879995070676,
+   "strat_std": 0.014500730595697727,
+   "strat_runs": [
+    0.43867962218908707,
+    0.4402050350063321,
+    0.43922798234710686,
+    0.4383483957400588,
+    0.4753329644709492
+   ],
+   "temporal": 0.48429735068447005
+  },
+  "knn": {
+   "strat_mean": 0.9916003983271746,
+   "strat_std": 0.001177788581189623,
+   "strat_runs": [
+    0.9927071959301621,
+    0.9908440588761473,
+    0.9926145653585804,
+    0.9921788878011656,
+    0.9896572836698176
+   ],
+   "temporal": 0.9573845867760008
+  },
+  "rf": {
+   "strat_mean": 0.9998844996141198,
+   "strat_std": 5.191974109963857e-05,
+   "strat_runs": [
+    0.9998243942883072,
+    0.9999296969964697,
+    0.9999610343188964,
+    0.9998479262800477,
+    0.9998594461868782
+   ],
+   "temporal": 0.9529887086216028
+  },
+  "xgboost": {
+   "strat_mean": 0.9998963582960354,
+   "strat_std": 0.00010369442373781327,
+   "strat_runs": [
+    0.9998093525980809,
+    0.9999296969964697,
+    1.0,
+    1.0,
+    0.9997427418856262
+   ],
+   "temporal": 0.966619329810206
+  },
+  "lightgbm": {
+   "strat_mean": 0.9999505926084788,
+   "strat_std": 7.056997032729106e-05,
+   "strat_runs": [
+    0.9999498954289591,
+    1.0,
+    1.0,
+    0.9999887244162071,
+    0.999814343197228
+   ],
+   "temporal": 0.9649254293180367
+  },
+  "dnn": {
+   "strat_mean": 0.9951986104677364,
+   "strat_std": 0.00370889300024776,
+   "strat_runs": [
+    0.9962061385691116,
+    0.997949389185129,
+    0.9954216666821376,
+    0.9983178291524079,
+    0.9880980287498962
+   ],
+   "temporal": 0.9773200464695668
+  },
+  "cnn": {
+   "strat_mean": 0.9942181588383436,
+   "strat_std": 0.004553637041182119,
+   "strat_runs": [
+    0.9964313741071571,
+    0.98532471474155,
+    0.9971642312217289,
+    0.994664836215681,
+    0.9975056379056012
+   ],
+   "temporal": 0.9847928229305306
+  },
+  "rnn": {
+   "strat_mean": 0.9976714100079846,
+   "strat_std": 0.0011259171641717985,
+   "strat_runs": [
+    0.9958072421229353,
+    0.9969585225408325,
+    0.9983859690085519,
+    0.9988372599348548,
+    0.9983680564327485
+   ],
+   "temporal": 0.9837182410001132
+  },
+  "ftt": {
+   "strat_mean": 0.9998529770358038,
+   "strat_std": 7.520078803796229e-05,
+   "strat_runs": [
+    0.9998000538434795,
+    0.9998374359926913,
+    0.9998300058805173,
+    1.0,
+    0.999797389462331
+   ],
+   "temporal": 0.9901290090172989
+  },
+  "logreg#tuned": {
+   "strat_mean": 0.9960449616301903,
+   "strat_std": 0.0003444004019342237,
+   "strat_runs": [
+    0.996081047474854,
+    0.9958341693294712,
+    0.9966448840193353,
+    0.9960525937986806,
+    0.9956121135286102
+   ],
+   "temporal": 0.9928252533576379
+  },
+  "nb#tuned": {
+   "strat_mean": 0.4925125792156095,
+   "strat_std": 0.004835103769656695,
+   "strat_runs": [
+    0.4881012735850171,
+    0.4899326134095266,
+    0.4915640802390956,
+    0.49108081310181295,
+    0.5018841157425951
+   ],
+   "temporal": 0.5268282061337695
+  },
+  "knn#tuned": {
+   "strat_mean": 0.9949456883930864,
+   "strat_std": 0.0006055260923463044,
+   "strat_runs": [
+    0.9960690193248394,
+    0.9944350857890749,
+    0.9950873551340992,
+    0.9946237014361152,
+    0.9945132802813033
+   ],
+   "temporal": 0.9603266408802617
+  },
+  "dnn#tuned": {
+   "strat_mean": 0.9905604708974252,
+   "strat_std": 0.00445895286733708,
+   "strat_runs": [
+    0.9942838687327067,
+    0.9939258168264572,
+    0.9869442693952671,
+    0.9940737650111269,
+    0.9835746345215676
+   ],
+   "temporal": 0.9615671441451951
+  }
+ },
+ "temoin_temperature": {
+  "ecart_max": 0.8209999999999997,
+  "valide": false
  }
 }

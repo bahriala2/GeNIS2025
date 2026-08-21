@@ -1,7 +1,6 @@
 # E8 — la condition auditée republiée sur la liste corrigée
 
-**`verify_e8.py` : 15 contrôles sur 15.** 177 runs sur 180 ; les trois
-manquants sont la graine 5 de trois configurations, côté liste corrigée.
+**`verify_e8.py` : 19 contrôles sur 19.** 180 runs sur 180.
 
 ---
 
@@ -150,85 +149,129 @@ colonne de celui d'un nouveau réglage — mais le papier doit le dire.
 Trouvé en republiant les Tableaux 7 et 8. Le pipeline ajuste la température en
 minimisant la **NLL** sur une grille de 80 points
 (`colab/e3_calibration_residual.py`, fonction `temperature`) ; la fonction
-que j'ai écrite dans E8 minimise l'**ECE** sur une grille de 100 points au pas
-de 0,05. **Objectif différent.**
+que j'ai écrite dans E8 minimisait l'**ECE** sur une grille de 100 points au
+pas de 0,05. **Objectif différent.**
 
-La preuve : sur le bras `publiee`, qui devrait reproduire le Tableau 7, E8
-donne pour naive Bayes T = 0,150 là où le papier a 5,821 et où E3-A avait
-retrouvé 5,000. Les deux extrémités opposées de la grille — ce n'est pas un
-artefact de grille.
+Le correctif n'a demandé aucun réentraînement : les matrices de probabilités
+d'E8 étaient conservées, et la température s'y recalcule avec l'objectif du
+pipeline (`colab/e8bis_recalage_temperature.py`). Les 180 runs portent
+désormais `temperature` (NLL, la bonne) et `temperature_ece` (l'ancienne,
+gardée pour que l'écart reste lisible).
 
-| colonne | républiable depuis E8 ? |
-|---|---|
-| Tableau 7, `ECEraw` | **oui** — l'ECE brut ne dépend pas de la température |
-| Tableau 7, `T` et `ECEcal` | **non** |
-| Tableau 8, `ECE stratified`, `ECE temporal`, `ratio` | **oui** |
-| Tableau 8, `T temporal`, `ECE temporal, calibrated` | **non** |
+### Le témoin s'est trompé de quantité avant de se tromper de verdict
 
-**Décision : les Tableaux 7 et 8 sont laissés en l'état.** Un tableau dont
-certaines colonnes viennent de la liste à treize et d'autres de la liste à
-douze induirait plus en erreur qu'un tableau non touché. Seul le Tableau 2 est
-republié.
+La première version comparait **T** au Tableau 7 publié et annonçait un écart
+maximal de **0,821**, donc l'échec. Les deux moitiés du contrôle étaient
+fausses :
 
-**Le correctif ne demande aucun réentraînement** : les matrices de
-probabilités d'E8 sont conservées dans `e8_probs/`, et la température se
-recalcule dessus avec l'objectif du pipeline.
+- **la cible.** Le T publié pour le bayésien naïf est 5,821. La grille du
+  pipeline s'arrête à **5**. Le recalage rend exactement 5,000 — c'est-à-dire
+  **la valeur d'E3-A**, la recomputation que la §6.5 déclare déjà comme la
+  bonne. Tout l'écart de 0,821 est un plafond de grille ;
+- **la quantité.** T est un paramètre *intermédiaire*, posé sur une surface
+  très plate. Deux jeux de probabilités quasi identiques y donnent des T
+  éloignés sans que rien de rapporté ne bouge. Ce qu'il faut contrôler est ce
+  que le tableau **rapporte** : l'ECE après calage.
 
-### Ce que la recomputation changera, et qu'il faut anticiper
+Le témoin corrigé teste l'ECE calibrée contre E3-A et écarte les T posés sur
+une borne de grille, dont l'écart ne renseigne pas sur la procédure.
 
-Les ECE bruts, eux, sont déjà mesurés et ils déplacent deux affirmations du
-manuscrit :
+### Ce qu'il donne — et le contraste n'était pas attendu
 
-- **§6.5 : « expected calibration error is at most 0.0009 for every model
-  except naive Bayes ».** Sous la liste corrigée le maximum est **0,0084**, et
-  il est porté par la régression logistique — dont l'ECE stratifié est passé de
-  0,000313 à 0,008429, soit ×27.
-- **§6.5 et conclusion : « ten of the eleven detectors » se dégradent sous le
-  protocole temporel.** Ce sont maintenant **neuf sur onze** : la régression
-  logistique **s'améliore** (rapport 0,4×), parce que c'est son bras stratifié
-  qui s'est dégradé, pas son bras temporel qui a progressé.
-- Les rapports des trois mieux calibrés passent de « 241 à 457 » à
-  **« 146 à 1403 »**.
+`verify_e8.py`, contrôle F, calculé depuis les fichiers versionnés :
 
+| | paires | écart max | |
+|---|---:|---:|---|
+| ECE **brute**, les deux protocoles | 22 | **0,0031** | `rnn\|temporal` |
+| ECE **calibrée**, stratifié | 7 | **0,0002** | `rnn\|strat_seed1` |
+| ECE **calibrée**, temporel | 7 | **0,0075** | `rf\|temporal` |
 
----
+L'ajustement sous-jacent se rejoue partout. Ce qui ne se rejoue serré que
+d'un côté, c'est l'ECE **après** calage : sur le bras temporel, l'optimum de
+NLL se déplace assez pour déplacer l'ECE de 0,0075, alors que l'ajustement
+qui le porte se rejoue à 0,0031.
 
-## 8. Ce qui est entré dans le manuscrit, et ce qui attend
+**C'est le calage qui amplifie, pas l'ajustement.** La dernière colonne du
+Tableau 8 est donc la moins stable du manuscrit, et sa légende le dit
+maintenant — avec les deux chiffres, pas avec une formule prudente.
 
-### Entré
+## 8. Ce qui est entré dans le manuscrit
 
 | élément | source |
 |---|---|
 | **Tableau 2** | E8, condition corrigée, entièrement |
-| **Tableau 13**, colonne macro-F1 et ordre des lignes | E8 |
+| **Tableau 7** (T, ECEraw, ECEcal) | E8 recalé, condition corrigée |
+| **Tableau 8**, entièrement | E8 recalé, condition corrigée |
+| **Tableau 10**, colonne macro-F1 | E8, condition corrigée |
+| **Tableau 13**, macro-F1, ordre des lignes, température | E8 recalé |
 | **Figures 5, 10, 18** | redessinées, `paper/regen_e8_figures.py` |
 | légendes des Figures 5, 10, 18 | recalculées |
-| prose des §6.1, §6.3, §8 citant le Tableau 2 | recalculée |
+| prose des §6.1, §6.3, §6.5, §8 | recalculée |
 
-Les Figures 5, 10 et 18 sont les seules que l'on puisse refaire sans les
-matrices de probabilités. Elles remplacent les images d'origine **en place** :
-le document les portait sous des noms de hachage, qu'on écrase sans toucher
-aux relations ni aux `extent` déclarés.
+Deux réserves écrites dans les légendes, parce qu'elles ne se devinent pas :
 
-### En attente, et pourquoi les cases sont vides plutôt que périmées
+- **Tableau 7.** T est ajusté sur une grille bornée à 0,05 et 5, donc la
+  valeur du bayésien naïf est *au plafond*. Et les colonnes essais, temps et
+  Δval viennent de la recherche publiée, conduite sur la condition à douze
+  colonnes : le bras `#tuned` mesure *les hyperparamètres publiés appliqués à
+  la condition corrigée*, pas un réajustement sur celle-ci.
+- **Tableau 8.** Le chiffre de stabilité ci-dessus.
+- **Tableau 10.** La colonne macro-F1 vient de la condition corrigée, sur 54
+  colonnes ; latence, débit et taille ont été mesurés **avant** la correction,
+  sur 55 colonnes, et ne sont pas remesurés. La légende annonçait déjà
+  « audited condition » alors que sa colonne macro-F1 portait encore les
+  valeurs à douze — le bayésien naïf s'y trompait de **0,1028**. Nommer la
+  provenance de chaque colonne vaut mieux qu'une colonne périmée sous une
+  légende qui affirme le contraire.
 
-Le Tableau 13 a **deux colonnes vides** : le débit demande une mesure de coût
-sur 54 colonnes, la température demande le recalage avec l'objectif du
-pipeline. Une case vide n'induit personne en erreur ; une valeur de la
-condition à douze posée à côté d'une valeur de la condition à treize, si.
+La §8 lisait ce tableau à voix haute et affirmait donc le contraire de ce
+qu'il montre désormais. Trois phrases corrigées : XGBoost n'est plus « à
+égalité en tête » (LightGBM est seul au-dessus, de 0,0001), la régression
+logistique passe de 0,9990 à 0,9963, et la marge temporelle du
+FT-Transformer passe de « 0,9966 contre 0,9888 » à **0,9901 contre 0,9666**
+— elle *grandit*, de 0,0078 à 0,0235.
+
+### Les trois affirmations de la §6.5 qui ont bougé
+
+| avant | après |
+|---|---|
+| ECE ≤ 0,0009 « pour tout modèle sauf le bayésien naïf » | ≤ **0,0015**, sauf la régression logistique **et** le bayésien naïf — l'erreur stratifiée de la logistique passe de 0,0003 à 0,0084 quand la colonne identifiante est retirée |
+| « dix des onze détecteurs » se dégradent en temporel | **neuf sur onze**. Le onzième est la régression logistique, et elle va dans l'autre sens (rapport 0,4×) — non parce que son bras temporel progresse, mais parce que son bras stratifié est monté le rejoindre |
+| rapports des trois mieux calibrés : 241 à 457 | **146 à 1403** |
+
+Les températures des ensembles d'arbres ne sont **plus au plancher** de la
+grille : XGBoost 0,85, LightGBM 1,46, forêt aléatoire 0,39. Retirer la colonne
+identifiante a retiré ce qui rendait leurs postérieures quasi déterministes.
+
+Ce qui **tient** : les trois détecteurs les mieux calibrés en stratifié
+(`xgboost`, `lightgbm`, `ftt`) restent exactement les trois qui se dégradent
+le plus. Même ensemble des deux côtés.
+
+## 9. Ce qui attend encore, et pourquoi les cases sont vides
+
+Une case vide n'induit personne en erreur ; une valeur de la condition à douze
+posée à côté d'une valeur de la condition à treize, si.
 
 | bloqué par | débloque |
 |---|---|
-| recalage des températures (NLL) | Tableaux 7, 8, 13 (température), §6.5 |
-| mesure de coût (54 colonnes) | Tableau 10, 13 (débit), Figure 14, §8 |
+| mesure de coût sur 54 colonnes (CPU, ~10 min) | colonnes de coût du Tableau 10, colonne débit du 13, axe horizontal de la Figure 14 |
 | `e8_probs/` | Figures 9 (McNemar) et 11 (bootstrap) |
-| `ftt` graine 5 | le *n* = 4 du Tableau 2 |
 
-### Ce que la Figure 18 montre maintenant
+**La graine 5 du `ftt` est arrivée**, donc le Tableau 2 porte ses cinq graines
+partout et le marqueur *n* = 4 a disparu de lui-même : il était calculé, pas
+écrit à la main.
+
+**La Figure 14 reste à redessiner.** Son axe vertical est le macro-F1
+temporel, qui a changé pour tous les détecteurs ; son axe horizontal est le
+débit, qui n'est pas remesuré. Sa légende est déjà juste au chiffre près
+(0,0020 pour l'écart logistique–FT-Transformer), mais les points, eux, sont
+encore placés à l'ancienne hauteur.
+
+## 10. Ce que la Figure 18 montre maintenant
 
 C'est le changement le plus visible du manuscrit. Sous la liste publiée, la
 perte se dispersait : « chaque détecteur perd ailleurs ». Sous la liste
-corrigée elle **se concentre sur `dos-hulk` et `dos-slowloris`**, où le DNN,
+corrigée elle se rassemble sur `dos-hulk` et `dos-slowloris`, où le DNN,
 XGBoost, LightGBM, k-NN et la forêt aléatoire tombent tous sous 0,93. La
 cellule la plus basse est la forêt aléatoire sur `dos-hulk` à **0,814**, contre
 0,957 pour la pire classe du détecteur de tête — et **onze de ces douze
