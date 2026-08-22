@@ -17,11 +17,18 @@ import urllib.request
 
 DEPOT = "bahriala2/GeNIS2025"
 BRANCHE = "claude/manuscript-e2-e3-sections-87snff"
+# Les deux premieres appartiennent au notebook e8_republication ; la
+# troisieme au notebook e5_intervalles_cinq_graines, et elle echouera si on
+# la lance depuis l'autre. Lancez-la separement, depuis le bon notebook.
 ETAPES = [
     ("e8ter_cout_deux_conditions",
      "cout d'inference, les deux conditions, mesure sur CPU"),
     ("e8quater_stats_mcnemar_bootstrap",
      "McNemar et bootstrap, pour les figures 9 et 11"),
+]
+ETAPES_E5 = [
+    ("e9_intervalles_six_detecteurs",
+     "robustesse a l'intervalle, six detecteurs de plus"),
 ]
 
 for nom, quoi in ETAPES:
@@ -36,3 +43,6 @@ for nom, quoi in ETAPES:
     print()
 
 print("Termine. Renvoie e8_results.json.")
+print()
+print("Pour E9, meme cellule mais dans le notebook e5_intervalles_cinq_graines,")
+print("en remplacant ETAPES par ETAPES_E5. Elle renvoie e5_results.json.")
