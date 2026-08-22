@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Figures 5, 10, 14 et 18, redessinees sur la condition auditee CORRIGEE.
+"""Figures 5, 9, 10, 11, 14 et 18, redessinees sur la condition auditee CORRIGEE.
 
 E7 a montre qu'IdleTime est un identifiant de fichier de capture ; E8 a refait
 la campagne sans lui. Ces trois figures dependent de la condition auditee et
-doivent donc etre redessinees. Ce sont les seules que l'on puisse refaire sans
-les matrices de probabilites : les figures 9 (McNemar) et 11 (bootstrap) en
-ont besoin.
+doivent donc etre redessinees. Les figures 9 (McNemar) et 11 (bootstrap) demandaient les matrices de
+probabilites, qui font 380 Mo et ne peuvent pas quitter Colab. Elles n'en ont
+pas besoin ici : e8quater y a fait le calcul et n'en a rapporte que le
+resultat -- 45 valeurs de p, 45 corrigees, dix moyennes et dix intervalles,
+sous "stats" dans e8_results.json.
 
 La figure 14 est un cas mixte, et c'est pour ca qu'elle etait restee de cote.
 Son axe vertical est le macro-F1 temporel, qui a change pour les neuf
@@ -22,7 +24,7 @@ condition "corrigee". Les colonnes full et clean de la figure 10 viennent de
 article1_results.json et ne changent pas -- elles n'ont jamais utilise la
 liste noire.
 
-Sorties : paper/figures_manuscrit/figure{05,10,14,18}_*.png
+Sorties : paper/figures_manuscrit/figure{05,09,10,11,14,18}_*.png
 """
 import json
 import pathlib
@@ -233,17 +235,21 @@ print(f"            cellule la plus basse {pire[1]} / {pire[2]} = {pire[0]:.4f}"
 # =========================================================================
 # Figure 14 — cout d'inference contre qualite, protocole temporel
 # =========================================================================
-# Debit : article1_results.json, mesure sur 55 colonnes, inchange.
-# Qualite : E8, condition corrigee, protocole temporel.
-COUT = R["cost"]
+# Les deux axes viennent maintenant de la meme condition et de la meme
+# session. Le debit est celui du protocole qui amortit reellement le surcout
+# par appel -- celui que la legende du tableau 10 annoncait deja -- et les
+# modeles Keras y ont ete mesures sous tf.device("/CPU:0").
+E8C = json.loads((REPO / "experiments" / "e8" / "e8_results.json")
+                 .read_text(encoding="utf-8"))["cout_deux_conditions"]
+COUT = {m: E8C[f"{m}|corrigee"]["flux_s_amorti_10240"] for m in ORD}
 PROFOND = {"ftt", "rnn", "cnn", "dnn"}
-P14 = sorted(((COUT[m]["throughput_512"], run(m, "temporal")["macro_f1"], m)
+P14 = sorted(((COUT[m], run(m, "temporal")["macro_f1"], m)
               for m in ORD if m != "nb"), key=lambda t: -t[1])
 # Decalages d'etiquette, en points. Le defaut place au-dessus a droite ; les
 # exceptions sont les seuls points ou ca chevauchait un voisin ou le cadre.
 DEC = {"logreg": (-8, 8, "right"), "rf": (8, -12, "left"),
        "dnn": (8, -12, "left"), "lightgbm": (-8, -12, "right"),
-       "cnn": (-6, 10, "right"), "rnn": (9, 4, "left")}
+       "cnn": (8, 8, "left"), "rnn": (-8, -12, "right")}
 
 # La figure remplace l'image d'origine EN PLACE dans le document, sous son nom
 # de hachage : on garde donc ses 1803 x 1276 pixels, pour que l'extent declare
@@ -288,4 +294,91 @@ print(f"            {tete[2]} mene a {tete[1]:.4f}, {second[2]} a "
       f"{second[1] - tete[1]:+.4f} pour {rapport:.0f}x le debit")
 print(f"            dnn domine sur les deux axes par : {domine}")
 
-print("\nles quatre figures sont ecrites dans", OUT)
+# =========================================================================
+# Figures 9 et 11 — les deux tests apparies, sur la condition corrigee
+# =========================================================================
+ST = json.loads((REPO / "experiments" / "e8" / "e8_results.json")
+                .read_text(encoding="utf-8"))["stats"]["corrigee"]
+HOLM, BOOT = ST["mcnemar_holm"], ST["bootstrap"]
+
+# --- 9 : McNemar apparie, correction de Holm ------------------------------
+# Ordre par macro-F1 decroissant, comme la figure publiee : la lecture est
+# "les meilleurs sont-ils separables entre eux ?", et elle demande que les
+# meilleurs soient cote a cote.
+M9 = sorted(BOOT, key=lambda m: -moy(m))
+n9 = len(M9)
+
+
+def holm(a, b):
+    return HOLM.get(f"{a}|{b}", HOLM.get(f"{b}|{a}"))
+
+
+ns = np.zeros((n9, n9))
+for i, a in enumerate(M9):
+    for j, b in enumerate(M9):
+        if i != j:
+            ns[i, j] = 1.0 if holm(a, b) >= .05 else 0.0
+n_ns = int(ns.sum() // 2)
+
+fig, ax = plt.subplots(figsize=(1486 / 285, 1653 / 285))
+ax.imshow(np.where(np.eye(n9, dtype=bool), np.nan, ns),
+          cmap=matplotlib.colors.ListedColormap(["#eaeef2", "#4a72b0"]),
+          vmin=0, vmax=1)
+for i in range(n9):
+    for j in range(n9):
+        if i != j and ns[i, j]:
+            ax.text(j, i, "ns", ha="center", va="center", fontsize=8.5,
+                    color="white")
+ax.set_xticks(range(n9))
+ax.set_xticklabels(M9, rotation=90, fontsize=9)
+ax.set_yticks(range(n9))
+ax.set_yticklabels(M9, fontsize=9)
+ax.set_xticks(np.arange(-.5, n9), minor=True)
+ax.set_yticks(np.arange(-.5, n9), minor=True)
+ax.grid(which="minor", color="white", lw=1.4)
+ax.tick_params(which="minor", length=0)
+ax.grid(which="major", visible=False)
+# La figure est etroite (5.2 in) et le sous-titre est long : sur une seule
+# ligne il depassait le cadre a droite. On le coupe en deux.
+ax.set_title(f"Saturation: {n_ns} model pairs are not distinguishable\n"
+             "(McNemar, Holm-corrected, $\\alpha$ = 0.05;\n"
+             "models ordered by macro-F1)", fontsize=10.5)
+ax.legend(handles=[matplotlib.patches.Patch(color="#4a72b0",
+                                            label="not distinguishable (p >= 0.05)"),
+                   matplotlib.patches.Patch(color="#eaeef2",
+                                            label="significantly different")],
+          loc="upper center", bbox_to_anchor=(.5, -.22), ncol=2, fontsize=9,
+          frameon=False)
+plt.tight_layout()
+plt.savefig(OUT / "figure09_mcnemar.png", dpi=285)
+plt.close()
+print(f"figure 9  : {n_ns} paires indistinguables sur "
+      f"{n9 * (n9 - 1) // 2}")
+
+# --- 11 : intervalles de confiance bootstrap ------------------------------
+# Le bayesien naif est ecarte, comme dans la figure publiee : son intervalle
+# est a 0.53 et ecraserait les neuf autres sur un point.
+M11 = sorted((m for m in BOOT if m != "nb"),
+             key=lambda m: BOOT[m]["macro_f1_mean"])
+mu = [BOOT[m]["macro_f1_mean"] for m in M11]
+lo = [mu[i] - BOOT[m]["macro_f1_ci95"][0] for i, m in enumerate(M11)]
+hi = [BOOT[m]["macro_f1_ci95"][1] - mu[i] for i, m in enumerate(M11)]
+
+fig, ax = plt.subplots(figsize=(1655 / 285, 964 / 285))
+ax.errorbar(mu, range(len(M11)), xerr=[lo, hi], fmt="o", ms=6, capsize=3,
+            lw=1.4, color="#4a72b0")
+ax.set_yticks(range(len(M11)))
+ax.set_yticklabels(M11, fontsize=10)
+ax.set_xlabel("macro-F1 (95 % bootstrap CI, audited condition, seed 1)",
+              fontsize=10)
+ax.set_title("Stratified ranking: the top group is statistically "
+             "indistinguishable", fontsize=11)
+ax.grid(alpha=.3)
+ax.set_axisbelow(True)
+plt.tight_layout()
+plt.savefig(OUT / "figure11_bootstrap_ci.png", dpi=285)
+plt.close()
+bas = min(BOOT[m]["macro_f1_ci95"][0] for m in M11)
+print(f"figure 11 : {len(M11)} detecteurs, borne basse {bas:.4f} ({M11[0]})")
+
+print("\nles six figures sont ecrites dans", OUT)

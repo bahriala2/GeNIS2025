@@ -1,6 +1,6 @@
 # E8 — la condition auditée republiée sur la liste corrigée
 
-**`verify_e8.py` : 19 contrôles sur 19.** 180 runs sur 180.
+**`verify_e8.py` : 33 contrôles sur 33.** 180 runs sur 180, coût et tests appariés compris.
 
 ---
 
@@ -440,3 +440,89 @@ régnait, quel qu'il soit. Et la limite du FT-Transformer écrite en §5 — son
 rapportable comme une amélioration sur le chiffre publié — trouve ici un
 mécanisme plausible de plus : la sélection de noyaux cuDNN n'est pas la même
 d'un backend à l'autre.
+
+---
+
+## 13. Tout est mesuré. Ce que la republication complète a changé
+
+`e8ter` a remesuré le coût des deux conditions dans une seule session, sous
+les deux protocoles, modèles Keras épinglés au CPU. `e8quater` a calculé
+McNemar et le bootstrap **là où sont les 380 Mo de matrices** et n'en a
+rapporté que quelques kilo-octets. Les deux témoins passent.
+
+### Le témoin du coût, en deux lectures
+
+**La machine ressemble à celle du papier :** sept détecteurs sur dix
+retrouvent le Tableau 10 à 1,5× près sous le protocole du papier. Trois n'y
+sont pas — `lightgbm` (2,08×), `cnn` (2,06×), `knn` (0,30×) — et ceux-là ne
+sont pas comparables à la campagne publiée, seulement aux deux conditions
+mesurées ici.
+
+**Le protocole vaut de 1,0× à 10,7×.** Les plus gros gains vont au DNN
+(10,7×), à la forêt aléatoire (8,5×) et au CNN (4,5×) : exactement les
+détecteurs qui paient un surcoût par appel.
+
+### Ce qui débloque, et ce que ça change
+
+La colonne de débit du Tableau 10 est désormais **une vraie mesure amortie** —
+un appel sur 10 240 flux à taille de lot 512 — c'est-à-dire ce que sa légende
+annonçait déjà. L'ancienne bouclait vingt appels de 512 et payait le surcoût
+vingt fois, ce qui écrasait le débit de tout détecteur qui en a un.
+
+**Les deux colonnes deviennent alors informatives séparément, et elles
+classent différemment :**
+
+| | débit (lots) | latence p50 |
+|---|---|---|
+| 1 | logreg 601 449 | logreg 0,14 ms |
+| 2 | **rf 58 151** | xgboost 1,22 ms |
+| 3 | dnn 51 972 | lightgbm 1,55 ms |
+| 4 | xgboost 42 687 | knn 25,79 ms |
+| 5 | cnn 28 580 | **rf 55,16 ms** |
+
+La forêt aléatoire est le cas qui sépare les deux régimes : **deuxième sur le
+débit, 55 ms par flux**, soit 45 fois la latence médiane de XGBoost.
+
+### Trois affirmations de la §8 qui tombent
+
+- « **highest throughput among the accurate models** » pour XGBoost : faux, il
+  est **quatrième**. La régression logistique, la forêt aléatoire et le DNN
+  passent devant.
+- « **smallest latency tail among the tree ensembles** » pour XGBoost :
+  **c'était déjà faux avant cette republication**. Le Tableau 10 publié donne
+  LightGBM à 1,42 ms de p99 contre 4,66 à XGBoost. L'erreur ne doit rien à la
+  correction — elle était dans le manuscrit depuis le début, et aucun des
+  trois vérificateurs ne pouvait la voir : ils contrôlent la cohérence, le
+  style et la mise en page, pas la lecture d'un tableau.
+- « **a hundred times faster than the FT-Transformer** » : c'est **78 fois**.
+
+La recommandation est réécrite en conséquence, et elle est meilleure : elle
+distingue les deux régimes au lieu de les confondre. En lots, la régression
+logistique domine sans partage. À l'arrivée de chaque flux, XGBoost mène sur
+la médiane, LightGBM tient la queue plus serrée.
+
+### Deux erreurs que j'ai faites en écrivant cette section
+
+Elles sont notées parce que le contrôle qui les attrape est maintenant dans
+`verify_e8.py`, section G :
+
+- j'ai écrit que la forêt aléatoire était « avant-dernière en latence ». Elle
+  est **cinquième sur neuf** ;
+- j'ai écrit qu'« aucun détecteur ne mène les deux colonnes », et **la
+  régression logistique mène les deux**. Pire : le contrôle que j'avais écrit
+  pour vérifier cette phrase passait **à vide**, avec un `or True` dans sa
+  condition. Un contrôle qui ne peut pas échouer ne contrôle rien.
+
+Un rang est exactement le genre d'affirmation qu'on écrit de mémoire et qui
+devient faux dès que la mesure change. Ils sont tous recalculés désormais.
+
+### Figures 9 et 11
+
+Redessinées sur la condition corrigée depuis `stats.corrigee`. **11 paires
+restent indistinguables sur 45** sous Holm — le même nombre que sous la liste
+publiée, ce qui dit que la saturation du protocole stratifié survit à la
+correction. Le témoin : le bras publié rejoue la campagne du papier à
+**0,000768** près sur la moyenne bootstrap.
+
+Il ne reste **aucune figure sans script de régénération** parmi celles que la
+correction touche.

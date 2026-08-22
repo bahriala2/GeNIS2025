@@ -219,6 +219,86 @@ print("   stable du manuscrit, et sa legende le dit.")
 chk("l'amplification vient bien du calage, pas de l'ajustement",
     max(cal_t)[0] > e_bs, f"{max(cal_t)[0]:.4f} contre {e_bs:.4f}")
 
+# =========================================================================
+# G. Le cout, et les rangs que la section 8 annonce
+#
+# La section 8 nomme des rangs. Un rang est exactement le genre d'affirmation
+# qu'on ecrit de memoire et qui devient faux quand la mesure change : j'ai
+# publie « last but one on latency » pour la foret aleatoire, qui est
+# cinquieme sur neuf. Les rangs cites sont donc recalcules ici.
+# =========================================================================
+print("\n\nG. Le cout d'inference et les rangs de la section 8\n")
+CD = E["cout_deux_conditions"]
+PRECIS = ["xgboost", "lightgbm", "rf", "ftt", "logreg", "rnn", "cnn", "dnn",
+          "knn"]
+deb = {m: CD[f"{m}|corrigee"]["flux_s_amorti_10240"] for m in PRECIS}
+lat = {m: CD[f"{m}|corrigee"]["p50_ms"] for m in PRECIS}
+r_deb = [m for _, m in sorted(((-v, m) for m, v in deb.items()))]
+r_lat = [m for _, m in sorted(((v, m) for m, v in lat.items()))]
+print(f"   debit    {' > '.join(r_deb)}")
+print(f"   latence  {' < '.join(r_lat)}")
+
+chk("la regression logistique mene sur le debit", r_deb[0] == "logreg",
+    f"{deb['logreg']:.0f} f/s")
+chk("la foret aleatoire est 2e sur le debit", r_deb[1] == "rf")
+chk("XGBoost est 4e sur le debit, pas 1er", r_deb.index("xgboost") == 3)
+chk("XGBoost mene sur la latence hors regression logistique",
+    r_lat[:2] == ["logreg", "xgboost"], f"{lat['xgboost']:.2f} ms")
+chk("LightGBM a la queue la plus serree des trois ensembles d'arbres",
+    min(("rf", "xgboost", "lightgbm"),
+        key=lambda m: CD[f"{m}|corrigee"]["p99_ms"]) == "lightgbm",
+    "ce que la 8 attribuait a XGBoost, et qui etait deja faux "
+    "sur le tableau 10 publie")
+chk("la foret aleatoire est 5e sur neuf en latence",
+    r_lat.index("rf") == 4, "et non avant-derniere")
+# Les deux colonnes ne mesurent pas la meme propriete -- mais ca ne veut pas
+# dire qu'aucun detecteur ne mene les deux : la regression logistique mene
+# bien les deux. Ce qui le montre est le desaccord AILLEURS dans le
+# classement. J'avais d'abord ecrit ici un controle qui passait a vide, et
+# dans la 8 la phrase que ce controle aurait du contredire.
+tau = sum((deb[a] - deb[b]) * (lat[a] - lat[b]) > 0
+          for i, a in enumerate(PRECIS) for b in PRECIS[i + 1:])
+chk("la regression logistique mene les DEUX colonnes",
+    r_deb[0] == r_lat[0] == "logreg")
+chk("les deux colonnes classent differemment ailleurs",
+    r_deb[1:4] != r_lat[1:4],
+    f"debit {r_deb[1:4]} contre latence {r_lat[1:4]}")
+chk("le k-NN est 8e sur neuf en qualite temporelle",
+    sorted(PRECIS, key=lambda m: -mf(m, "corrigee", "temporal")).index("knn") == 7)
+
+# Le surcout par appel : ce que l'ancien protocole supprimait.
+gain = E["temoin_cout"]["gain_amorti"]
+forts = sorted(((g, m) for m, g in gain.items()), reverse=True)[:3]
+print(f"\n   amortir vaut le plus a : "
+      + ", ".join(f"{m} {g:.1f}x" for g, m in forts))
+chk("les plus gros gains sont des modeles a surcout par appel",
+    {m for _, m in forts} <= {"dnn", "cnn", "rnn", "ftt", "rf"})
+chk("les deux conditions sont mesurees dans la meme session",
+    len(E["temoin_cout"]["paires_completes"]) == 10)
+chk("les mesures Keras sont bien des mesures CPU",
+    E["gpu_visible_cout"] is False
+    or all(CD[f"{m}|{c}"].get("backend") == "CPU"
+           for m in ("ftt", "rnn", "cnn", "dnn")
+           for c in ("publiee", "corrigee")))
+
+# =========================================================================
+# H. McNemar et bootstrap, calcules dans Colab et rapportes ici
+# =========================================================================
+print("\n\nH. Les deux tests apparies\n")
+S = E["stats"]
+n_ns = sum(1 for v in S["corrigee"]["mcnemar_holm"].values() if v >= .05)
+print(f"   {n_ns} paires indistinguables sur "
+      f"{len(S['corrigee']['mcnemar_holm'])}, condition corrigee")
+chk("le bras publie rejoue la campagne du papier",
+    E["temoin_stats"]["valide"],
+    f"ecart max {E['temoin_stats']['ecart_max_bootstrap']:.6f} sur la "
+    f"moyenne bootstrap ({E['temoin_stats']['pire']})")
+BT = S["corrigee"]["bootstrap"]
+chk("les intervalles bootstrap encadrent les moyennes a cinq graines",
+    all(BT[m]["macro_f1_ci95"][0] <= RUNS[f"{m}|corrigee|strat_seed1"]["macro_f1"]
+        <= BT[m]["macro_f1_ci95"][1] for m in PRECIS),
+    "graine 1, la graine sur laquelle le bootstrap est tire")
+
 manq = [f"{c}|{v}|{p}" for c in CFG for v in ("publiee", "corrigee")
         for p in ["temporal"] + [f"strat_seed{s}" for s in range(1, 6)]
         if f"{c}|{v}|{p}" not in RUNS]

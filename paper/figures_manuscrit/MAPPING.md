@@ -33,7 +33,7 @@ entered at 15, 16 and 19. If you are reading an older draft, this table is the m
 | 6 | `figure06_importance_vs_transferability.png` | **none** | none, see below |
 | 7 | `figure07_transferability_plane.png` | `fig8_transferability.png` | regen_en.py |
 | 8 | `figure08_transferability_spectrum.png` | `fig6_spectrum_both.png` | regen_fig6.py |
-| 9 | `figure09_mcnemar.png` | **none** | none, see below |
+| 9 | `figure09_mcnemar.png` | **none** | regen_e8_figures.py |
 | 10 | `figure10_conditions_protocols.png` | `fig2_before_after.png` | regenerate_figures.py |
 | 11 | `figure11_bootstrap_ci.png` | `fig7_ranking_ci.png` | regenerate_figures.py |
 | 12 | `figure12_intervals_per_class.png` | `fig3_interval_heatmap.png` | regen_en.py |
@@ -52,17 +52,17 @@ Figures 2, 6, 9, 14 and 18 were rendered while the native Word document was bein
 built and were never written back to `paper/figures/`. The images here are the ones
 the manuscript shows, extracted from the document itself, so nothing is lost.
 
-**Two of the five now have one.** `regen_e8_figures.py` draws Figures 14 and 18 (and
-redraws 5 and 10) on the audited condition as corrected in Section 9. Figure 14 is
-the mixed case: its quality axis comes from `experiments/e8/e8_results.json` over 54
-columns, its throughput axis from `article1_results.json` `cost.<model>.throughput_512`
-over 55, measured before the correction and not re-measured. The caption says so.
+**Three of the five now have one.** `regen_e8_figures.py` draws Figures 9, 14 and 18
+(and redraws 5, 10 and 11) on the audited condition as corrected in Section 9. Both of
+Figure 14's axes now come from the same session and the same condition.
 
-**Three remain: 2, 6 and 9.** Figure 9 (pairwise McNemar) needs the stored probability
-matrices, which are not committed — as does redrawing Figure 11 on the corrected
-condition, though that one does have a script. Figure 2 (class distribution) and
-Figure 6 (importance versus transferability) read only `article1_results.json` and
-could be scripted at any time; that is the gap left to close.
+Figures 9 and 11 need the pairwise tests, which need the probability matrices — 380 MB
+that cannot leave Colab. They did not have to: `colab/e8quater_stats_mcnemar_bootstrap.py`
+computes them there and returns 45 p-values, 45 corrected, ten means and ten intervals,
+under `stats` in `e8_results.json`. That is what these two figures read.
+
+**Two remain: 2 and 6.** Both read only `article1_results.json` and could be scripted at
+any time; that is the gap left to close.
 
 ## Captions
 
