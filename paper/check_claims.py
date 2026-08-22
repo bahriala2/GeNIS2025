@@ -239,6 +239,77 @@ chk("la figure 14 donne le bon rapport de debit",
     f"{rap:,}".replace(",", " ") in f14 or str(rap) in f14, f"{rap}")
 
 # =========================================================================
+# D. Les sections 1 a 6, ce que la seconde relecture y a trouve
+# =========================================================================
+print("\nD. Les affirmations des sections 1 a 6\n")
+
+# Le bras regle : six detecteurs n'ont pas de configuration adoptee, et leur
+# bras regle EST leur bras par defaut. Le dire « inerte » les confond avec
+# ceux que la recherche a bel et bien touches.
+INERTES = [c for c in ("xgboost", "lightgbm", "rf", "ftt", "rnn", "cnn")
+           if c not in adopte]
+p65 = prose("Hyperparameter tuning is similarly inert where it matters")
+chk(f"la 6.5 dit que {len(INERTES)} detecteurs n'ont recu aucune configuration",
+    "the search adopted no configuration at all for any of them" in p65,
+    f"{INERTES}")
+g_nb = moy("nb#tuned") - moy("nb")
+chk("la 6.5 donne le bon gain du bayesien naif",
+    f"{g_nb:+.4f}" in p65, f"{g_nb:+.4f}")
+
+# Le calage sous protocole temporel : il ameliore les uns et aggrave les
+# autres, et le compte doit suivre la mesure.
+CAL = ("xgboost", "lightgbm", "rf", "ftt", "logreg", "rnn", "cnn", "dnn",
+       "knn", "nb", "majority")
+mieux = [m for m in CAL
+         if R8[f"{m}|corrigee|temporal"]["ece_calibree"]
+         < R8[f"{m}|corrigee|temporal"]["ece"]]
+MOTS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight",
+        "nine", "ten", "eleven"]
+pcal = prose("Temperature scaling is no longer inert under the temporal")
+chk(f"la 6.5 compte {len(mieux)} ameliorations et {len(CAL) - len(mieux)} "
+    "aggravations",
+    f"improves {MOTS[len(mieux)]} of the eleven detectors and worsens "
+    f"{MOTS[len(CAL) - len(mieux)]}" in pcal)
+chk("la 6.5 ne dit plus que le calage repare le FT-Transformer",
+    "repairs the FT-Transformer decisively" not in pcal,
+    f"{R8['ftt|corrigee|temporal']['ece']:.4f} -> "
+    f"{R8['ftt|corrigee|temporal']['ece_calibree']:.4f}")
+
+# Les bornes de la 6.4. Une borne qui ne tient qu'a l'arrondi n'est pas une
+# borne : la cellule DoS la plus basse de la figure 12 vaut 0.99287.
+CL = A["slice60"]["classes"]
+DOS = [c for c in CL if c.startswith("dos-")]
+
+
+def lgbm(iv, s):
+    return (A["intervals"][iv]["runs"].get(f"lightgbm|seed{s}")
+            or E5[f"{iv}|lightgbm|seed{s}"])
+
+
+bas = min(st.mean(lgbm(iv, s)["per_class_f1"][c] for s in (1, 2, 3))
+          for iv in ("5", "10", "30") for c in DOS)
+p12 = prose("Figure 12 resolves this by family")
+m = re.search(r"never falling below (0\.\d+)", p12)
+chk("la 6.4 borne les familles DoS sous leur minimum reel",
+    m and float(m.group(1)) <= bas, f"minimum {bas:.5f}, borne {m.group(1)}")
+
+fpr = max(lgbm("10", s)["binary"]["fpr"] for s in (1, 2, 4, 5))
+p64 = prose("Table 6 gives the effect on detection")
+chk("la 6.4 borne le FPR des quatre autres graines au-dessus du reel",
+    f"{100 * fpr:.4f}%" in p64, f"{100 * fpr:.4f}%")
+
+# Figure 2 : trois parts qui doivent sommer a 100 a la precision affichee.
+cnt = A["slice60"]["class_counts"]
+n = A["slice60"]["n"]
+parts = {"dos": sum(v for k, v in cnt.items() if k.startswith("dos-")),
+         "benign": cnt["benign"],
+         "bf": sum(v for k, v in cnt.items() if k.startswith("bruteforce-"))}
+f2 = prose("Figure 2. Class distribution of the 60-second slice")
+aff = [float(x) for x in re.findall(r"(\d+\.\d+)%", f2)]
+chk("les trois parts de la figure 2 somment a 100 comme affichees",
+    abs(sum(aff[:3]) - 100) < 0.005, f"{aff[:3]} -> {sum(aff[:3]):.2f}")
+
+# =========================================================================
 print()
 if ecarts:
     print(f"{len(ecarts)} ecart(s) entre la prose et les donnees :")

@@ -33,6 +33,16 @@ FAUTES = [
      "2 600 times the throughput"),
     ("6.3 : le CNN perd au reglage",
      "logistic regression inverts the same way", "the CNN loses 0.0067 despite no"),
+    ("6.4 : borne DoS a 0.993", "never falling below 0.992",
+     "never falling below 0.993"),
+    ("6.4 : FPR a 0.01 %", "against 0.0143% at worst for",
+     "against at most 0.01% for"),
+    ("6.5 : nb gagne +0.1668", "naive Bayes gains +0.0462",
+     "naive Bayes gains +0.1668"),
+    ("6.5 : le calage repare le ftt", "The clearest repair is k-NN",
+     "It repairs the FT-Transformer decisively"),
+    ("figure 2 : 87.3 %", "floods account for 87.26% of the flows",
+     "floods account for 87.3% of the flows"),
 ]
 ok = []
 for nom, bon, casse in FAUTES:
