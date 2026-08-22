@@ -4728,5 +4728,6 @@
   "valide": false,
   "mesure": "ecart maximal sur T contre le tableau 7 publie",
   "perime": "Ce controle portait sur T, un parametre intermediaire pose sur une surface plate, et le comparait au tableau 7 publie dont le T du bayesien naif (5.821) est hors de la grille, bornee a 5. Les 0.821 sont donc entierement un plafond de grille. Le controle valide est verify_e8.py section F : il compare l'ECE APRES calage a E3-A et ecarte les T poses sur une borne."
- }
+ },
+ "cout_corrige_note": "Mesure de la cellule 10, condition corrigee. Le backend n'y est pas trace, et Colab n'attribue un GPU que quand il en a un de libre : les quatre modeles Keras ont donc pu etre mesures sur GPU alors que le tableau 10 annonce un cout CPU. L'indice est le FT-Transformer, a 5758 flux/s ici contre 430 au papier et 464 remesures sur CPU ; apres deduction de l'amortissement des appels, il reste 10.3x inexplique. La latence a une ligne ne permet PAS de trancher : le manuscrit etablit qu'elle est dominee par un surcout fixe d'API, donc elle reste vers 65-80 ms des deux cotes. Remplacee par cout_deux_conditions, qui epingle tf.device('/CPU:0') et trace son backend."
 }

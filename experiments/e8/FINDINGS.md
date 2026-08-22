@@ -385,3 +385,58 @@ du papier retrouve l'ordre de grandeur du Tableau 10, l'écart est bien le
 protocole et la colonne amortie peut le remplacer ; sinon la machine diffère,
 les deux conditions restent comparables entre elles et rien ne peut être
 comparé à la campagne publiée.
+
+---
+
+## 12. Le GPU intermittent de Colab, et ce qu'il a contaminé
+
+Colab attribue un GPU quand il en a un de libre, et pas autrement. La campagne
+E8 a donc tourné tantôt sur GPU, tantôt sur CPU seul, **sans que rien ne le
+consigne**. C'est l'explication qui manquait au FT-Transformer.
+
+### L'indice, et pourquoi il a fallu deux essais pour le lire
+
+La cellule 10 donne `ftt` à **5 758 flux/s** ; le papier a 430, et une mesure
+CPU refaite aujourd'hui donne 464. J'avais d'abord écarté l'hypothèse GPU en
+regardant la latence à une ligne : 65 ms dans la cellule 10, donc « pas un
+GPU ». **C'était un mauvais raisonnement, et le manuscrit contenait déjà de
+quoi le savoir** — la §8 établit que cette latence est dominée par un surcoût
+fixe de l'API de prédiction, donc elle reste vers 65–80 ms sur GPU comme sur
+CPU. Elle ne discrimine rien.
+
+Ce qui discrimine est le débit par lots. Une fois l'amortissement des appels
+déduit — mesuré, pas supposé :
+
+| | papier (CPU) | e8ter (CPU) | cellule 10 | amortissement seul | reste |
+|---|---:|---:|---:|---:|---:|
+| `ftt` | 430 | 464 | 5 758 | 557 | **10,3×** |
+| `rnn` | 3 803 | 4 744 | 14 937 | 7 590 | 2,0× |
+| `cnn` | 3 134 | 3 812 | 21 770 | 28 590 | 0,8× |
+| `dnn` | 5 269 | 6 693 | 15 242 | 46 851 | 0,3× |
+
+Dix fois de trop sur le FT-Transformer, et des restes incohérents entre les
+quatre — la signature d'une session où le backend n'était pas le même partout.
+
+### Ce qui est corrigé
+
+`colab/e8ter_cout_deux_conditions.py` épingle désormais
+`tf.device("/CPU:0")` autour de la **mesure** des modèles Keras — l'ajustement
+peut rester où il est rapide, c'est un coût d'inférence qu'on rapporte — comme
+le fait le pipeline publié, qui avait cette précaution et dont la cellule 10
+s'était écartée. Chaque mesure porte `"backend": "CPU"`, la présence d'un GPU
+est consignée, et toute mesure Keras antérieure à cet épinglage est refaite
+plutôt que crue sur parole.
+
+`cout_corrige` garde ses chiffres — c'est ce que la cellule a produit — avec
+une note qui dit ce qui n'y est pas tracé.
+
+### Ce que ça vaut pour le reste de la campagne
+
+Rien de ce qui touche à la **détection** n'est en cause : la bande de
+reproductibilité intra-session (§2) a été mesurée par trois ajustements
+identiques dans une même session, donc elle capture déjà le backend qui y
+régnait, quel qu'il soit. Et la limite du FT-Transformer écrite en §5 — son
+écart de 0,0187 au papier dépasse l'effet de 0,0122, donc le gain n'est pas
+rapportable comme une amélioration sur le chiffre publié — trouve ici un
+mécanisme plausible de plus : la sélection de noyaux cuDNN n'est pas la même
+d'un backend à l'autre.

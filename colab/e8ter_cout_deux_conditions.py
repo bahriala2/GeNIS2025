@@ -53,6 +53,38 @@ warnings.filterwarnings("ignore", message=".*does not have valid feature names.*
 N_LOTS, TAILLE, N_LAT = 20, 512, 200
 COUT = STATE.setdefault("cout_deux_conditions", {})
 
+# --- le CPU, et pourquoi il faut l'epingler --------------------------------
+# Colab donne un GPU quand il en a un de libre, et pas autrement. Le tableau
+# 10 annonce "single-host CPU inference cost" : une mesure faite sur GPU n'y a
+# pas sa place, et melangee a des mesures CPU elle est pire qu'inutile.
+#
+# On ne peut PAS s'en remettre a la latence a une ligne pour reperer apres
+# coup une mesure faite sur GPU : le manuscrit etablit lui-meme que cette
+# latence est dominee par un surcout fixe de l'API de prediction, donc elle
+# reste aux alentours de 65-80 ms des deux cotes. C'est le debit par lots qui
+# separe les deux, et il n'a pas de valeur de reference a laquelle le comparer.
+# D'ou : on epingle, on trace, et on ne devine pas.
+#
+# Le pipeline publie fait pareil (article1_pipeline.ipynb : les modeles
+# profonds sont mesures sous with tf.device("/CPU:0")).
+GPU_VU = bool(tf.config.list_physical_devices("GPU"))
+STATE["gpu_visible_cout"] = GPU_VU
+print("GPU visible :", "OUI — les mesures Keras seront tout de meme faites "
+      "sur CPU" if GPU_VU else "non")
+
+# Les mesures faites avant cet epinglage ne portent pas la trace de leur
+# backend. Pour les modeles Keras, c'est exactement la ou le doute porte : on
+# les refait. Quelques minutes, et plus aucune ambiguite.
+PROFONDS = {"rnn", "cnn", "dnn", "ftt"}
+_a_refaire = [k for k, v in COUT.items()
+              if k.split("|")[0].split("#")[0] in PROFONDS
+              and v.get("backend") != "CPU"]
+for k in _a_refaire:
+    del COUT[k]
+if _a_refaire:
+    print(f"{len(_a_refaire)} mesure(s) Keras refaites, backend non trace :",
+          ", ".join(sorted(_a_refaire)))
+
 
 def prepare(liste):
     """Les trois matrices mises a l'echelle sur les colonnes demandees."""
@@ -126,8 +158,15 @@ for cond in ("publiee", "corrigee"):
                     return _net.predict(shape_for(_n, A), batch_size=TAILLE,
                                         verbose=0)
 
-            r = mesure(predit, Xte)
+            if nom in SK:
+                r = mesure(predit, Xte)
+            else:
+                # Ajustement la ou c'est rapide, mesure sur CPU : c'est un
+                # cout CPU qu'on rapporte, pas une vitesse d'entrainement.
+                with tf.device("/CPU:0"):
+                    r = mesure(predit, Xte)
             r["n_features"] = len(COLS[cond])
+            r["backend"] = "CPU"
             COUT[cle] = r
             print(f"{cle:<24}{r['p50_ms']:>9.2f}"
                   f"{r['flux_s_boucle_512']:>12.0f}"
