@@ -104,7 +104,7 @@ indépendantes.
 | 19 | Kapoor & Narayanan, *Patterns* 4 (9) (2023) 100804 | **confirmée** — Cell Press `S2666-3899(23)00159-9`, PubMed 37720327 |
 | 20 | Aas, Jullum, Løland, *Artificial Intelligence* 298 (2021) 103502 | **confirmée** — ACM DL sur le DOI, ScienceDirect `S0004370221000539` |
 | 29 | Minderer et al., NeurIPS 2021 | **confirmée** — huit auteurs dans l'ordre exact des actes |
-| 34 | Snoek et al., NeurIPS 2019 | **confirmée**, avec une réserve à connaître |
+| 34 | Snoek et al., NeurIPS 2019 | **confirmée** ; identifiant arXiv retiré, voir plus bas |
 
 ## La seule erreur, et ce qu'elle était
 
@@ -131,11 +131,14 @@ entre le préprint et les actes** :
   Lakshminarayanan, Snoek.
 
 Le manuscrit suit **l'ordre des actes**, qui est le bon puisque c'est les
-actes qu'il cite. Mais il donne aussi l'identifiant arXiv dans la même entrée,
-et un relecteur qui suit ce lien verra un premier auteur différent. Deux
-options défendables : retirer l'identifiant arXiv de cette entrée seule, ou le
-garder en sachant que la question peut être posée. Rien à corriger dans
-l'état.
+actes qu'il cite. Mais il donnait aussi l'identifiant arXiv dans la même
+entrée, et un relecteur qui suit ce lien voit un premier auteur différent de
+celui qu'il vient de lire. **L'identifiant a été retiré de cette entrée.**
+
+Les autres entrées gardent le leur — [5], [6], [12], [29] et [30] — parce
+qu'aucune n'a cet écart. Vérifié pour la [29] : Minderer, Djolonga,
+Romijnders, Hubis, Zhai, Houlsby, Tran, Lucic, dans le même ordre des deux
+côtés. L'asymétrie n'est donc pas un oubli de mise en forme, elle a un motif.
 
 ## Ce qui reste hors de portée
 
