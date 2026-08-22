@@ -20,7 +20,7 @@ Cette précaution n'est pas théorique : sur Rosay et al., la reconstruction par
 donnait la bonne liste de paires dupliquées mais la mauvaise attribution, et seule la
 lecture du PDF l'a corrigée.
 
-## Les six références ajoutées
+## Les sept références ajoutées
 
 | # | Référence | Manque comblé | Placement | Vérification |
 |---|---|---|---|---|
@@ -83,3 +83,64 @@ par Kapoor & Narayanan et par les entrées existantes. Un traitement vraiment sy
 supposerait une recherche bibliographique avec accès aux bases, que l'environnement ne
 permet pas. **Une passe sur Scopus ou Web of Science côté auteurs reste nécessaire avant
 soumission**, et les sept entrées ci-dessus doivent y être recontrôlées.
+
+---
+
+# Vérification des sept entrées — faite
+
+La recherche web fonctionne dans cet environnement même quand les notices
+éditeur sont bloquées : `doi.org`, `dblp.org` et `papers.nips.cc` refusent la
+connexion, mais l'index de recherche restitue les notices. Les sept entrées
+ont donc été recontrôlées ici, chacune contre au moins deux sources
+indépendantes.
+
+## Résultat
+
+| # | Entrée | Verdict |
+|---|---|---|
+| 10 | Rosay et al., ICISSP 2022, pp. 25–36 | **confirmée** — SciTePress 107740, HAL hal-03563228, researchr `RosayCCL22` |
+| 13 | Goldschmidt & Chudá, *Computers & Security* 156 (2025) 104510 | **confirmée** — ScienceDirect `S0167404825001993`, dépôt officiel des auteurs |
+| 14 | Cantone, Marrocco, Bria, *IEEE Access* 12 (2024) 144489–144508 | **corrigée — le titre était celui du préprint** |
+| 19 | Kapoor & Narayanan, *Patterns* 4 (9) (2023) 100804 | **confirmée** — Cell Press `S2666-3899(23)00159-9`, PubMed 37720327 |
+| 20 | Aas, Jullum, Løland, *Artificial Intelligence* 298 (2021) 103502 | **confirmée** — ACM DL sur le DOI, ScienceDirect `S0004370221000539` |
+| 29 | Minderer et al., NeurIPS 2021 | **confirmée** — huit auteurs dans l'ordre exact des actes |
+| 34 | Snoek et al., NeurIPS 2019 | **confirmée**, avec une réserve à connaître |
+
+## La seule erreur, et ce qu'elle était
+
+**[14] portait deux titres à la fois.** Le manuscrit citait *On the
+cross-dataset generalization of machine learning for network intrusion
+detection*, qui est le titre du **préprint** arXiv:2402.10974, avec le volume
+et les pages de la **revue**. Le titre publié dans *IEEE Access* est *Machine
+learning in network intrusion detection: A cross-dataset generalization
+study* (dblp `journals/access/CantoneMB24`). Auteurs, volume et pages étaient
+justes ; seul le titre venait de l'autre version. Corrigé.
+
+C'est exactement le défaut qu'une passe bibliographique existe pour attraper :
+rien dans le manuscrit ne pouvait le signaler, puisque l'entrée est
+parfaitement cohérente avec elle-même.
+
+## La réserve sur [34], qui n'est pas une erreur
+
+L'ordre des auteurs de *Can you trust your model's uncertainty?* **diffère
+entre le préprint et les actes** :
+
+- **actes NeurIPS 2019** : Snoek, Ovadia, Fertig, Lakshminarayanan, Nowozin,
+  Sculley, Dillon, Ren, Nado ;
+- **arXiv:1906.02530** : Ovadia, Fertig, Ren, Nado, Sculley, Nowozin, Dillon,
+  Lakshminarayanan, Snoek.
+
+Le manuscrit suit **l'ordre des actes**, qui est le bon puisque c'est les
+actes qu'il cite. Mais il donne aussi l'identifiant arXiv dans la même entrée,
+et un relecteur qui suit ce lien verra un premier auteur différent. Deux
+options défendables : retirer l'identifiant arXiv de cette entrée seule, ou le
+garder en sachant que la question peut être posée. Rien à corriger dans
+l'état.
+
+## Ce qui reste hors de portée
+
+La confirmation contre **Scopus ou Web of Science** reste utile pour un motif
+que cette passe ne couvre pas : ces deux bases sont celles que les éditeurs et
+les comités de thèse interrogent, et une entrée absente de leur index est un
+problème même si elle est parfaitement exacte. Les sept entrées ci-dessus sont
+désormais exactes ; ce qui n'est pas établi, c'est leur indexation.
