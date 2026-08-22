@@ -37,8 +37,9 @@ FAUTES = [
      "never falling below 0.993"),
     ("6.4 : FPR a 0.01 %", "against 0.0143% at worst for",
      "against at most 0.01% for"),
-    ("6.5 : nb gagne +0.1668", "naive Bayes gains +0.0462",
-     "naive Bayes gains +0.1668"),
+    # La 6.5 ouvre desormais une phrase sur ce chiffre, d'ou la majuscule.
+    ("6.5 : nb gagne +0.1668", "Naive Bayes gains +0.0462",
+     "Naive Bayes gains +0.1668"),
     ("6.5 : le calage repare le ftt", "The clearest repair is k-NN",
      "It repairs the FT-Transformer decisively"),
     ("figure 2 : 87.3 %", "floods account for 87.26% of the flows",
