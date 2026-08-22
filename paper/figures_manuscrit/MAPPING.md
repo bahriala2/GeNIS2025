@@ -26,11 +26,11 @@ entered at 15, 16 and 19. If you are reading an older draft, this table is the m
 | Figure | File in this folder | Source in `paper/figures/` | Script |
 |---|---|---|---|
 | 1 | `figure01_argument_chain.png` | `fig_concept.png` | regen_fig_concept.py |
-| 2 | `figure02_class_distribution.png` | **none** | none, see below |
+| 2 | `figure02_class_distribution.png` | **none** | regen_figures_2_6.py |
 | 3 | `figure03_capture_windows.png` | `fig1_timeline.png` | regen_en.py |
 | 4 | `figure04_partition_schemes.png` | `fig_protocols.png` | regen_fig_protocols.py |
 | 5 | `figure05_per_class_f1_audited.png` | `fig6_per_class_f1.png` | regen_en.py |
-| 6 | `figure06_importance_vs_transferability.png` | **none** | none, see below |
+| 6 | `figure06_importance_vs_transferability.png` | **none** | regen_figures_2_6.py |
 | 7 | `figure07_transferability_plane.png` | `fig8_transferability.png` | regen_en.py |
 | 8 | `figure08_transferability_spectrum.png` | `fig6_spectrum_both.png` | regen_fig6.py |
 | 9 | `figure09_mcnemar.png` | **none** | regen_e8_figures.py |
@@ -42,27 +42,35 @@ entered at 15, 16 and 19. If you are reading an older draft, this table is the m
 | 15 | `figure15_rolling_origins.png` | `figE4b_origines.png` | regen_e4b.py |
 | 16 | `figure16_leave_one_family_out.png` | `figE4b_lofo.png` | regen_e4b.py |
 | 17 | `figure17_cicids2017_audit.png` | `figE2_cicids2017_audit.png` | regen_e2.py |
-| 18 | `figure18_per_class_f1_temporal.png` | **none** | none, see below |
+| 18 | `figure18_per_class_f1_temporal.png` | **none** | regen_e8_figures.py |
 | 19 | `figure19_threshold_cost.png` | `figE4c_seuil.png` | regen_e4c.py |
 | 20 | `figure20_horizons.png` | `figE4_horizons.png` | regen_e4.py |
 
-## The figures with no script
+## Every figure now has a regeneration script
 
 Figures 2, 6, 9, 14 and 18 were rendered while the native Word document was being
-built and were never written back to `paper/figures/`. The images here are the ones
-the manuscript shows, extracted from the document itself, so nothing is lost.
+built and were never written back to `paper/figures/`, so the column above records **none**
+as their source. That is a statement about where the original image came from, not about
+whether one can be produced today: each of the five now has a script, and the images in this
+folder are what those scripts draw.
 
-**Three of the five now have one.** `regen_e8_figures.py` draws Figures 9, 14 and 18
-(and redraws 5, 10 and 11) on the audited condition as corrected in Section 9. Both of
-Figure 14's axes now come from the same session and the same condition.
+`regen_e8_figures.py` draws 9, 14 and 18 (and redraws 5, 10 and 11) on the audited condition
+as corrected in Section 9. `regen_figures_2_6.py` draws 2 and 6 from `article1_results.json`
+alone.
 
-Figures 9 and 11 need the pairwise tests, which need the probability matrices — 380 MB
-that cannot leave Colab. They did not have to: `colab/e8quater_stats_mcnemar_bootstrap.py`
-computes them there and returns 45 p-values, 45 corrected, ten means and ten intervals,
-under `stats` in `e8_results.json`. That is what these two figures read.
+Redrawing the last two corrected three errors the images carried:
 
-**Two remain: 2 and 6.** Both read only `article1_results.json` and could be scripted at
-any time; that is the gap left to close.
+- Figure 2 gave 5 029 benign test flows. The smallest non-zero false-positive rate in the
+  whole campaign is exactly 1/5030, so the partition holds 5 030 — which the caption and
+  Sections 4.5 and 9 already said.
+- Figure 2's title rounded one of three shares to a coarser precision than the other two, so
+  the three displayed values summed to 100.04.
+- Figure 6 drew `IdleTime` in the colour reserved for retained columns. Section 9 excludes it,
+  and it now carries its own marker, because it is excluded by a criterion neither of the
+  other two reaches.
+
+This matters beyond tidiness: the contributions list in Section 1 promises "the scripts
+regenerating every figure and table", and until now that sentence was false.
 
 ## Captions
 
