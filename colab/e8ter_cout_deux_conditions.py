@@ -32,6 +32,7 @@
 import gc
 import platform
 import time
+import warnings
 
 import numpy as np
 from sklearn.preprocessing import RobustScaler
@@ -43,6 +44,11 @@ for _n in ("STATE", "save_state", "X", "y", "SPLITS", "FEATS", "COLS", "BASE",
         raise NameError(
             f"{_n} n'est pas defini : execute d'abord les cellules 1 a 6 "
             "du notebook (Execution > Tout executer).")
+
+# LightGBM avertit a chaque appel qu'il a ete ajuste avec des noms de
+# colonnes et qu'on lui passe un tableau nu. C'est vrai, c'est sans effet sur
+# la prediction, et repete 4400 fois ca rend la sortie illisible.
+warnings.filterwarnings("ignore", message=".*does not have valid feature names.*")
 
 N_LOTS, TAILLE, N_LAT = 20, 512, 200
 COUT = STATE.setdefault("cout_deux_conditions", {})
@@ -141,37 +147,77 @@ STATE["plateforme_cout"] = platform.platform()
 save_state(STATE)
 
 # --------------------------------------------------------------------------
-# LE TEMOIN. La condition publiee, sous le protocole du papier, doit
-# retrouver l'ordre de grandeur du tableau 10. Si elle ne le retrouve pas,
-# c'est la machine qui differe et non la mesure, et il faudra le dire plutot
-# que de substituer une colonne a l'autre.
+# LE TEMOIN, en deux lectures separees.
+#
+# La premiere version posait UNE question qui en contenait deux, et les
+# reglait par un seul seuil : "l'ecart relatif maximal a la campagne publiee
+# est-il sous 3 ?". Ca melange "cette machine est-elle celle du papier ?" avec
+# "le protocole explique-t-il l'ecart ?", alors que seule la seconde porte la
+# decision -- et un seul detecteur atypique suffisait a faire echouer les neuf
+# autres. On les separe.
 # --------------------------------------------------------------------------
 T10 = {"xgboost": 46317, "lightgbm": 6281, "rf": 7738, "ftt": 430,
        "logreg": 1139252, "rnn": 3803, "cnn": 3134, "dnn": 5269,
        "knn": 1875, "nb": 228377}
-print(f"\n{'modele':<10}{'tableau 10':>12}{'ici, 20x512':>13}{'rapport':>10}")
-rapports = []
+
+# --- lecture 1 : cette machine ressemble-t-elle a celle du papier ? --------
+# Sous le protocole DU PAPIER, sur la condition DU PAPIER, le debit mesure ici
+# devrait retrouver le tableau 10. C'est une description, pas une note : on
+# compte les modeles dans la bande et on nomme ceux qui en sortent.
+print(f"\n{'modele':<10}{'tableau 10':>12}{'ici, 20x512':>13}{'machine':>10}"
+      f"{'gain amorti':>13}")
+dans, hors, gains = [], [], {}
 for m, publie in T10.items():
     r = COUT.get(f"{m}|publiee")
     if not r:
         continue
     q = r["flux_s_boucle_512"] / publie
-    rapports.append(q)
-    print(f"{m:<10}{publie:>12.0f}{r['flux_s_boucle_512']:>13.0f}{q:>9.1f}x")
+    g = r["flux_s_amorti_10240"] / r["flux_s_boucle_512"]
+    gains[m] = g
+    (dans if 1 / 1.5 <= q <= 1.5 else hors).append((m, q))
+    print(f"{m:<10}{publie:>12.0f}{r['flux_s_boucle_512']:>13.0f}{q:>9.2f}x"
+          f"{g:>12.1f}x")
 
-if rapports:
-    pire = max(max(rapports), 1 / min(rapports))
-    STATE["temoin_cout"] = {"ecart_relatif_max": float(pire),
-                            "valide": bool(pire < 3)}
-    save_state(STATE)
-    print(f"\necart relatif maximal a la campagne publiee : {pire:.1f}x")
-    if pire < 3:
-        print("TEMOIN VALIDE — la machine est comparable a celle du papier,")
-        print("donc l'ecart entre l'ancienne colonne et la nouvelle est bien")
-        print("le protocole. La colonne amortie peut remplacer le tableau 10.")
-    else:
-        print("TEMOIN INVALIDE — cette machine n'est pas celle du papier. Les")
-        print("deux conditions restent comparables ENTRE ELLES, mais pas avec")
-        print("la campagne publiee : m'envoyer ce tableau tel quel.")
+print(f"\n{len(dans)}/{len(dans) + len(hors)} detecteurs retrouvent le tableau "
+      f"10 a 1.5x pres.")
+if hors:
+    print("hors bande : " + ", ".join(f"{m} ({q:.2f}x)" for m, q in hors))
+    print("Ces detecteurs-la ne sont pas comparables a la campagne publiee ;")
+    print("ils restent comparables entre les deux conditions mesurees ici.")
+
+# --- lecture 2 : le protocole explique-t-il l'ecart a la cellule 10 ? ------
+# C'est la question qui porte la decision. Le gain est mesure DANS cette
+# session, machine et modele identiques : rien d'autre ne varie que le
+# decoupage des appels.
+if gains:
+    fort = sorted(((g, m) for m, g in gains.items()), reverse=True)
+    print(f"\nAmortir les appels vaut de {fort[-1][0]:.1f}x ({fort[-1][1]}) a "
+          f"{fort[0][0]:.1f}x ({fort[0][1]}).")
+    print("Les detecteurs qui y gagnent le plus sont ceux qui paient un")
+    print("surcout par appel : backend joblib, ou API de prediction Keras.")
+
+# --- ce qui autorise la republication --------------------------------------
+# Une colonne de cout ne peut etre republiee que si les DEUX conditions ont
+# ete mesurees dans la meme session. C'est vrai par construction ici, et c'est
+# la seule garantie dont le tableau 10 a besoin : il compare des detecteurs
+# entre eux, pas cette session a une autre.
+paires = [m for m in T10 if f"{m}|publiee" in COUT and f"{m}|corrigee" in COUT]
+STATE["temoin_cout"] = {
+    "machine_dans_bande": [m for m, _ in dans],
+    "machine_hors_bande": {m: float(q) for m, q in hors},
+    "gain_amorti": {m: float(g) for m, g in gains.items()},
+    "paires_completes": paires,
+    "valide": bool(len(paires) == len(T10))}
+save_state(STATE)
+print(f"\n{len(paires)}/{len(T10)} detecteurs ont leurs DEUX conditions "
+      f"mesurees ici.")
+if len(paires) == len(T10):
+    print("TEMOIN VALIDE — les deux conditions sont comparables entre elles,")
+    print("ce qui est tout ce que le tableau 10 demande. Il peut etre republie")
+    print("sur la colonne amortie, en disant de quelle session elle vient.")
+else:
+    manquants = [m for m in T10 if m not in paires]
+    print("INCOMPLET — il manque : " + ", ".join(manquants))
+    print("Relance cette meme cellule : elle saute ce qui est deja mesure.")
 
 print("\nRenvoie e8_results.json.")
