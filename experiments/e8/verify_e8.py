@@ -242,8 +242,23 @@ chk("la regression logistique mene sur le debit", r_deb[0] == "logreg",
     f"{deb['logreg']:.0f} f/s")
 chk("la foret aleatoire est 2e sur le debit", r_deb[1] == "rf")
 chk("XGBoost est 4e sur le debit, pas 1er", r_deb.index("xgboost") == 3)
-chk("XGBoost mene sur la latence hors regression logistique",
-    r_lat[:2] == ["logreg", "xgboost"], f"{lat['xgboost']:.2f} ms")
+# Ce controle disait d'abord « XGBoost mene sur la latence HORS regression
+# logistique ». L'exception etait la pour sauver une phrase de la section 8,
+# pas pour mesurer quoi que ce soit -- et la phrase etait fausse. On teste ce
+# que le papier affirme maintenant : la regression logistique devance XGBoost
+# partout sauf sur le macro-F1 stratifie.
+AXES = {"debit": (deb["logreg"] > deb["xgboost"], "plus haut"),
+        "latence p50": (lat["logreg"] < lat["xgboost"], "plus bas"),
+        "latence p99": (CD["logreg|corrigee"]["p99_ms"]
+                        < CD["xgboost|corrigee"]["p99_ms"], "plus bas"),
+        "macro-F1 temporel": (mf("logreg", "corrigee", "temporal")
+                              > mf("xgboost", "corrigee", "temporal"), "plus haut")}
+for nom, (gagne, sens) in AXES.items():
+    chk(f"la regression logistique devance XGBoost sur {nom}", gagne, sens)
+chk("et elle est derriere sur le macro-F1 stratifie, le seul",
+    moy("logreg", "corrigee", range(1, 6)) < moy("xgboost", "corrigee", range(1, 6)),
+    f"{moy('logreg', 'corrigee', range(1, 6)):.4f} contre "
+    f"{moy('xgboost', 'corrigee', range(1, 6)):.4f}")
 chk("LightGBM a la queue la plus serree des trois ensembles d'arbres",
     min(("rf", "xgboost", "lightgbm"),
         key=lambda m: CD[f"{m}|corrigee"]["p99_ms"]) == "lightgbm",
