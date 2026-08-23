@@ -254,8 +254,9 @@ corpus become its reference numbers, leaving the reference numbers outside the a
 is the one inconsistency that matters.
 
 E9, which fills the interval-robustness column of Table 13 for six further detectors,
-is running at the time of writing. Deposit once, after it finishes, so that version 2
-carries E8 and E9 together.
+has finished. Its seventy-two runs are in the repository as
+`experiments/e5/e5_results_e9.json`, and Table 13, Section 6.4 and the recommendation of
+Section 8 are all computed from them. Nothing now blocks the deposit.
 
 The paper needs no change for this. Section 11 cites the **concept** DOI,
 `10.5281/zenodo.21910662`, which resolves to the latest version; the new version DOI

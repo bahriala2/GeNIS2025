@@ -83,8 +83,14 @@ print(f"  {'typographie':16s} {len(PROSE)} paragraphes de prose examines")
 # "size", "sized", "Segment Size" ne sont pas des -ize, et -ising n'est pas
 # une terminaison americaine : "comprising" et "promising" viennent de
 # comprise et promise, que les deux orthographes ecrivent pareil.
+# CRediT est un vocabulaire CONTROLE : « Conceptualization » et
+# « Visualization » sont les noms officiels des roles, pas des mots de la
+# prose. Les angliciser rendrait la declaration non conforme, donc c'est ce
+# controle qui cede, et seulement pour ces deux termes.
+CREDIT = {"conceptualization", "visualization"}
 zed = re.findall(r"\b\w{4,}(?:ization|izing|ized|izes)\b", CORPS)
-zed = [w for w in zed if not w.lower().startswith("size")]
+zed = [w for w in zed
+       if not w.lower().startswith("size") and w.lower() not in CREDIT]
 if zed:
     signale(f"orthographe : formes en -ize dans le corps {sorted(set(zed))}")
 n_ise = len(re.findall(r"\w+isation\b", CORPS))
