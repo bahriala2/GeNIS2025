@@ -1,0 +1,2091 @@
+{
+ "meta": {
+  "version": "v1",
+  "build": "2026-08-16",
+  "graines_calculees": [
+   4,
+   5
+  ]
+ },
+ "temoin": {
+  "rejoue": 0.9999028573780938,
+  "publie": 0.9999028573780938,
+  "ecart": 0.0,
+  "reproduit": true
+ },
+ "runs": {
+  "5|lightgbm|seed4": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 441.4,
+   "predict_time_s": 40.229,
+   "n_test": 554716
+  },
+  "5|xgboost|seed4": {
+   "accuracy": 0.9999963945514462,
+   "macro_f1": 0.999789305390689,
+   "weighted_f1": 0.9999963965142942,
+   "mcc": 0.9999951872350887,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 0.9985074626865672,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9995962858296327,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 515.92,
+   "predict_time_s": 11.02,
+   "n_test": 554716
+  },
+  "5|dnn|seed4": {
+   "accuracy": 0.8859145941346563,
+   "macro_f1": 0.5126652944216848,
+   "weighted_f1": 0.8998128162583409,
+   "mcc": 0.8608889410642577,
+   "per_class_f1": {
+    "benign": 0.7580197409006786,
+    "bruteforce-ftp": 0.02071945119779488,
+    "bruteforce-smb": 0.0,
+    "bruteforce-ssh": 0.0,
+    "dos-hulk": 0.6597153024911032,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999968171821241,
+    "dos-slowloris": 0.17553951693582964,
+    "dos-udp": 0.9999968210876331
+   },
+   "binary": {
+    "detection_f1": 0.997138072932627,
+    "fpr": 0.3895926477893691,
+    "fnr": 1.8292772159864195e-06,
+    "pr_auc": 0.9993638333342918,
+    "roc_auc": 0.9782805799590647
+   },
+   "fit_time_s": 385.8,
+   "predict_time_s": 2.248,
+   "n_test": 554716
+  },
+  "5|lightgbm|seed5": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 439.53,
+   "predict_time_s": 44.962,
+   "n_test": 554716
+  },
+  "5|xgboost|seed5": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 510.38,
+   "predict_time_s": 10.89,
+   "n_test": 554716
+  },
+  "5|dnn|seed5": {
+   "accuracy": 0.8888079665991246,
+   "macro_f1": 0.5173258042562401,
+   "weighted_f1": 0.8997109583991404,
+   "mcc": 0.8643186756814089,
+   "per_class_f1": {
+    "benign": 0.7531141199226306,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.0,
+    "bruteforce-ssh": 0.07444012196404164,
+    "dos-hulk": 0.6546688091412248,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999936344250294,
+    "dos-slowloris": 0.17371555285323415,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9970898498595996,
+    "fpr": 0.3955538996522603,
+    "fnr": 1.0975663295918517e-05,
+    "pr_auc": 0.9993491821279192,
+    "roc_auc": 0.9776311265710874
+   },
+   "fit_time_s": 190.49,
+   "predict_time_s": 1.74,
+   "n_test": 554716
+  },
+  "10|lightgbm|seed4": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 0.9999999999999999,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 232.09,
+   "predict_time_s": 20.012,
+   "n_test": 294427
+  },
+  "10|xgboost|seed4": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 0.9999999999999999,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 334.27,
+   "predict_time_s": 5.482,
+   "n_test": 294427
+  },
+  "10|dnn|seed4": {
+   "accuracy": 0.8508322945925476,
+   "macro_f1": 0.509340167381562,
+   "weighted_f1": 0.8713193855741713,
+   "mcc": 0.8268365832342353,
+   "per_class_f1": {
+    "benign": 0.7906500597167719,
+    "bruteforce-ftp": 0.029637833647137003,
+    "bruteforce-smb": 0.0,
+    "bruteforce-ssh": 0.0034522439585730723,
+    "dos-hulk": 0.5194635263330062,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999936344250294,
+    "dos-slowloris": 0.24087056607722088,
+    "dos-udp": 0.9999936422763194
+   },
+   "binary": {
+    "detection_f1": 0.9957479398127291,
+    "fpr": 0.3380945579202971,
+    "fnr": 0.0003026866045521282,
+    "pr_auc": 0.9987326318342161,
+    "roc_auc": 0.9726791505701683
+   },
+   "fit_time_s": 193.59,
+   "predict_time_s": 0.927,
+   "n_test": 294427
+  },
+  "10|lightgbm|seed5": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 290.89,
+   "predict_time_s": 27.434,
+   "n_test": 294427
+  },
+  "10|xgboost|seed5": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 307.57,
+   "predict_time_s": 5.585,
+   "n_test": 294427
+  },
+  "10|dnn|seed5": {
+   "accuracy": 0.8555295540150869,
+   "macro_f1": 0.5144651091856124,
+   "weighted_f1": 0.8724232575744474,
+   "mcc": 0.8319496486591221,
+   "per_class_f1": {
+    "benign": 0.7827724976453464,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.08619017862914521,
+    "bruteforce-ssh": 0.0,
+    "dos-hulk": 0.5093583621494044,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.2518649442466145,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9956044527223112,
+    "fpr": 0.34709327238965865,
+    "fnr": 0.00037226973203537605,
+    "pr_auc": 0.9986857404734072,
+    "roc_auc": 0.9714544778359119
+   },
+   "fit_time_s": 164.85,
+   "predict_time_s": 1.372,
+   "n_test": 294427
+  },
+  "30|lightgbm|seed4": {
+   "accuracy": 0.9999567065831969,
+   "macro_f1": 0.9998490105499764,
+   "weighted_f1": 0.9999566986147057,
+   "mcc": 0.9999467359234222,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9989339019189766,
+    "dos-hulk": 0.9998538937320411,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9998532992987706,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 0.9999999999999999
+   },
+   "fit_time_s": 124.53,
+   "predict_time_s": 14.747,
+   "n_test": 115491
+  },
+  "30|xgboost|seed4": {
+   "accuracy": 0.9999567065831969,
+   "macro_f1": 0.9998490105499764,
+   "weighted_f1": 0.9999566986147057,
+   "mcc": 0.9999467359234222,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9989339019189766,
+    "dos-hulk": 0.9998538937320411,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9998532992987706,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 0.9999999999999999
+   },
+   "fit_time_s": 146.87,
+   "predict_time_s": 2.657,
+   "n_test": 115491
+  },
+  "30|dnn|seed4": {
+   "accuracy": 0.9206691430501078,
+   "macro_f1": 0.851467261106943,
+   "weighted_f1": 0.9464830724189396,
+   "mcc": 0.909147707289918,
+   "per_class_f1": {
+    "benign": 0.9968878795525276,
+    "bruteforce-ftp": 0.12807504546759835,
+    "bruteforce-smb": 0.9060893098782138,
+    "bruteforce-ssh": 0.987601078167116,
+    "dos-hulk": 0.8999090568662066,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.7446620527168311,
+    "dos-udp": 0.9999809273139937
+   },
+   "binary": {
+    "detection_f1": 0.9998311219436495,
+    "fpr": 0.005203961725700856,
+    "fnr": 5.4777512005404715e-05,
+    "pr_auc": 0.9999625635745798,
+    "roc_auc": 0.9996375790639789
+   },
+   "fit_time_s": 113.99,
+   "predict_time_s": 0.463,
+   "n_test": 115491
+  },
+  "30|lightgbm|seed5": {
+   "accuracy": 0.9999220718497546,
+   "macro_f1": 0.9999219500025985,
+   "weighted_f1": 0.9999220710948973,
+   "mcc": 0.999904123636423,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 0.9995615957913196,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9997359542320668,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 131.63,
+   "predict_time_s": 15.293,
+   "n_test": 115491
+  },
+  "30|xgboost|seed5": {
+   "accuracy": 0.9999393892164757,
+   "macro_f1": 0.9999392967981442,
+   "weighted_f1": 0.999939389803391,
+   "mcc": 0.9999254296087667,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 0.9996590521650187,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9997946190182789,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 142.55,
+   "predict_time_s": 2.58,
+   "n_test": 115491
+  },
+  "30|dnn|seed5": {
+   "accuracy": 0.9952204067849443,
+   "macro_f1": 0.9879204357051287,
+   "weighted_f1": 0.9952690978703926,
+   "mcc": 0.9941335556656447,
+   "per_class_f1": {
+    "benign": 0.9989083886136535,
+    "bruteforce-ftp": 0.994740796393689,
+    "bruteforce-smb": 0.9315323707498836,
+    "bruteforce-ssh": 0.9989361702127659,
+    "dos-hulk": 0.9762236370871469,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.99094255828902,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9999406590497232,
+    "fpr": 0.0015108275977841195,
+    "fnr": 3.651834133693648e-05,
+    "pr_auc": 0.9999754361958721,
+    "roc_auc": 0.9997410895883159
+   },
+   "fit_time_s": 218.88,
+   "predict_time_s": 0.472,
+   "n_test": 115491
+  },
+  "30|nb|seed1": {
+   "accuracy": 0.7754457057259873,
+   "macro_f1": 0.49025180103422206,
+   "weighted_f1": 0.7310461780035524,
+   "mcc": 0.7314910976025654,
+   "per_class_f1": {
+    "benign": 0.16196205460434984,
+    "bruteforce-ftp": 0.004940711462450593,
+    "bruteforce-smb": 0.8393080972674856,
+    "bruteforce-ssh": 0.01059322033898305,
+    "dos-hulk": 0.140356782228206,
+    "dos-icmp": 0.9983053751975476,
+    "dos-pushack": 0.754943787835111,
+    "dos-slowloris": 0.5430222161083981,
+    "dos-udp": 0.958833964265467
+   },
+   "binary": {
+    "detection_f1": 0.975799446768137,
+    "fpr": 0.9118683901292597,
+    "fnr": 9.12958533423412e-06,
+    "pr_auc": 0.9600288977222339,
+    "roc_auc": 0.6171015619302869
+   },
+   "fit_time_s": 0.18,
+   "predict_time_s": 0.489,
+   "n_test": 115491
+  },
+  "30|rf|seed1": {
+   "accuracy": 0.9999393892164757,
+   "macro_f1": 0.9998855141332993,
+   "weighted_f1": 0.9999393885510884,
+   "mcc": 0.9999254297289183,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9994672349493873,
+    "dos-hulk": 0.9997077732320281,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9997946190182789,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 102.66,
+   "predict_time_s": 1.446,
+   "n_test": 115491
+  },
+  "30|knn|seed1": {
+   "accuracy": 0.9979132573100934,
+   "macro_f1": 0.9938632188384963,
+   "weighted_f1": 0.9979102992114919,
+   "mcc": 0.9974325028799643,
+   "per_class_f1": {
+    "benign": 0.9916715739883907,
+    "bruteforce-ftp": 0.9879154078549849,
+    "bruteforce-smb": 0.994,
+    "bruteforce-ssh": 0.9822294022617124,
+    "dos-hulk": 0.9937174304777675,
+    "dos-icmp": 0.9991043695333194,
+    "dos-pushack": 0.9999809083793123,
+    "dos-slowloris": 0.9962452332062188,
+    "dos-udp": 0.9999046438447602
+   },
+   "binary": {
+    "detection_f1": 0.9995481412172802,
+    "fpr": 0.010575793184488837,
+    "fnr": 0.00032866507203242827,
+    "pr_auc": 0.9998629983482638,
+    "roc_auc": 0.9987330650521591
+   },
+   "fit_time_s": 0.0,
+   "predict_time_s": 40.898,
+   "n_test": 115491
+  },
+  "30|cnn|seed1": {
+   "accuracy": 0.6938116390021734,
+   "macro_f1": 0.7388212698402294,
+   "weighted_f1": 0.7092166837029663,
+   "mcc": 0.7086913549879074,
+   "per_class_f1": {
+    "benign": 0.9846599625021306,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 0.10159666429370487,
+    "bruteforce-ssh": 0.9213095921883975,
+    "dos-hulk": 0.896969696969697,
+    "dos-icmp": 0.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.7448555126081354,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9991790118952054,
+    "fpr": 0.030216551955682392,
+    "fnr": 0.0,
+    "pr_auc": 0.9994466139707563,
+    "roc_auc": 0.9949040086095009
+   },
+   "fit_time_s": 68.21,
+   "predict_time_s": 1.188,
+   "n_test": 115491
+  },
+  "30|logreg|seed1": {
+   "accuracy": 0.7393130200621694,
+   "macro_f1": 0.6120391660587563,
+   "weighted_f1": 0.6750043329177532,
+   "mcc": 0.7339014701089721,
+   "per_class_f1": {
+    "benign": 0.9982351458105723,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.9025054466230937,
+    "bruteforce-ssh": 0.25069637883008355,
+    "dos-hulk": 0.8187257670767316,
+    "dos-icmp": 0.9999809273139937,
+    "dos-pushack": 0.0008396946564885496,
+    "dos-slowloris": 0.5421147682345476,
+    "dos-udp": 0.9952543659832954
+   },
+   "binary": {
+    "detection_f1": 0.9999041459173007,
+    "fpr": 0.003021655195568239,
+    "fnr": 2.7388756002702358e-05,
+    "pr_auc": 0.9996354242890001,
+    "roc_auc": 0.9984238507325641
+   },
+   "fit_time_s": 265.01,
+   "predict_time_s": 0.067,
+   "n_test": 115491
+  },
+  "30|rnn|seed1": {
+   "accuracy": 0.9996103592487726,
+   "macro_f1": 0.9990008546668823,
+   "weighted_f1": 0.9996104210704538,
+   "mcc": 0.9995206446081975,
+   "per_class_f1": {
+    "benign": 0.9978173270651444,
+    "bruteforce-ftp": 0.9970193740685543,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9984034060670569,
+    "dos-hulk": 0.9985395774510758,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9992661519945989,
+    "dos-udp": 0.9999618553555081
+   },
+   "binary": {
+    "detection_f1": 0.9998813164741863,
+    "fpr": 0.0023501762632197414,
+    "fnr": 0.00010955502401080943,
+    "pr_auc": 0.9999991305557343,
+    "roc_auc": 0.9999843715047094
+   },
+   "fit_time_s": 289.78,
+   "predict_time_s": 1.219,
+   "n_test": 115491
+  },
+  "30|nb|seed2": {
+   "accuracy": 0.7735667714367354,
+   "macro_f1": 0.48455308289565696,
+   "weighted_f1": 0.7277418972516452,
+   "mcc": 0.7295462890092601,
+   "per_class_f1": {
+    "benign": 0.16676923076923078,
+    "bruteforce-ftp": 0.0009675858732462506,
+    "bruteforce-smb": 0.8180019782393669,
+    "bruteforce-ssh": 0.008483563096500531,
+    "dos-hulk": 0.11825996353216983,
+    "dos-icmp": 0.9983243840207167,
+    "dos-pushack": 0.7522116268382353,
+    "dos-slowloris": 0.5389851485148515,
+    "dos-udp": 0.9589742651765953
+   },
+   "binary": {
+    "detection_f1": 0.9758733439652177,
+    "fpr": 0.9090146046667785,
+    "fnr": 9.12958533423412e-06,
+    "pr_auc": 0.9624685386661008,
+    "roc_auc": 0.6413190276537056
+   },
+   "fit_time_s": 0.17,
+   "predict_time_s": 0.566,
+   "n_test": 115491
+  },
+  "30|rf|seed2": {
+   "accuracy": 0.9999480478998364,
+   "macro_f1": 0.999941901195363,
+   "weighted_f1": 0.9999480481715034,
+   "mcc": 0.9999360824300223,
+   "per_class_f1": {
+    "benign": 0.9999160580878033,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 0.9997077447637603,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9998533079067038,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9999954352281701,
+    "fpr": 0.00016786973308712439,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 97.11,
+   "predict_time_s": 0.895,
+   "n_test": 115491
+  },
+  "30|knn|seed2": {
+   "accuracy": 0.9981643591275511,
+   "macro_f1": 0.9957580139754286,
+   "weighted_f1": 0.9981636531350491,
+   "mcc": 0.9977414949128615,
+   "per_class_f1": {
+    "benign": 0.9935343017885633,
+    "bruteforce-ftp": 0.9924924924924925,
+    "bruteforce-smb": 0.9967443025294265,
+    "bruteforce-ssh": 0.990405117270789,
+    "dos-hulk": 0.9932277710109623,
+    "dos-icmp": 0.9994852927159388,
+    "dos-pushack": 0.9999809083793123,
+    "dos-slowloris": 0.9960091554668701,
+    "dos-udp": 0.9999427841245018
+   },
+   "binary": {
+    "detection_f1": 0.9996485189868217,
+    "fpr": 0.0068826590565721005,
+    "fnr": 0.00032866507203242827,
+    "pr_auc": 0.9998215462405677,
+    "roc_auc": 0.9983553826740099
+   },
+   "fit_time_s": 0.0,
+   "predict_time_s": 41.0,
+   "n_test": 115491
+  },
+  "30|cnn|seed2": {
+   "accuracy": 0.6926773514819337,
+   "macro_f1": 0.7419824673160131,
+   "weighted_f1": 0.7086292793481894,
+   "mcc": 0.7075637693843007,
+   "per_class_f1": {
+    "benign": 0.9553704515563349,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 0.10139416983523447,
+    "bruteforce-ssh": 0.9744136460554371,
+    "dos-hulk": 0.9007004972996097,
+    "dos-icmp": 0.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.7459634410975027,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9976819065749145,
+    "fpr": 0.08544569414134631,
+    "fnr": 0.0,
+    "pr_auc": 0.9984306229760633,
+    "roc_auc": 0.9855039357463065
+   },
+   "fit_time_s": 128.49,
+   "predict_time_s": 1.022,
+   "n_test": 115491
+  },
+  "30|logreg|seed2": {
+   "accuracy": 0.7665532379146427,
+   "macro_f1": 0.7180952565795051,
+   "weighted_f1": 0.7157273446842501,
+   "mcc": 0.7612989787428407,
+   "per_class_f1": {
+    "benign": 0.9989087551414422,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.9047619047619048,
+    "bruteforce-ssh": 0.9951845906902087,
+    "dos-hulk": 0.8958879306237194,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.10916573408902205,
+    "dos-slowloris": 0.5638829165890737,
+    "dos-udp": 0.9950654773201746
+   },
+   "binary": {
+    "detection_f1": 0.9999406579662116,
+    "fpr": 0.0011750881316098707,
+    "fnr": 5.4777512005404715e-05,
+    "pr_auc": 0.9998612563638509,
+    "roc_auc": 0.999362723679017
+   },
+   "fit_time_s": 246.09,
+   "predict_time_s": 0.079,
+   "n_test": 115491
+  },
+  "30|rnn|seed2": {
+   "accuracy": 0.9995930418820514,
+   "macro_f1": 0.9990517420428304,
+   "weighted_f1": 0.9995930024691762,
+   "mcc": 0.9994993478977102,
+   "per_class_f1": {
+    "benign": 0.9973929862921538,
+    "bruteforce-ftp": 0.9992531740104555,
+    "bruteforce-smb": 0.9967589129892794,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 0.9986855557178326,
+    "dos-icmp": 0.9999809273139937,
+    "dos-pushack": 0.9999809076503046,
+    "dos-slowloris": 0.999413214411454,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9998585062827775,
+    "fpr": 0.004532482793352359,
+    "fnr": 3.651834133693648e-05,
+    "pr_auc": 0.9999989317163538,
+    "roc_auc": 0.9999805883283794
+   },
+   "fit_time_s": 291.43,
+   "predict_time_s": 1.078,
+   "n_test": 115491
+  },
+  "30|nb|seed3": {
+   "accuracy": 0.7627001238191721,
+   "macro_f1": 0.485224912714201,
+   "weighted_f1": 0.7208445501188318,
+   "mcc": 0.7154652835178791,
+   "per_class_f1": {
+    "benign": 0.1528721432983323,
+    "bruteforce-ftp": 0.0042796005706134095,
+    "bruteforce-smb": 0.8351592356687898,
+    "bruteforce-ssh": 0.004250797024442083,
+    "dos-hulk": 0.23497022856777003,
+    "dos-icmp": 0.9979823359220344,
+    "dos-pushack": 0.7516826681591826,
+    "dos-slowloris": 0.42800919611892607,
+    "dos-udp": 0.9578180090977183
+   },
+   "binary": {
+    "detection_f1": 0.9755641274620723,
+    "fpr": 0.9169044821218735,
+    "fnr": 0.00021911004802161886,
+    "pr_auc": 0.9548356197709307,
+    "roc_auc": 0.5651157175784035
+   },
+   "fit_time_s": 0.19,
+   "predict_time_s": 0.488,
+   "n_test": 115491
+  },
+  "30|rf|seed3": {
+   "accuracy": 0.9999047544830333,
+   "macro_f1": 0.9998155526127697,
+   "weighted_f1": 0.9999047518198273,
+   "mcc": 0.9998828206094511,
+   "per_class_f1": {
+    "benign": 0.9994961370507222,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9994672349493873,
+    "dos-hulk": 0.9995130502532139,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999809083793123,
+    "dos-slowloris": 0.9998826428822908,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9999726119941207,
+    "fpr": 0.0010072183985227463,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 101.15,
+   "predict_time_s": 0.917,
+   "n_test": 115491
+  },
+  "30|knn|seed3": {
+   "accuracy": 0.9981383830774693,
+   "macro_f1": 0.994389789114015,
+   "weighted_f1": 0.9981365347019409,
+   "mcc": 0.9977095633109444,
+   "per_class_f1": {
+    "benign": 0.9933697020562317,
+    "bruteforce-ftp": 0.9917231000752446,
+    "bruteforce-smb": 0.9937578027465668,
+    "bruteforce-ssh": 0.9811117107393416,
+    "dos-hulk": 0.9937694704049844,
+    "dos-icmp": 0.9995995805129183,
+    "dos-pushack": 0.9999809083793123,
+    "dos-slowloris": 0.9962148997975412,
+    "dos-udp": 0.9999809273139937
+   },
+   "binary": {
+    "detection_f1": 0.999639379733141,
+    "fpr": 0.006546919590397851,
+    "fnr": 0.00036518341336936477,
+    "pr_auc": 0.9998475067192178,
+    "roc_auc": 0.9985925779447505
+   },
+   "fit_time_s": 0.0,
+   "predict_time_s": 40.153,
+   "n_test": 115491
+  },
+  "30|cnn|seed3": {
+   "accuracy": 0.9163917534699674,
+   "macro_f1": 0.872311675699057,
+   "weighted_f1": 0.9342562015302547,
+   "mcc": 0.9038291384636764,
+   "per_class_f1": {
+    "benign": 0.9392840246017978,
+    "bruteforce-ftp": 0.9873228933631618,
+    "bruteforce-smb": 0.31144348367998753,
+    "bruteforce-ssh": 0.9876144318793754,
+    "dos-hulk": 0.8985212173167595,
+    "dos-icmp": 0.9855857598916513,
+    "dos-pushack": 0.9998854393401306,
+    "dos-slowloris": 0.7411478312186486,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.996472743930371,
+    "fpr": 0.00016786973308712439,
+    "fnr": 0.007020651122026038,
+    "pr_auc": 0.9999844117665182,
+    "roc_auc": 0.9998192152063768
+   },
+   "fit_time_s": 42.29,
+   "predict_time_s": 0.782,
+   "n_test": 115491
+  },
+  "30|logreg|seed3": {
+   "accuracy": 0.7361958940523504,
+   "macro_f1": 0.6075879688708429,
+   "weighted_f1": 0.672753720817187,
+   "mcc": 0.73033300291841,
+   "per_class_f1": {
+    "benign": 0.9862034574468085,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.9053092501368364,
+    "bruteforce-ssh": 0.23163841807909605,
+    "dos-hulk": 0.8143858283044578,
+    "dos-icmp": 0.9998665013826642,
+    "dos-pushack": 0.0005344327378225683,
+    "dos-slowloris": 0.5351939190612794,
+    "dos-udp": 0.995159912688621
+   },
+   "binary": {
+    "detection_f1": 0.9992418360356246,
+    "fpr": 0.004028873594090985,
+    "fnr": 0.001296401117461245,
+    "pr_auc": 0.9996225223190185,
+    "roc_auc": 0.9980675555230132
+   },
+   "fit_time_s": 236.24,
+   "predict_time_s": 0.066,
+   "n_test": 115491
+  },
+  "30|rnn|seed3": {
+   "accuracy": 0.9994112095314787,
+   "macro_f1": 0.9971183085208118,
+   "weighted_f1": 0.9994127476762042,
+   "mcc": 0.9992757189916711,
+   "per_class_f1": {
+    "benign": 0.9954537800976595,
+    "bruteforce-ftp": 0.9977628635346756,
+    "bruteforce-smb": 0.9995,
+    "bruteforce-ssh": 0.9832285115303984,
+    "dos-hulk": 0.9985392930178206,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999618174875907,
+    "dos-slowloris": 0.9996185110191624,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9997535416970936,
+    "fpr": 0.007554137988920598,
+    "fnr": 8.216626800810707e-05,
+    "pr_auc": 0.9999202595402811,
+    "roc_auc": 0.9993466951800715
+   },
+   "fit_time_s": 263.14,
+   "predict_time_s": 1.066,
+   "n_test": 115491
+  },
+  "10|nb|seed1": {
+   "accuracy": 0.9004167416711103,
+   "macro_f1": 0.7221435887976462,
+   "weighted_f1": 0.8892346534554461,
+   "mcc": 0.8714799742926046,
+   "per_class_f1": {
+    "benign": 0.43666666666666665,
+    "bruteforce-ftp": 0.9955022488755623,
+    "bruteforce-smb": 0.9120825147347741,
+    "bruteforce-ssh": 0.0023001725129384704,
+    "dos-hulk": 0.517464699012634,
+    "dos-icmp": 0.9622415269790775,
+    "dos-pushack": 0.9056518171082392,
+    "dos-slowloris": 0.8120498058642388,
+    "dos-udp": 0.9553328474246842
+   },
+   "binary": {
+    "detection_f1": 0.9900700591372392,
+    "fpr": 0.6819025853449507,
+    "fnr": 0.003381739995685846,
+    "pr_auc": 0.9920067470661449,
+    "roc_auc": 0.828380508326622
+   },
+   "fit_time_s": 0.65,
+   "predict_time_s": 1.497,
+   "n_test": 294427
+  },
+  "10|rf|seed1": {
+   "accuracy": 0.9999966035723626,
+   "macro_f1": 0.999960071225311,
+   "weighted_f1": 0.9999966039400463,
+   "mcc": 0.9999955909115891,
+   "per_class_f1": {
+    "benign": 0.9999285765302478,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9997120644975526,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9999982604248391,
+    "fpr": 0.00014283673760891302,
+    "fnr": 0.0,
+    "pr_auc": 0.9999999999878955,
+    "roc_auc": 0.9999999995030487
+   },
+   "fit_time_s": 253.41,
+   "predict_time_s": 2.481,
+   "n_test": 294427
+  },
+  "10|knn|seed1": {
+   "accuracy": 0.9987772860505321,
+   "macro_f1": 0.993474360219087,
+   "weighted_f1": 0.9987792415243038,
+   "mcc": 0.9984128745479453,
+   "per_class_f1": {
+    "benign": 0.9879449318781653,
+    "bruteforce-ftp": 0.9940564635958395,
+    "bruteforce-smb": 0.9930278884462151,
+    "bruteforce-ssh": 0.9767045454545454,
+    "dos-hulk": 0.9932178400294877,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999809035182085,
+    "dos-slowloris": 0.9963366690493209,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9997060025920481,
+    "fpr": 0.010855592058277389,
+    "fnr": 0.00032356154279710255,
+    "pr_auc": 0.9999464748384118,
+    "roc_auc": 0.9988984198778956
+   },
+   "fit_time_s": 0.0,
+   "predict_time_s": 103.676,
+   "n_test": 294427
+  },
+  "10|cnn|seed1": {
+   "accuracy": 0.90472001548771,
+   "macro_f1": 0.5382960110709216,
+   "weighted_f1": 0.9227465477879642,
+   "mcc": 0.8840517396428026,
+   "per_class_f1": {
+    "benign": 0.8005480859809883,
+    "bruteforce-ftp": 0.04565617962192042,
+    "bruteforce-smb": 0.0,
+    "bruteforce-ssh": 0.002229654403567447,
+    "dos-hulk": 0.1638922722966572,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.8323442651396842,
+    "dos-udp": 0.999993642195477
+   },
+   "binary": {
+    "detection_f1": 0.9959648426739112,
+    "fpr": 0.3323810884159406,
+    "fnr": 6.958312748324786e-06,
+    "pr_auc": 0.9992513958256293,
+    "roc_auc": 0.9844064497057067
+   },
+   "fit_time_s": 134.45,
+   "predict_time_s": 1.583,
+   "n_test": 294427
+  },
+  "10|logreg|seed1": {
+   "accuracy": 0.5200779819785549,
+   "macro_f1": 0.426524783105003,
+   "weighted_f1": 0.5343897560276805,
+   "mcc": 0.4917482468779738,
+   "per_class_f1": {
+    "benign": 0.22943061559099717,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.9489795918367347,
+    "bruteforce-ssh": 0.2975609756097561,
+    "dos-hulk": 0.20192601226653345,
+    "dos-icmp": 0.8557377526226193,
+    "dos-pushack": 0.0,
+    "dos-slowloris": 0.4299334468348553,
+    "dos-udp": 0.8751546531835314
+   },
+   "binary": {
+    "detection_f1": 0.9227216161978542,
+    "fpr": 0.12055420654192259,
+    "fnr": 0.14095454134281518,
+    "pr_auc": 0.9943734603134007,
+    "roc_auc": 0.9106065899149631
+   },
+   "fit_time_s": 493.95,
+   "predict_time_s": 0.154,
+   "n_test": 294427
+  },
+  "10|rnn|seed1": {
+   "accuracy": 0.9986889789319594,
+   "macro_f1": 0.9948686376199244,
+   "weighted_f1": 0.998688103470914,
+   "mcc": 0.998299169908147,
+   "per_class_f1": {
+    "benign": 0.9959856630824373,
+    "bruteforce-ftp": 0.9992531740104555,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9752808988764045,
+    "dos-hulk": 0.9876662816261133,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999936343439874,
+    "dos-slowloris": 0.9956444444444444,
+    "dos-udp": 0.999993642195477
+   },
+   "binary": {
+    "detection_f1": 0.9999025924328235,
+    "fpr": 0.007713183830881302,
+    "fnr": 6.958312748324786e-06,
+    "pr_auc": 0.9999994303268359,
+    "roc_auc": 0.9999777656513477
+   },
+   "fit_time_s": 493.32,
+   "predict_time_s": 1.84,
+   "n_test": 294427
+  },
+  "10|nb|seed2": {
+   "accuracy": 0.8975399674622232,
+   "macro_f1": 0.7189341606862537,
+   "weighted_f1": 0.8861762577697492,
+   "mcc": 0.8677924845157542,
+   "per_class_f1": {
+    "benign": 0.40053240503737075,
+    "bruteforce-ftp": 0.9947877885331348,
+    "bruteforce-smb": 0.9177045177045177,
+    "bruteforce-ssh": 0.0023001725129384704,
+    "dos-hulk": 0.5297686375321337,
+    "dos-icmp": 0.9626419898159029,
+    "dos-pushack": 0.8990948709353,
+    "dos-slowloris": 0.8129902224132374,
+    "dos-udp": 0.950586841691748
+   },
+   "binary": {
+    "detection_f1": 0.9898892567092682,
+    "fpr": 0.7206113412369661,
+    "fnr": 0.0028181166630715385,
+    "pr_auc": 0.9920720838101046,
+    "roc_auc": 0.8302434845024576
+   },
+   "fit_time_s": 0.72,
+   "predict_time_s": 1.589,
+   "n_test": 294427
+  },
+  "10|rf|seed2": {
+   "accuracy": 0.9999932071447252,
+   "macro_f1": 0.9999759359696699,
+   "weighted_f1": 0.9999932069099029,
+   "mcc": 0.9999911818507126,
+   "per_class_f1": {
+    "benign": 0.9998571428571429,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 0.9999262808698858,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9999965208557303,
+    "fpr": 0.00028567347521782604,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 253.91,
+   "predict_time_s": 3.281,
+   "n_test": 294427
+  },
+  "10|knn|seed2": {
+   "accuracy": 0.9991441002353725,
+   "macro_f1": 0.9948664660787093,
+   "weighted_f1": 0.9991447053528515,
+   "mcc": 0.99888898462562,
+   "per_class_f1": {
+    "benign": 0.9918930450860475,
+    "bruteforce-ftp": 0.9918458117123795,
+    "bruteforce-smb": 0.9937138546643198,
+    "bruteforce-ssh": 0.9838802533103052,
+    "dos-hulk": 0.9947296649835993,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999681729355374,
+    "dos-slowloris": 0.9977673920161938,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9998016673857674,
+    "fpr": 0.003856591915440651,
+    "fnr": 0.0003026866045521282,
+    "pr_auc": 0.9999202546804582,
+    "roc_auc": 0.9983600568306801
+   },
+   "fit_time_s": 0.0,
+   "predict_time_s": 103.344,
+   "n_test": 294427
+  },
+  "10|cnn|seed2": {
+   "accuracy": 0.8440903857322868,
+   "macro_f1": 0.4768980976306943,
+   "weighted_f1": 0.8568347153207028,
+   "mcc": 0.8194876757528223,
+   "per_class_f1": {
+    "benign": 0.7941809417233365,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.0801667468334135,
+    "bruteforce-ssh": 0.0022988505747126436,
+    "dos-hulk": 0.16205962059620596,
+    "dos-icmp": 0.9999872846334795,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.2533894343151005,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9958578538797755,
+    "fpr": 0.34109412941008427,
+    "fnr": 1.043746912248718e-05,
+    "pr_auc": 0.9986914228571262,
+    "roc_auc": 0.9729096400831565
+   },
+   "fit_time_s": 229.69,
+   "predict_time_s": 1.334,
+   "n_test": 294427
+  },
+  "10|logreg|seed2": {
+   "accuracy": 0.4897920367357613,
+   "macro_f1": 0.39814356360185477,
+   "weighted_f1": 0.5140825816408149,
+   "mcc": 0.4616040757036699,
+   "per_class_f1": {
+    "benign": 0.1715331588580421,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.9311251314405888,
+    "bruteforce-ssh": 0.1842818428184282,
+    "dos-hulk": 0.20793859097201,
+    "dos-icmp": 0.8403668642543277,
+    "dos-pushack": 0.0,
+    "dos-slowloris": 0.4238934982176094,
+    "dos-udp": 0.8241529858556861
+   },
+   "binary": {
+    "detection_f1": 0.9086846922942045,
+    "fpr": 0.28381659762891015,
+    "fnr": 0.1615928969543465,
+    "pr_auc": 0.9973550848033612,
+    "roc_auc": 0.9555009133752053
+   },
+   "fit_time_s": 469.1,
+   "predict_time_s": 0.124,
+   "n_test": 294427
+  },
+  "10|rnn|seed2": {
+   "accuracy": 0.9993852465976286,
+   "macro_f1": 0.9959460304361009,
+   "weighted_f1": 0.9993859894749101,
+   "mcc": 0.9992020085809599,
+   "per_class_f1": {
+    "benign": 0.992181335628721,
+    "bruteforce-ftp": 0.9925816023738873,
+    "bruteforce-smb": 0.999000499750125,
+    "bruteforce-ssh": 0.9844060107740289,
+    "dos-hulk": 0.9967554015190621,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999936343439874,
+    "dos-slowloris": 0.9986021473396187,
+    "dos-udp": 0.999993642195477
+   },
+   "binary": {
+    "detection_f1": 0.9998104060962267,
+    "fpr": 0.012141122696757605,
+    "fnr": 8.349975297989744e-05,
+    "pr_auc": 0.9999860508068042,
+    "roc_auc": 0.9996865297997128
+   },
+   "fit_time_s": 453.64,
+   "predict_time_s": 1.69,
+   "n_test": 294427
+  },
+  "10|nb|seed3": {
+   "accuracy": 0.8841648354260988,
+   "macro_f1": 0.7160429814473253,
+   "weighted_f1": 0.872325792526284,
+   "mcc": 0.8512831600080196,
+   "per_class_f1": {
+    "benign": 0.44231906921711694,
+    "bruteforce-ftp": 0.9962602842183994,
+    "bruteforce-smb": 0.9147437454457129,
+    "bruteforce-ssh": 0.0023001725129384704,
+    "dos-hulk": 0.516877748926925,
+    "dos-icmp": 0.9604372118584558,
+    "dos-pushack": 0.8684161599746597,
+    "dos-slowloris": 0.8128084102124008,
+    "dos-udp": 0.9302240306593172
+   },
+   "binary": {
+    "detection_f1": 0.9902265721118622,
+    "fpr": 0.6796171975432082,
+    "fnr": 0.003124282423997829,
+    "pr_auc": 0.992249608794286,
+    "roc_auc": 0.8345038742341853
+   },
+   "fit_time_s": 0.64,
+   "predict_time_s": 1.254,
+   "n_test": 294427
+  },
+  "10|rf|seed3": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 229.26,
+   "predict_time_s": 2.275,
+   "n_test": 294427
+  },
+  "10|knn|seed3": {
+   "accuracy": 0.9991746680841092,
+   "macro_f1": 0.9950254911447498,
+   "weighted_f1": 0.9991748770548767,
+   "mcc": 0.9989286261602223,
+   "per_class_f1": {
+    "benign": 0.9913230548583721,
+    "bruteforce-ftp": 0.996276991809382,
+    "bruteforce-smb": 0.9928021841648051,
+    "bruteforce-ssh": 0.9814020028612304,
+    "dos-hulk": 0.9956106377485153,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 0.9978145488604433,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9997895319085282,
+    "fpr": 0.012712469647193258,
+    "fnr": 0.00011133300397319658,
+    "pr_auc": 0.9999539347468483,
+    "roc_auc": 0.9990531558670116
+   },
+   "fit_time_s": 0.0,
+   "predict_time_s": 102.794,
+   "n_test": 294427
+  },
+  "10|cnn|seed3": {
+   "accuracy": 0.8398822118895346,
+   "macro_f1": 0.47279657271429965,
+   "weighted_f1": 0.8566973964156911,
+   "mcc": 0.8149019613117616,
+   "per_class_f1": {
+    "benign": 0.8009243409791167,
+    "bruteforce-ftp": 0.027604134430896824,
+    "bruteforce-smb": 0.0,
+    "bruteforce-ssh": 0.0023001725129384704,
+    "dos-hulk": 0.17428167687235044,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999872690931775,
+    "dos-slowloris": 0.250071560540217,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9959699915103003,
+    "fpr": 0.331666904727896,
+    "fnr": 1.3916625496649573e-05,
+    "pr_auc": 0.9986795785326108,
+    "roc_auc": 0.9720563010730752
+   },
+   "fit_time_s": 150.56,
+   "predict_time_s": 1.358,
+   "n_test": 294427
+  },
+  "10|logreg|seed3": {
+   "accuracy": 0.4162016391159778,
+   "macro_f1": 0.3830753135308835,
+   "weighted_f1": 0.4418789987237855,
+   "mcc": 0.38468205487702845,
+   "per_class_f1": {
+    "benign": 0.14201070791195716,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.9448345035105316,
+    "bruteforce-ssh": 0.35,
+    "dos-hulk": 0.24722068407377434,
+    "dos-icmp": 0.8403816096021706,
+    "dos-pushack": 0.0,
+    "dos-slowloris": 0.3429456262374981,
+    "dos-udp": 0.5802846904420194
+   },
+   "binary": {
+    "detection_f1": 0.8571445551144603,
+    "fpr": 0.14755034995000715,
+    "fnr": 0.24730191423183706,
+    "pr_auc": 0.9946893589886661,
+    "roc_auc": 0.918522819369219
+   },
+   "fit_time_s": 481.84,
+   "predict_time_s": 0.125,
+   "n_test": 294427
+  },
+  "10|rnn|seed3": {
+   "accuracy": 0.9929082590930859,
+   "macro_f1": 0.9162524796555966,
+   "weighted_f1": 0.9911338952155936,
+   "mcc": 0.9908348014516618,
+   "per_class_f1": {
+    "benign": 0.9956281803196445,
+    "bruteforce-ftp": 0.9977628635346756,
+    "bruteforce-smb": 0.3213087248322148,
+    "bruteforce-ssh": 0.9758291174817313,
+    "dos-hulk": 0.9844923582825754,
+    "dos-icmp": 0.9999809268289581,
+    "dos-pushack": 0.999980903031962,
+    "dos-slowloris": 0.9712956003931318,
+    "dos-udp": 0.999993642195477
+   },
+   "binary": {
+    "detection_f1": 0.9998938947749265,
+    "fpr": 0.007856020568490215,
+    "fnr": 2.087493824497436e-05,
+    "pr_auc": 0.9999853030125033,
+    "roc_auc": 0.9996750417754445
+   },
+   "fit_time_s": 320.01,
+   "predict_time_s": 1.625,
+   "n_test": 294427
+  },
+  "5|nb|seed1": {
+   "accuracy": 0.9408832627867233,
+   "macro_f1": 0.7824755035873726,
+   "weighted_f1": 0.9362914814106313,
+   "mcc": 0.9216125731037733,
+   "per_class_f1": {
+    "benign": 0.7234747532953972,
+    "bruteforce-ftp": 0.9992531740104555,
+    "bruteforce-smb": 0.9011292924637013,
+    "bruteforce-ssh": 0.0,
+    "dos-hulk": 0.6599402862143519,
+    "dos-icmp": 0.9714784795542603,
+    "dos-pushack": 0.9447153395745806,
+    "dos-slowloris": 0.8688872107939916,
+    "dos-udp": 0.9734009963796144
+   },
+   "binary": {
+    "detection_f1": 0.9964958208167777,
+    "fpr": 0.37630402384500744,
+    "fnr": 0.0014798852677330133,
+    "pr_auc": 0.999183632008843,
+    "roc_auc": 0.9717164829968746
+   },
+   "fit_time_s": 1.03,
+   "predict_time_s": 2.67,
+   "n_test": 554716
+  },
+  "5|rf|seed1": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 0.9999999999999999
+   },
+   "fit_time_s": 522.52,
+   "predict_time_s": 5.703,
+   "n_test": 554716
+  },
+  "5|knn|seed1": {
+   "accuracy": 0.9992284340094751,
+   "macro_f1": 0.9931289194026003,
+   "weighted_f1": 0.9992288191533408,
+   "mcc": 0.9989701042480295,
+   "per_class_f1": {
+    "benign": 0.990984222389181,
+    "bruteforce-ftp": 0.9947955390334573,
+    "bruteforce-smb": 0.9881481481481481,
+    "bruteforce-ssh": 0.9741741741741742,
+    "dos-hulk": 0.9923574681117354,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.999974538024278,
+    "dos-slowloris": 0.9977293636345841,
+    "dos-udp": 0.9999968211078439
+   },
+   "binary": {
+    "detection_f1": 0.9998683079399338,
+    "fpr": 0.01713859910581222,
+    "fnr": 1.0975663295918517e-05,
+    "pr_auc": 0.9998828428210175,
+    "roc_auc": 0.9960224244605561
+   },
+   "fit_time_s": 0.01,
+   "predict_time_s": 233.166,
+   "n_test": 554716
+  },
+  "5|cnn|seed1": {
+   "accuracy": 0.8730377346245647,
+   "macro_f1": 0.4620398848298334,
+   "weighted_f1": 0.8843764336877032,
+   "mcc": 0.8458628386885034,
+   "per_class_f1": {
+    "benign": 0.7555830306776911,
+    "bruteforce-ftp": 0.01864834353092029,
+    "bruteforce-smb": 0.0,
+    "bruteforce-ssh": 0.0,
+    "dos-hulk": 0.21063657572727706,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999777207003339,
+    "dos-slowloris": 0.17351647172443396,
+    "dos-udp": 0.9999968211078439
+   },
+   "binary": {
+    "detection_f1": 0.9971153433999914,
+    "fpr": 0.3928216592151018,
+    "fnr": 0.0,
+    "pr_auc": 0.999285134173562,
+    "roc_auc": 0.9755887693427301
+   },
+   "fit_time_s": 414.22,
+   "predict_time_s": 2.576,
+   "n_test": 554716
+  },
+  "5|logreg|seed1": {
+   "accuracy": 0.6173789831192898,
+   "macro_f1": 0.4870463734228174,
+   "weighted_f1": 0.6035637003026415,
+   "mcc": 0.598098495017421,
+   "per_class_f1": {
+    "benign": 0.5245453939918737,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.9748794722151738,
+    "bruteforce-ssh": 0.2878069797501077,
+    "dos-hulk": 0.17259658909536194,
+    "dos-icmp": 0.9530887041486678,
+    "dos-pushack": 0.00010184466143015366,
+    "dos-slowloris": 0.5321008564489327,
+    "dos-udp": 0.9382975204938089
+   },
+   "binary": {
+    "detection_f1": 0.986774207295494,
+    "fpr": 0.021982116244411327,
+    "fnr": 0.02579097946819253,
+    "pr_auc": 0.9992875785008744,
+    "roc_auc": 0.9873287364423842
+   },
+   "fit_time_s": 1033.41,
+   "predict_time_s": 0.306,
+   "n_test": 554716
+  },
+  "5|rnn|seed1": {
+   "accuracy": 0.9986227186524276,
+   "macro_f1": 0.9936561494361514,
+   "weighted_f1": 0.9986212156264669,
+   "mcc": 0.9981619432659772,
+   "per_class_f1": {
+    "benign": 0.9907303018915194,
+    "bruteforce-ftp": 0.9985074626865672,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 0.9744098393175957,
+    "dos-hulk": 0.9849521203830369,
+    "dos-icmp": 0.9997488228056175,
+    "dos-pushack": 0.999945891062795,
+    "dos-slowloris": 0.9947984268412886,
+    "dos-udp": 0.9998124799369424
+   },
+   "binary": {
+    "detection_f1": 0.9998646505698394,
+    "fpr": 0.017759562841530054,
+    "fnr": 9.146386079932096e-06,
+    "pr_auc": 0.9999997647349749,
+    "roc_auc": 0.9999843519783008
+   },
+   "fit_time_s": 590.04,
+   "predict_time_s": 2.911,
+   "n_test": 554716
+  },
+  "5|nb|seed2": {
+   "accuracy": 0.946843069246245,
+   "macro_f1": 0.8608266904089762,
+   "weighted_f1": 0.9444708574242625,
+   "mcc": 0.9294891225513887,
+   "per_class_f1": {
+    "benign": 0.7704167302701878,
+    "bruteforce-ftp": 0.9985074626865672,
+    "bruteforce-smb": 0.8991850989522701,
+    "bruteforce-ssh": 0.5747918461096756,
+    "dos-hulk": 0.7277325275880189,
+    "dos-icmp": 0.9722259251566341,
+    "dos-pushack": 0.9472346717183385,
+    "dos-slowloris": 0.8822099447513813,
+    "dos-udp": 0.975136006447713
+   },
+   "binary": {
+    "detection_f1": 0.9972563005664353,
+    "fpr": 0.3731992051664183,
+    "fnr": 5.487831647959258e-06,
+    "pr_auc": 0.9994053235564879,
+    "roc_auc": 0.9795385375739429
+   },
+   "fit_time_s": 0.99,
+   "predict_time_s": 2.503,
+   "n_test": 554716
+  },
+  "5|rf|seed2": {
+   "accuracy": 0.999998197275723,
+   "macro_f1": 0.9999901430829907,
+   "weighted_f1": 0.9999981972437355,
+   "mcc": 0.9999975936098254,
+   "per_class_f1": {
+    "benign": 0.9999378997702292,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 0.9999733879766879,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9999990853622286,
+    "fpr": 0.00012419274714356682,
+    "fnr": 0.0,
+    "pr_auc": 0.9999999999966538,
+    "roc_auc": 0.9999999997728171
+   },
+   "fit_time_s": 472.53,
+   "predict_time_s": 5.653,
+   "n_test": 554716
+  },
+  "5|knn|seed2": {
+   "accuracy": 0.9992194203880905,
+   "macro_f1": 0.9935935839081012,
+   "weighted_f1": 0.9992199015434635,
+   "mcc": 0.9989580480187537,
+   "per_class_f1": {
+    "benign": 0.9896996773392901,
+    "bruteforce-ftp": 0.9918458117123795,
+    "bruteforce-smb": 0.9887976101568334,
+    "bruteforce-ssh": 0.981563126252505,
+    "dos-hulk": 0.9933340443686007,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.9999713555508168,
+    "dos-slowloris": 0.9971306297924848,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9998481683246198,
+    "fpr": 0.009562841530054645,
+    "fnr": 0.00016280567222279132,
+    "pr_auc": 0.9999115242191788,
+    "roc_auc": 0.9969954394346979
+   },
+   "fit_time_s": 0.0,
+   "predict_time_s": 231.128,
+   "n_test": 554716
+  },
+  "5|cnn|seed2": {
+   "accuracy": 0.8860353766612105,
+   "macro_f1": 0.512946466872792,
+   "weighted_f1": 0.9000787144865395,
+   "mcc": 0.8610019687134762,
+   "per_class_f1": {
+    "benign": 0.7580197409006786,
+    "bruteforce-ftp": 0.020751907686581052,
+    "bruteforce-smb": 0.0,
+    "bruteforce-ssh": 0.0008071025020177562,
+    "dos-hulk": 0.6574747042895824,
+    "dos-icmp": 0.9999395968247005,
+    "dos-pushack": 0.9999809035182085,
+    "dos-slowloris": 0.17960464162849146,
+    "dos-udp": 0.9999396045048682
+   },
+   "binary": {
+    "detection_f1": 0.997138072932627,
+    "fpr": 0.3895926477893691,
+    "fnr": 1.8292772159864195e-06,
+    "pr_auc": 0.999366740791272,
+    "roc_auc": 0.9783797949617783
+   },
+   "fit_time_s": 269.74,
+   "predict_time_s": 2.903,
+   "n_test": 554716
+  },
+  "5|logreg|seed2": {
+   "accuracy": 0.6469779130221591,
+   "macro_f1": 0.5268476447555349,
+   "weighted_f1": 0.6130311901013408,
+   "mcc": 0.6185207966168946,
+   "per_class_f1": {
+    "benign": 0.8716750139120757,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.934761441090555,
+    "bruteforce-ssh": 0.3686520376175549,
+    "dos-hulk": 0.23817299078114615,
+    "dos-icmp": 0.9964012710404411,
+    "dos-pushack": 0.0,
+    "dos-slowloris": 0.3806997846111544,
+    "dos-udp": 0.9512662637468873
+   },
+   "binary": {
+    "detection_f1": 0.9978872374851346,
+    "fpr": 0.0273224043715847,
+    "fnr": 0.003815872272547671,
+    "pr_auc": 0.999143428788931,
+    "roc_auc": 0.984980877196711
+   },
+   "fit_time_s": 1052.34,
+   "predict_time_s": 1.028,
+   "n_test": 554716
+  },
+  "5|rnn|seed2": {
+   "accuracy": 0.9987615284217509,
+   "macro_f1": 0.9957242640928455,
+   "weighted_f1": 0.9987619310419447,
+   "mcc": 0.9983468564888388,
+   "per_class_f1": {
+    "benign": 0.9940157087644932,
+    "bruteforce-ftp": 0.9985074626865672,
+    "bruteforce-smb": 0.9970104633781763,
+    "bruteforce-ssh": 0.9915764139590855,
+    "dos-hulk": 0.986179769308457,
+    "dos-icmp": 0.9997488116246165,
+    "dos-pushack": 0.9999649881118725,
+    "dos-slowloris": 0.9947594745761051,
+    "dos-udp": 0.9997552844262373
+   },
+   "binary": {
+    "detection_f1": 0.9999121996725779,
+    "fpr": 0.009811227024341779,
+    "fnr": 3.109771267176913e-05,
+    "pr_auc": 0.9999975989595532,
+    "roc_auc": 0.9998467554363556
+   },
+   "fit_time_s": 1408.99,
+   "predict_time_s": 14.829,
+   "n_test": 554716
+  },
+  "5|nb|seed3": {
+   "accuracy": 0.955544819330973,
+   "macro_f1": 0.9035227461739753,
+   "weighted_f1": 0.9541065425031995,
+   "mcc": 0.9412759985118782,
+   "per_class_f1": {
+    "benign": 0.9106152805949966,
+    "bruteforce-ftp": 0.9992531740104555,
+    "bruteforce-smb": 0.9169419537517697,
+    "bruteforce-ssh": 0.715438950554995,
+    "dos-hulk": 0.7709540613163262,
+    "dos-icmp": 0.9745157432002113,
+    "dos-pushack": 0.9528619975574789,
+    "dos-slowloris": 0.9155068392207434,
+    "dos-udp": 0.9756167153588021
+   },
+   "binary": {
+    "detection_f1": 0.998792299217461,
+    "fpr": 0.16368604073522106,
+    "fnr": 7.317108863945678e-06,
+    "pr_auc": 0.9999599886859191,
+    "roc_auc": 0.9985341366919103
+   },
+   "fit_time_s": 0.99,
+   "predict_time_s": 2.587,
+   "n_test": 554716
+  },
+  "5|rf|seed3": {
+   "accuracy": 1.0,
+   "macro_f1": 1.0,
+   "weighted_f1": 1.0,
+   "mcc": 1.0,
+   "per_class_f1": {
+    "benign": 1.0,
+    "bruteforce-ftp": 1.0,
+    "bruteforce-smb": 1.0,
+    "bruteforce-ssh": 1.0,
+    "dos-hulk": 1.0,
+    "dos-icmp": 1.0,
+    "dos-pushack": 1.0,
+    "dos-slowloris": 1.0,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0
+   },
+   "fit_time_s": 621.77,
+   "predict_time_s": 7.318,
+   "n_test": 554716
+  },
+  "5|knn|seed3": {
+   "accuracy": 0.9994069037128909,
+   "macro_f1": 0.994804642023881,
+   "weighted_f1": 0.9994070543697844,
+   "mcc": 0.999208309645307,
+   "per_class_f1": {
+    "benign": 0.9919801056885297,
+    "bruteforce-ftp": 0.9947955390334573,
+    "bruteforce-smb": 0.989557434112382,
+    "bruteforce-ssh": 0.9837251356238698,
+    "dos-hulk": 0.9953069169644285,
+    "dos-icmp": 1.0,
+    "dos-pushack": 0.999974538024278,
+    "dos-slowloris": 0.9979052876803508,
+    "dos-udp": 0.9999968210876331
+   },
+   "binary": {
+    "detection_f1": 0.9998820136699511,
+    "fpr": 0.009190263288623945,
+    "fnr": 0.00010061024687925307,
+    "pr_auc": 0.9999769777593523,
+    "roc_auc": 0.9992173633263115
+   },
+   "fit_time_s": 0.0,
+   "predict_time_s": 212.376,
+   "n_test": 554716
+  },
+  "5|cnn|seed3": {
+   "accuracy": 0.8765656660345114,
+   "macro_f1": 0.46880156003852874,
+   "weighted_f1": 0.8850280712632661,
+   "mcc": 0.8499786806714623,
+   "per_class_f1": {
+    "benign": 0.7608494921514312,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.0,
+    "bruteforce-ssh": 0.06751859622353615,
+    "dos-hulk": 0.21581845803266236,
+    "dos-icmp": 0.9999395979768502,
+    "dos-pushack": 0.9999458948514177,
+    "dos-slowloris": 0.1751451800232288,
+    "dos-udp": 0.9999968210876331
+   },
+   "binary": {
+    "detection_f1": 0.9971653612249142,
+    "fpr": 0.3859910581222057,
+    "fnr": 0.0,
+    "pr_auc": 0.9992986782916913,
+    "roc_auc": 0.976057375664273
+   },
+   "fit_time_s": 2053.61,
+   "predict_time_s": 20.946,
+   "n_test": 554716
+  },
+  "5|logreg|seed3": {
+   "accuracy": 0.6369655823881049,
+   "macro_f1": 0.5126390343663736,
+   "weighted_f1": 0.6126419846540013,
+   "mcc": 0.6150230660819523,
+   "per_class_f1": {
+    "benign": 0.6898619746880099,
+    "bruteforce-ftp": 0.0,
+    "bruteforce-smb": 0.9780835881753313,
+    "bruteforce-ssh": 0.3546344271732873,
+    "dos-hulk": 0.1874066898398769,
+    "dos-icmp": 0.9924894387737128,
+    "dos-pushack": 0.0005218442740318834,
+    "dos-slowloris": 0.47209488466855853,
+    "dos-udp": 0.9386584617045539
+   },
+   "binary": {
+    "detection_f1": 0.9935284401728081,
+    "fpr": 0.028564331843020367,
+    "fnr": 0.012444572900355612,
+    "pr_auc": 0.9992133418217474,
+    "roc_auc": 0.9856572934538468
+   },
+   "fit_time_s": 1192.3,
+   "predict_time_s": 0.433,
+   "n_test": 554716
+  },
+  "5|rnn|seed3": {
+   "accuracy": 0.9993257811204292,
+   "macro_f1": 0.991577103230756,
+   "weighted_f1": 0.9993393556664176,
+   "mcc": 0.9991003116106637,
+   "per_class_f1": {
+    "benign": 0.989525183466098,
+    "bruteforce-ftp": 0.9970193740685543,
+    "bruteforce-smb": 0.9997501873594804,
+    "bruteforce-ssh": 0.9431018078020933,
+    "dos-hulk": 0.9958970533383066,
+    "dos-icmp": 0.999974567973449,
+    "dos-pushack": 0.9999745381863551,
+    "dos-slowloris": 0.9989512168824677,
+    "dos-udp": 1.0
+   },
+   "binary": {
+    "detection_f1": 0.9998472778418439,
+    "fpr": 0.02036761053154496,
+    "fnr": 5.487831647959258e-06,
+    "pr_auc": 0.9999998243794672,
+    "roc_auc": 0.999990125378933
+   },
+   "fit_time_s": 2347.07,
+   "predict_time_s": 17.707,
+   "n_test": 554716
+  }
+ },
+ "intervalles": {
+  "5": {
+   "n": 2773578,
+   "benign_share": 0.014515185799714303,
+   "n_features": 55
+  },
+  "10": {
+   "n": 1472133,
+   "benign_share": 0.023779101480640677,
+   "n_features": 55
+  },
+  "30": {
+   "n": 577452,
+   "benign_share": 0.05158177649397699,
+   "n_features": 55
+  }
+ },
+ "table_macro_f1": {
+  "5|lightgbm": {
+   "1": 1.0,
+   "2": 1.0,
+   "3": 1.0,
+   "4": 1.0,
+   "5": 1.0
+  },
+  "5|xgboost": {
+   "1": 0.9999992931433298,
+   "2": 1.0,
+   "3": 1.0,
+   "4": 0.999789305390689,
+   "5": 1.0
+  },
+  "5|dnn": {
+   "1": 0.5121097696904745,
+   "2": 0.5562703480919069,
+   "3": 0.5189522511828011,
+   "4": 0.5126652944216848,
+   "5": 0.5173258042562401
+  },
+  "10|lightgbm": {
+   "1": 0.9998729764672524,
+   "2": 0.9999638930738409,
+   "3": 0.8374316326683519,
+   "4": 1.0,
+   "5": 1.0
+  },
+  "10|xgboost": {
+   "1": 0.9999942520091266,
+   "2": 0.9999638930738409,
+   "3": 1.0,
+   "4": 1.0,
+   "5": 1.0
+  },
+  "10|dnn": {
+   "1": 0.510330109195437,
+   "2": 0.5149662853057133,
+   "3": 0.510715947673195,
+   "4": 0.509340167381562,
+   "5": 0.5144651091856124
+  },
+  "30|lightgbm": {
+   "1": 0.9999028573780938,
+   "2": 0.9999837945355073,
+   "3": 0.9999300103701442,
+   "4": 0.9998490105499764,
+   "5": 0.9999219500025985
+  },
+  "30|xgboost": {
+   "1": 0.9998768457492653,
+   "2": 0.9999826558921183,
+   "3": 0.9999375440589697,
+   "4": 0.9998490105499764,
+   "5": 0.9999392967981442
+  },
+  "30|dnn": {
+   "1": 0.8512436937924214,
+   "2": 0.8432264451652832,
+   "3": 0.8487940325804126,
+   "4": 0.851467261106943,
+   "5": 0.9879204357051287
+  },
+  "60|lightgbm": {
+   "1": 0.9999020403172568,
+   "2": 1.0,
+   "3": 1.0,
+   "4": 1.0,
+   "5": 0.9999059711977635
+  },
+  "60|xgboost": {
+   "1": 0.9999903915231741,
+   "2": 1.0,
+   "3": 1.0,
+   "4": 1.0,
+   "5": 1.0
+  },
+  "60|dnn": {
+   "1": 0.9980894183602571,
+   "2": 0.9968693087355032,
+   "3": 0.991475502596109,
+   "4": 0.998895040231726,
+   "5": 0.9985378068449422
+  }
+ },
+ "effondrements": {
+  "5|dnn": {
+   "1": 0.5121097696904745,
+   "2": 0.5562703480919069,
+   "3": 0.5189522511828011,
+   "4": 0.5126652944216848,
+   "5": 0.5173258042562401
+  },
+  "10|lightgbm": {
+   "3": 0.8374316326683519
+  },
+  "10|dnn": {
+   "1": 0.510330109195437,
+   "2": 0.5149662853057133,
+   "3": 0.510715947673195,
+   "4": 0.509340167381562,
+   "5": 0.5144651091856124
+  },
+  "30|dnn": {
+   "1": 0.8512436937924214,
+   "2": 0.8432264451652832,
+   "3": 0.8487940325804126,
+   "4": 0.851467261106943,
+   "5": 0.9879204357051287
+  }
+ }
+}
