@@ -72,6 +72,35 @@ Redrawing the last two corrected three errors the images carried:
 This matters beyond tidiness: the contributions list in Section 1 promises "the scripts
 regenerating every figure and table", and until now that sentence was false.
 
+## What the figure audit found
+
+A full pass over the twenty images, hash-compared against the ones the `.docx`
+actually embeds, found **two figures the manuscript showed that this folder had
+already superseded**, and the build script was not swapping them in:
+
+- **Figure 9** carried the original campaign. It gave `ftt`–`logreg` as a
+  non-significant pair where the corrected condition gives `logreg`–`rnn`, so it
+  contradicted Section 6.1's own list, and it ordered XGBoost ahead of LightGBM
+  under a title that reads "ordered by macro-F1", which Table 2 contradicts.
+- **Figure 11** placed logistic regression at 0.9991 where Section 6.7 reads
+  0.9963, and again put XGBoost first.
+
+Both are now in `REDESSINEES`, and every one of the twenty images in the `.docx`
+is byte-identical to the file of the same name here. Section 11 claims Figures 5,
+9, 10, 11, 14 and 18 are computed from the corrected campaign; until this pass
+that sentence was true of four of the six.
+
+**Figure 1** carried two numbers from the published campaign: "XGBoost and
+LightGBM at macro-F1 1.0000", which the correction moves to 0.9999 for XGBoost,
+and "12 of 67 columns excluded", which Table 3 gives as 13. `regen_fig_concept.py`
+now reads `experiments/e8/e8_results.json` for both and asserts them.
+
+**Figure 8** still draws `IdleTime` in the colour of the retained columns, which
+is what Figure 6 was redrawn to stop doing. Here it is correct as drawn — the
+transferability rule does retain that column, and the legend says "retained under
+both" rules, not "retained by the paper" — so the caption now says which test
+excludes it instead.
+
 ## Captions
 
 - **Figure 1** (2679x1520 px): The chain of argument, capture schedule to audited benchmark

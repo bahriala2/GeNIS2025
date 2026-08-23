@@ -28,6 +28,12 @@ from matplotlib.path import Path
 
 HERE = pathlib.Path(__file__).resolve().parent
 R = json.loads((HERE / 'article1_results.json').read_text(encoding='utf-8'))
+# La campagne corrigee de la section 9 : c'est elle que le tableau 2 et la
+# liste noire de treize colonnes rapportent, et donc elle que les encadres
+# 3 et 5 doivent citer. Les deux chiffres qu'ils portaient venaient de la
+# campagne publiee et la contredisaient.
+E8 = json.loads((HERE.parent / 'experiments' / 'e8' / 'e8_results.json')
+                .read_text(encoding='utf-8'))
 
 WIDTH_IN = 6124575 / 914400          # 6.698 in, l'extent du .docx
 HEIGHT_IN = 3.80
@@ -56,8 +62,8 @@ STAGES = [
     dict(n='3', title='Random split',
          body='The standard protocol hides it. The nine-class task is '
               'solved and the leaderboard carries almost no information.',
-         evid='XGBoost and LightGBM at macro-F1 1.0000; 11 of 45 pairs not '
-              'separable',
+         evid='LightGBM at macro-F1 1.0000 and XGBoost at 0.9999; 11 of 45 '
+              'pairs not separable',
          sec='Section 6.1', state='shortcut'),
     dict(n='4', title='Temporal split',
          body='The usual remedy, applied within each class. It does not '
@@ -66,11 +72,11 @@ STAGES = [
          evid='the same probe still scores 0.9862',
          sec='Section 6.2', state='shortcut'),
     dict(n='5', title='Audit',
-         body='Exclude what does not survive the change of protocol: '
+         body='Exclude what does not survive the change of protocol, '
               'transferability below 0.50 among columns that are '
-              'individually predictive.',
-         evid='12 of 67 columns excluded; permutation importance below '
-              '1e-4 for all eight behavioural ones',
+              'individually predictive, and what identifies a capture file.',
+         evid='13 of 67 columns excluded; permutation importance below '
+              '1e-4 for the eight the ratio rule finds',
          sec='Section 4.3', state='audited'),
     dict(n='6', title='Audited benchmark',
          body='Removing them costs almost nothing under a random split, '
@@ -88,12 +94,21 @@ assert round(A['chance'], 4) == 0.1942
 assert round(R['shortcut_probes']['starttime_only']['strat_mean'], 4) == 0.9970
 assert round(R['shortcut_probes']['starttime_only']['temporal'], 4) == 0.9862
 assert len(A['blacklist']) == 12 and len(R['slice60']['features_full']) == 67
+# La liste noire de l'encadre 5 est celle que le tableau 3 publie : douze
+# colonnes du rejeu d'origine plus la colonne identifiante de la section 9.
+assert len(E8['blacklist_corrigee']) == 13
 assert all(abs(A['perm_importance'][f]) < 1e-4
            for f in A['blacklist'] if f in A['perm_importance'])
-# le 1.0000 du tableau 2 est la moyenne sur cinq graines, pas la graine 1
-assert all(round(sum(M[f'{m}|audited|strat_seed{s_}']['macro_f1']
-                     for s_ in range(1, 6)) / 5, 4) == 1.0
-           for m in ('xgboost', 'lightgbm'))
+# Les macro-F1 de l'encadre 3 sont les moyennes sur cinq graines de la
+# CONDITION CORRIGEE, pas de la graine 1 et pas de la campagne publiee : sous
+# la correction, XGBoost tombe a 0.9999 et LightGBM seul tient 1.0000.
+def _moy5(m):
+    return round(sum(E8['runs'][f'{m}|corrigee|strat_seed{s_}']['macro_f1']
+                     for s_ in range(1, 6)) / 5, 4)
+
+
+assert _moy5('lightgbm') == 1.0, _moy5('lightgbm')
+assert _moy5('xgboost') == 0.9999, _moy5('xgboost')
 _MODELS = ('majority', 'logreg', 'nb', 'knn', 'rf', 'xgboost', 'lightgbm',
            'rnn', 'cnn', 'dnn', 'ftt')
 _loss = max(M[f'{m}|clean|strat_seed1']['macro_f1']
