@@ -157,7 +157,7 @@ im = ax.imshow(Mt, aspect="auto", vmin=.80, vmax=1.0, cmap="RdYlGn")
 ax.set_xticks(range(len(CN)))
 ax.set_xticklabels(CN, rotation=35, ha="right", fontsize=8)
 ax.set_yticks(range(len(ORD_T)))
-ax.set_yticklabels(ORD_T, fontsize=8)
+ax.set_yticklabels([NICE[m] for m in ORD_T], fontsize=8)
 ax.set_xticks(np.arange(-.5, len(CN), 1), minor=True)
 ax.set_yticks(np.arange(-.5, len(ORD_T), 1), minor=True)
 ax.grid(which="minor", color="white", lw=1.4)
@@ -224,12 +224,15 @@ note = ((f"{_et(libres)} are free for every detector. " if libres else "")
         + f"The lowest cell is {pire[1]} on {pire[2]} ({pire[0]:.3f}), "
         + f"against {Mt[0].min():.3f} for the leading detector's worst class. "
         + _avant())
-fig.text(.5, .045, "\n".join(textwrap.wrap(note, 108)), ha="center",
-         fontsize=8.2, color="#25292e")
-plt.tight_layout(rect=[0, .13, 1, 1])
+# La note reste CALCULEE -- c'est elle qui verifie ce que la legende du
+# manuscrit affirme -- mais elle n'est plus dessinee dans l'image : le
+# lecteur la lisait deux fois, une fois sous le titre et une fois dans la
+# legende. On l'imprime pour qui redige la legende.
+plt.tight_layout()
 plt.savefig(OUT / "figure18_per_class_f1_temporal.png", dpi=285)
 plt.close()
 print(f"figure 18 : ordre temporel {ORD_T}")
+print("            note verifiee :", note)
 print(f"            cellule la plus basse {pire[1]} / {pire[2]} = {pire[0]:.4f}")
 
 # =========================================================================
@@ -261,7 +264,8 @@ for deb, q, m in P14:
                marker="^" if creux else "o",
                color="#c23b34" if creux else "#4a72b0", zorder=3)
     dx, dy, ha = DEC.get(m, (8, 8, "left"))
-    ax.annotate(m, (deb, q), textcoords="offset points", xytext=(dx, dy),
+    ax.annotate(NICE[m], (deb, q), textcoords="offset points",
+                xytext=(dx, dy),
                 ha=ha, fontsize=9.5, color="#3b4046")
 ax.set_xscale("log")
 ax.set_xlabel("CPU throughput (flows/s, batch 512, log scale)", fontsize=10)
@@ -330,9 +334,9 @@ for i in range(n9):
             ax.text(j, i, "ns", ha="center", va="center", fontsize=8.5,
                     color="white")
 ax.set_xticks(range(n9))
-ax.set_xticklabels(M9, rotation=90, fontsize=9)
+ax.set_xticklabels([NICE[m] for m in M9], rotation=90, fontsize=9)
 ax.set_yticks(range(n9))
-ax.set_yticklabels(M9, fontsize=9)
+ax.set_yticklabels([NICE[m] for m in M9], fontsize=9)
 ax.set_xticks(np.arange(-.5, n9), minor=True)
 ax.set_yticks(np.arange(-.5, n9), minor=True)
 ax.grid(which="minor", color="white", lw=1.4)
@@ -368,7 +372,7 @@ fig, ax = plt.subplots(figsize=(1655 / 285, 964 / 285))
 ax.errorbar(mu, range(len(M11)), xerr=[lo, hi], fmt="o", ms=6, capsize=3,
             lw=1.4, color="#4a72b0")
 ax.set_yticks(range(len(M11)))
-ax.set_yticklabels(M11, fontsize=10)
+ax.set_yticklabels([NICE[m] for m in M11], fontsize=10)
 ax.set_xlabel("macro-F1 (95 % bootstrap CI, audited condition, seed 1)",
               fontsize=10)
 ax.set_title("Stratified ranking: the top group is statistically "
