@@ -3,7 +3,7 @@
 *Révision du plan initial après vérification (voir `verification_proposition.md`).
 Les changements par rapport à la v1 sont marqués **[v2]**.*
 
-**Titre de travail :** *A Leakage-Audited Benchmark of Deep and Ensemble Detectors on the GeNIS 2025 Corpus: Calibration, Cost, and Class Imbalance under the Natural Distribution*
+**Titre de travail :** *A Leakage-Audited Benchmark of Eleven Detectors on the GeNIS 2025 Corpus: Calibration, Cost, and Protocol Robustness under the Natural Distribution*
 
 **Rôle stratégique :** référence de provenance des détecteurs GeNIS de BAg-IDS et premier benchmark indépendant audité sur GeNIS.
 

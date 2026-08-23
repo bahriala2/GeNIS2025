@@ -239,6 +239,43 @@ The other detectors are joblib dumps.
   add little: the probability matrices in `probs/` already allow every reported metric,
   significance test and calibration curve to be recomputed without retraining.
 
+## Why version 2 is now needed, and not optional
+
+Version 1.0.0 holds the original 154-run campaign. Since it was deposited, the paper's
+headline numbers moved: **Tables 2, 7, 8, 10 and 13 and Figures 5, 9, 10, 11, 14 and 18
+are computed from the E8 campaign**, 180 runs over fifteen configurations, two feature
+conditions, both protocols and five seeds. Section 11 says so itself, and says that E8
+lives in the repository rather than in the archive.
+
+That is the weak point a referee will find. A reader who downloads this record cannot
+reproduce Table 2, the paper's central table, and a GitHub repository is mutable where
+an archive is not. For a paper whose argument is that the first numbers published on a
+corpus become its reference numbers, leaving the reference numbers outside the archive
+is the one inconsistency that matters.
+
+E9, which fills the interval-robustness column of Table 13 for six further detectors,
+is running at the time of writing. Deposit once, after it finishes, so that version 2
+carries E8 and E9 together.
+
+The paper needs no change for this. Section 11 cites the **concept** DOI,
+`10.5281/zenodo.21910662`, which resolves to the latest version; the new version DOI
+follows automatically and the 1.0.0 files stay accessible at
+`10.5281/zenodo.21910663`.
+
+What version 2 should add, beyond the 1.0.0 contents:
+
+| | |
+|---|---|
+| `experiments/e2` … `experiments/e9` | every follow-up campaign, 0.6 MB in all |
+| `paper/*.py` | the scripts that draw every figure and assert every table |
+| `paper/figures_manuscrit/` | the twenty images the manuscript shows, at their final resolution |
+| `colab/` | the notebooks and cells that produced each campaign |
+| E8 and E9 probability matrices | ~380 MB, currently in Drive, well inside Zenodo's 50 GB |
+
+The repository is 18 MB without them, so the deposit is cheap. Including the matrices is
+what lets a reader recompute the calibration and the paired tests without retraining,
+exactly as `probs/` does for the 154 runs of 1.0.0.
+
 ## A canonical archive, if a new version is made
 
 `colab/zenodo_export_cell.py` builds a single `genis2025-artefact.zip` containing all
