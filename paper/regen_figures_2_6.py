@@ -37,7 +37,16 @@ OUT.mkdir(exist_ok=True)
 A = json.loads((HERE / "article1_results.json").read_text(encoding="utf-8"))
 CNT = A["slice60"]["class_counts"]
 N = A["slice60"]["n"]
+# DPI fixe la GEOMETRIE : les figsize sont ecrits en pixels divises par lui,
+# donc le changer ne change pas le nombre de pixels rendus. Il en faut un
+# second pour la resolution de sortie.
 DPI = 285
+# Elsevier demande 300 dpi au moins pour une figure mixte trait et
+# demi-teinte. La figure 6 occupe 5.76 pouces de large dans le document, ou
+# ses 1678 pixels ne faisaient que 291 dpi effectifs. A 320 en sortie elle en
+# fait 327, et le rapport hauteur/largeur ne bouge pas, donc l'etendue posee
+# dans le document reste valable.
+DPI_OUT = 320
 
 VERT, BLEU, ROUGE = "#4b9c5a", "#4a72b0", "#c23b34"
 
@@ -86,7 +95,7 @@ fig.text(.5, .025,
          + "reported in this paper is an integer multiple of that step.",
          ha="center", fontsize=9.2, color="#4a4f55")
 plt.tight_layout(rect=[0, .135, 1, 1])
-plt.savefig(OUT / "figure02_class_distribution.png", dpi=DPI)
+plt.savefig(OUT / "figure02_class_distribution.png", dpi=DPI_OUT)
 plt.close()
 print(f"figure 2  : {n_benin_test} flux benins de test, pas de {pas:.4f} point")
 print("            parts " + ", ".join(f"{f} {100 * parts[f] / N:.2f}%"
@@ -165,7 +174,8 @@ ax.legend(handles=[
                label="excluded by the capture-file test")],
     loc="lower right", fontsize=9.5)
 plt.tight_layout()
-plt.savefig(OUT / "figure06_importance_vs_transferability.png", dpi=DPI)
+plt.savefig(OUT / "figure06_importance_vs_transferability.png",
+            dpi=DPI_OUT)
 plt.close()
 nuls = sum(1 for r in TT.values() if r["importance"] == 0)
 print(f"figure 6  : {len(TT)} colonnes, {len(BL8)} exclues par la regle, "
