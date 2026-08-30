@@ -28,7 +28,7 @@ Rank,positional,excluded,name,,,,,,,,,,,,,
 Seq,positional,excluded,name,,,,,,,,,,,,,
 Dur,behavioural,excluded,transferability rule,0.0000,0.922,0.304,0.33,0.1508,yes,yes,yes,0.9218,0.5742,0.6229,1,identical-1
 RunTime,behavioural,excluded,transferability rule,0.0000,0.922,0.304,0.33,0.1508,yes,yes,yes,0.9218,0.5742,0.6229,2,identical-1
-IdleTime,behavioural,retained,,0.2279,0.621,0.585,0.94,0.9156,no,no,yes,0.6184,0.6302,1.0191,37,
+IdleTime,behavioural,excluded,capture-file test,0.2279,0.621,0.585,0.94,0.9156,no,no,yes,0.6184,0.6302,1.0191,37,
 Mean,behavioural,excluded,transferability rule,0.0000,0.922,0.304,0.33,0.1508,yes,yes,yes,0.9218,0.5742,0.6229,3,identical-1
 Sum,behavioural,excluded,transferability rule,0.0000,0.922,0.304,0.33,0.1508,yes,yes,yes,0.9218,0.5742,0.6229,4,identical-1
 Min,behavioural,excluded,transferability rule,0.0000,0.922,0.304,0.33,0.1508,yes,yes,yes,0.9218,0.5742,0.6229,5,identical-1

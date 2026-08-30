@@ -4,13 +4,15 @@
 Reviewer minor 14. The blacklist is stated three times in the manuscript, in
 prose in Section 4.3, as Table 3, and as a spectrum in Figure 6. None of those
 can be read by a script, so anyone wanting to reproduce the audited condition
-has to retype twelve names and trust their eyes. This writes the whole
+has to retype thirteen names and trust their eyes. This writes the whole
 disposition out once, with the measurements that produced it.
 
 Sources, all committed:
   paper/article1_results.json            the published campaign (audit block)
   experiments/e4a/e4abis_results.json    the nested audit that re-derives the
                                          list without opening the test set
+  experiments/e7/e7_results.json         the capture-file test, which adds the
+                                         thirteenth column after the campaign
 
 One row per column of the released 2-flows module that the audit had an
 opinion about: 23 identifiers excluded by name, 4 positional columns excluded
@@ -37,12 +39,21 @@ IDENTIFIERS = ["FlowID", "AutoId", "SrcAddr", "DstAddr", "Ssaddr", "Sdaddr",
 R = json.loads((HERE / "article1_results.json").read_text(encoding="utf-8"))
 B = json.loads((REPO / "experiments" / "e4a" / "e4abis_results.json")
                .read_text(encoding="utf-8"))
+C = json.loads((REPO / "experiments" / "e7" / "e7_results.json")
+               .read_text(encoding="utf-8"))
 
 A = R["audit"]
 P_MAX = A["chance"]                      # 0.19422112035889263
 R_THR = A["rule"]["ratio_below"]         # 0.50
 K_MIN = A["rule"]["min_acc_x_chance"]    # 3.0
+# La liste du champ « blacklist » est celle de la campagne publiee, a douze
+# colonnes. Le test du fichier de capture en a ajoute une treizieme apres coup
+# (Sections 4.3 et 9), et c'est la liste corrigee que le manuscrit rapporte :
+# ce fichier doit decrire celle-la, sans quoi il contredit le tableau 3.
 BLACK = A["blacklist"]
+BLACK_CORR = C["blacklist_corrigee"]
+CAPTURE = sorted(set(BLACK_CORR) - set(BLACK))
+assert CAPTURE == ["IdleTime"], CAPTURE
 POSITIONAL = [c for c in BLACK if c not in
               {r["feature"] for r in A["transfer_table"]}]
 ROWS = {r["feature"]: r for r in A["transfer_table"]}
@@ -110,8 +121,9 @@ for f, r in ROWS.items():
     out.append({
         "column": f,
         "category": "behavioural",
-        "disposition": "excluded" if flag else "retained",
-        "excluded_by": "transferability rule" if flag else "",
+        "disposition": "excluded" if flag or f in CAPTURE else "retained",
+        "excluded_by": ("transferability rule" if flag else
+                        "capture-file test" if f in CAPTURE else ""),
         "perm_importance": f'{r["importance"]:.4f}',
         "acc_stratified": f"{s:.3f}",
         "acc_temporal": f"{t:.3f}",
@@ -141,16 +153,19 @@ n_kept = sum(1 for d in out if d["disposition"] == "retained")
 ranks = sorted(int(d["nested_rank"]) for d in out
                if d["flagged_tau"] == "yes" and d["nested_rank"] != "")
 assert len(out) == 90, len(out)
-assert n_beh == 63 and n_kept == 55 and n_excl == 35
+assert n_beh == 63 and n_kept == 54 and n_excl == 36
 assert n_flag == 8 and n_star == 13
 assert set(d["column"] for d in out if d["disposition"] == "excluded"
-           and d["category"] != "identifier") == set(BLACK)
+           and d["category"] != "identifier") == set(BLACK_CORR)
+assert [d["excluded_by"] for d in out if d["column"] in CAPTURE] == \
+    ["capture-file test"]
 assert ranks == [1, 2, 3, 4, 5, 6, 7, 8], ranks
 print(f"ecrit : {OUT}")
 print(f"  {len(out)} colonnes : 23 identifiants, {len(POSITIONAL)} "
       f"positionnelles, {n_beh} comportementales")
-print(f"  liste noire publiee : {len(BLACK)} colonnes "
-      f"({len(POSITIONAL)} par nom + {n_flag} par la regle)")
+print(f"  liste noire corrigee : {len(BLACK_CORR)} colonnes "
+      f"({len(POSITIONAL)} par nom + {n_flag} par la regle "
+      f"+ {len(CAPTURE)} par le test du fichier de capture)")
 print(f"  variante tau* : {n_star} comportementales, "
       f"liste noire {len(POSITIONAL) + n_star}")
 print(f"  rangs des huit publiees dans l'audit imbrique : {ranks} "

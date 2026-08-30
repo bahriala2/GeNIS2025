@@ -76,9 +76,17 @@ y = 2.42
 entete(y, 'b', 'Global chronological split',
        'degenerate on GeNIS: the last 20% holds classes the first 60% never '
        'contains. Reported as a property of the corpus, not used as a protocol')
-bande(y, 0, 0.60, TRAIN, 'train')
-bande(y, 0.60, 0.80, VAL, 'val')
-bande(y, 0.80, 1.0, TEST, 'test')
+# Sur un axe qui court A L'INTERIEUR d'une classe, une coupe chronologique
+# globale ne coupe rien : la classe tombe entiere dans une seule fenetre, et
+# c'est exactement ce qui la rend degeneree. La dessiner en 60/20/20 la
+# rendait indiscernable de (c), dont elle est le contraire.
+_h = 0.115
+bande(y + 0.145, 0, 1.0, TRAIN, None, h=_h)
+ax.text(X0 + 0.5 * W, y + 0.145 + _h / 2, 'benign, captured first',
+        ha='center', va='center', fontsize=5.6, color='white', zorder=3)
+bande(y, 0, 1.0, TEST, None, h=_h)
+ax.text(X0 + 0.5 * W, y + _h / 2, 'an attack family captured last',
+        ha='center', va='center', fontsize=5.6, color='white', zorder=3)
 
 
 # --- (c) temporel par classe : le protocole evalue -----------------------

@@ -38,7 +38,7 @@ import time
 # --------------------------------------------------------------------------
 README = r"""# Artefact for *A Leakage-Audited Benchmark of Eleven Intrusion Detectors on GeNIS 2025*
 
-This archive is the reproducibility artefact referenced in Section 10 of the paper.
+This archive is the reproducibility artefact referenced in Section 11 of the paper.
 It contains the pipeline, the frozen evaluation protocol, every measurement the
 paper reports, and the trained detectors.
 
@@ -55,9 +55,9 @@ paper reports, and the trained detectors.
 > recent version. See `ARCHIVE_README.md` in the code repository for what v1.0.0
 > actually contains.
 
-## What Section 10 promises, and where it is
+## What Section 11 promises, and where it is
 
-| Promised in Section 10 | Location in this archive |
+| Promised in Section 11 | Location in this archive |
 |---|---|
 | the pipeline | `code/colab/article1_pipeline.ipynb` |
 | the frozen split indices | `frozen_splits_60s.npz` |
