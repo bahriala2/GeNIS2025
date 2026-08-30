@@ -29,7 +29,7 @@ md(r"""
 
 > **Notebook VERSION_PLACEHOLDER, compilé le BUILD_PLACEHOLDER.** La cellule 1.1 réaffiche ce numéro à l'exécution : s'il ne correspond pas, Colab sert une copie en cache, voir la note en fin de notebook.
 
-Expérience complémentaire de l'article *A Leakage-Audited Benchmark of Eleven
+Expérience complémentaire de l'article *A Shortcut-Audited Benchmark of Eleven
 Detectors on the GeNIS 2025 Corpus*.
 
 **Question.** L'article évalue le module `2-flows` sous un protocole audité. La baseline du

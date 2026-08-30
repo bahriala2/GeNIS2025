@@ -4,9 +4,9 @@ This file describes **what is actually deposited on Zenodo**, which is not the l
 that `colab/zenodo_export_cell.py` builds. It is maintained by hand and is
 deliberately not overwritten by that script.
 
-- **Record title**: Reproducibility artefact for: A Leakage-Audited Benchmark of Deep
-  and Ensemble Detectors on the GeNIS 2025 Corpus: Calibration, Cost, and Class
-  Imbalance under the Natural Distribution
+- **Record title**: Reproducibility artefact for: A Shortcut-Audited Benchmark of
+  Eleven Detectors on the GeNIS 2025 Corpus: Calibration, Cost, and Protocol
+  Robustness under the Natural Distribution
 - **Concept DOI, all versions**: `10.5281/zenodo.21910662` — this is what Section 11
   of the paper cites
 - **Version DOI, v1.0.0**: `10.5281/zenodo.21910663`, published 13 August 2026

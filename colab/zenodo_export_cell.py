@@ -36,13 +36,13 @@ import time
 # Le README de l'archive. En anglais : c'est la premiere page que lit un
 # relecteur. Les champs entre accolades sont remplis a l'export.
 # --------------------------------------------------------------------------
-README = r"""# Artefact for *A Leakage-Audited Benchmark of Eleven Detectors on the GeNIS 2025 Corpus*
+README = r"""# Artefact for *A Shortcut-Audited Benchmark of Eleven Detectors on the GeNIS 2025 Corpus*
 
 This archive is the reproducibility artefact referenced in Section 10 of the paper.
 It contains the pipeline, the frozen evaluation protocol, every measurement the
 paper reports, and the trained detectors.
 
-- **Paper**: A Leakage-Audited Benchmark of Eleven Detectors on the GeNIS 2025 Corpus
+- **Paper**: A Shortcut-Audited Benchmark of Eleven Detectors on the GeNIS 2025 Corpus
 - **Corpus**: GeNIS 2025, `2-flows` module, 60-second flows, doi:10.5281/zenodo.14919237
 - **Code repository**: https://github.com/bahriala2/GeNIS2025
 - **This artefact, all versions**: {archive_doi}
