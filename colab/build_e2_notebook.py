@@ -32,8 +32,8 @@ md(r"""
 > **Notebook VERSION_PLACEHOLDER, compilé le BUILD_PLACEHOLDER.** La cellule 1.1 réaffiche ce numéro
 > à l'exécution. S'il ne correspond pas, Colab sert une copie en cache.
 
-Expérience complémentaire de l'article *A Shortcut-Audited Benchmark of Eleven
-Detectors on the GeNIS 2025 Corpus*.
+Expérience complémentaire de l'article *A Leakage-Audited Benchmark of Eleven
+Intrusion Detectors on GeNIS 2025*.
 
 **Ce que le relecteur demande.** Les trois résultats à portée méthodologique de l'article sont
 démontrés sur un seul corpus. Il demande le même audit sur un corpus indépendant, et donne la
