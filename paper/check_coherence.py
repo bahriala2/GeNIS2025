@@ -116,6 +116,18 @@ else:
                  if ordre_cit[i + 1] < ordre_cit[i]]
         signale(f"bibliographie : ordre de premiere citation non croissant, "
                 f"premiers reculs {recul[:5]}")
+    # Une entree sans annee est une entree qu'on n'a pas fini de verifier.
+    # Le cas se presente quand on cite un manuscrit accepte, dont la version
+    # d'auteur ne porte ni volume ni DOI : la reference reste incomplete
+    # jusqu'a ce que quelqu'un ouvre la page de l'editeur. Le controle existe
+    # pour que cet etat ne puisse pas traverser une soumission sans etre vu.
+    sans_annee = [t.strip()[:70] for t in BLOCS[i_ref:]
+                  if re.match(r"\s*\[\d+\]", t)
+                  and not re.search(r"\b(19|20)\d\d\b", t)]
+    if sans_annee:
+        signale("bibliographie : entree sans annee, a completer -> "
+                + " | ".join(sans_annee))
+
     print(f"  {'References':9s} {len(entrees)} entrees, "
           f"{len(ordre_cit)} citees, ordre de premiere citation "
           f"{'croissant' if ordre_cit == sorted(ordre_cit) else 'NON CROISSANT'}")
