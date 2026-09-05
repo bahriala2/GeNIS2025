@@ -51,9 +51,23 @@ it in the first person now refer to it in the third.
 
 
 - Figure 12 is 1593 pixels wide against a 1772-pixel minimum for a
-  single-column bitmap, and has no vector version because the script that drew
-  it is not in the repository. The other nineteen are either above the minimum
-  or supplied as vector.
+  single-column bitmap, and has no vector version. The other nineteen are
+  either above the minimum or supplied as vector.
+
+  The figure cannot be redrawn from anything committed here. It plots the
+  per-class F1 of LightGBM at 5, 10 and 30 seconds, averaged over seeds 1 to 3,
+  and those runs are not in the repository: `article1_results.json` holds 154
+  runs, all of them at 60 seconds, and `experiments/e5` holds seeds 4 and 5
+  only. The code that drew it is cell 31 of `colab/article1_pipeline.ipynb`,
+  which stores its output in `RESULTS["intervals"]` — an object that lives in
+  the Colab run and in `article1_final.zip` on Zenodo, not here.
+
+  To fix it, supply that `RESULTS["intervals"]` object, or the archive that
+  contains it. Redrawing then takes minutes, in vector, and the values Section
+  6.4 quotes from the figure (bruteforce-ftp at 0.685 for the three-seed mean
+  at 10 s, from 0.999, 1.000 and 0.056) become reproducible assertions rather
+  than prose. Upscaling the PNG is not an option: it would add no information
+  while claiming a resolution the image does not have.
 - The affiliation on the title page gives no street address. The guide asks for
   the full postal address of each affiliation; the Tunisian one is complete,
   the Bordeaux one is the laboratory's standard form and may need a street.
