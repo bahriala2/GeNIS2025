@@ -10,7 +10,7 @@ re-checks the anonymisation.
 | `manuscript_anonymised.docx` | Manuscript | 47 pages, no author name, affiliation or acknowledgement in the body |
 | `highlights.docx` | Highlights | 5 bullets, longest 80 characters |
 | `figures/*.pdf` | Artwork | Vector versions of 15 of the 20 figures |
-| `cover_letter.md` | Cover letter | Names the AI contribution and the engineering application, and discloses the prior conference paper |
+| `cover_letter.docx` | Cover letter | Names the AI contribution and the engineering application, and discloses the prior conference paper |
 
 ## The four desk-rejection conditions
 

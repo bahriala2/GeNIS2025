@@ -143,6 +143,20 @@ def elaguer_media(d):
     return retires
 
 
+def sans_entete(arbre):
+    """Retire l'en-tete courant.
+
+    Il porte le titre de l'article, ce qui a un sens sur quarante-sept pages
+    et aucun sur une lettre d'une page, ou il apparait juste au-dessus du meme
+    titre et se lit comme une erreur de montage.
+    """
+    body = arbre.getroot().find(W + "body")
+    for sect in body.iter(W + "sectPr"):
+        for ref in list(sect):
+            if ref.tag in (W + "headerReference", W + "footerReference"):
+                sect.remove(ref)
+
+
 def refermer(d, doc, arbre, tete, cible):
     arbre.write(doc, encoding="UTF-8", xml_declaration=True)
     xml = doc.read_text(encoding="utf-8")
@@ -205,6 +219,7 @@ for ligne in [
     else:
         body.append(p)
 
+sans_entete(arbre)
 arbre.write(doc, encoding="UTF-8", xml_declaration=True)
 elaguer_media(d)
 arbre = ET.parse(doc)
@@ -300,9 +315,152 @@ for ligne in ["Highlights"] + ["- " + b for b in PUCES]:
         body.insert(list(body).index(sectPr[0]), p)
     else:
         body.append(p)
+sans_entete(arbre)
 arbre.write(doc, encoding="UTF-8", xml_declaration=True)
 elaguer_media(d)
 arbre = ET.parse(doc)
 refermer(d, doc, arbre, tete, OUT / "highlights.docx")
 print("ecrit : submission/highlights.docx, %d puces, la plus longue %d caracteres"
       % (len(PUCES), max(len(b) for b in PUCES)))
+
+# --------------------------------------------------------------------------
+# 4. la lettre de soumission
+# --------------------------------------------------------------------------
+LETTRE = [
+    ("corps", "Mohamed Ala Eddine Bahri"),
+    ("corps", "INSIGHT Lab, ISITCom, University of Sousse"),
+    ("corps", "Hammam Sousse 4011, Tunisia"),
+    ("corps", COURRIEL),
+    ("corps", ""),
+    ("corps", "To the Editor-in-Chief"),
+    ("corps", "Engineering Applications of Artificial Intelligence"),
+    ("corps", ""),
+    ("gras", "Submission of an Original Research article: \u201cA Leakage-Audited "
+             "Benchmark of Eleven Intrusion Detectors on GeNIS 2025: "
+             "Calibration, Cost, and Protocol Robustness\u201d"),
+    ("corps", ""),
+    ("corps", "Dear Editor,"),
+    ("corps", ""),
+    ("corps", "We submit the manuscript above for consideration as an Original "
+              "Research article."),
+    ("corps", ""),
+    ("gras", "The contribution in AI and the application in engineering"),
+    ("corps",
+     "The contribution in artificial intelligence is a feature-audit protocol "
+     "of four complementary tests, each with a stated blind spot, that decides "
+     "which columns of a network-flow corpus a learned detector may use, "
+     "together with the finding that attribution methods cannot stand in for "
+     "it. On the corpus studied here, every one of the eight behavioural "
+     "shortcuts the protocol removes is scored at or below 0.0001 by "
+     "permutation importance, because they are mutually redundant and six of "
+     "them are numerically identical columns. The application in engineering "
+     "is network intrusion detection on enterprise traffic, evaluated here on "
+     "GeNIS 2025, a corpus captured on an industrial CyberRange, with a second "
+     "corpus used to test which of the findings carry."),
+    ("corps", ""),
+    ("gras", "Fit with the journal"),
+    ("corps",
+     "The scope of Engineering Applications of Artificial Intelligence names "
+     "\u201cindustrial experiences in the application of the above techniques, "
+     "e.g. case studies or benchmarking exercises\u201d. This paper is such an "
+     "exercise made rigorous: eleven supervised detectors and one unsupervised "
+     "detector, five seeds, two evaluation protocols, paired significance "
+     "testing, and the calibration and single-host inference cost of every "
+     "model, on a corpus whose first published numbers are about to become its "
+     "reference numbers. The methodological result, that the standard remedies "
+     "for shortcut learning, attribution ranking and chronological splitting, "
+     "were each insufficient here and measurably so, is of direct use to "
+     "anyone deploying a learned detector on operational traffic."),
+    ("corps", ""),
+    ("gras", "Relation to our earlier work"),
+    ("corps",
+     "Three of the neural architectures evaluated here, the recurrent, "
+     "convolutional and dense detectors, were first published by two of the "
+     "authors in a conference paper, cited as reference [7], on a different "
+     "corpus and under a single random split. The present manuscript reuses "
+     "those architectures unchanged and serves as their provenance record. It "
+     "shares no results, no corpus, no protocol and no text with that paper. "
+     "Everything reported here, the audit protocol, the temporal evaluation, "
+     "the calibration, the cost measurements and the external validation, is "
+     "new."),
+    ("corps", ""),
+    ("gras", "Principal findings"),
+    ("corps",
+     "A random split saturates the nine-class task, leaving eleven model pairs "
+     "statistically indistinguishable and the leaderboard uninterpretable. A "
+     "timestamp-only probe survives a label-aware per-class temporal split at "
+     "98.6% accuracy against a 19.4% majority rate, so chronological "
+     "evaluation alone does not remove a schedule shortcut; on the second "
+     "corpus the same probe falls to 10.3%, which makes the sufficiency of "
+     "temporal splitting a property to measure rather than to assume. Under "
+     "temporal evaluation the ranking inverts, and logistic regression trails "
+     "the best macro-F1 by 0.0020 at 1\u00a0097 times its throughput."),
+    ("corps", ""),
+    ("gras", "Compliance and declarations"),
+    ("corps",
+     "The manuscript is 47 pages and 3.8 MB, within the journal\u2019s limits, "
+     "formatted single-column, with a 250-word abstract that carries no "
+     "undefined acronym and six keywords. The title page and the anonymised "
+     "manuscript are uploaded as separate files for double anonymized review; "
+     "highlights and vector artwork accompany them. The code repository and "
+     "the data archive are withheld from the anonymised manuscript because "
+     "their addresses identify the authors, and we will supply both to the "
+     "editorial office on request and restore the citations on acceptance."),
+    ("corps", ""),
+    ("corps",
+     "The work is original, has not been published elsewhere, and is not under "
+     "consideration by another journal. All authors have approved the "
+     "submission. The authors declare no competing financial or personal "
+     "interests, and the research received no specific grant from any funding "
+     "agency. A generative AI assistant was used to draft and revise portions "
+     "of the manuscript text and to review the analysis code; the authors "
+     "reviewed and edited all content and take full responsibility for it, as "
+     "declared in the manuscript and in the submission system."),
+    ("corps", ""),
+    ("corps", "Thank you for considering our work."),
+    ("corps", ""),
+    ("corps", "Yours sincerely,"),
+    ("corps", ""),
+    ("corps", "Mohamed Ala Eddine Bahri, on behalf of Farah Jemili and "
+              "Mohamed Mosbah"),
+]
+
+d, doc, arbre, tete = ouvrir()
+body = arbre.getroot().find(W + "body")
+kids = list(body)
+# Le paragraphe de la 4.3 a conduite grasse fournit le modele du passage en
+# gras ; le corps du resume celui du texte courant.
+modele_gras = kids[index(kids, "A third criterion, and why the first two")]
+corps = kids[6]
+sectPr = [e for e in kids if e.tag == W + "sectPr"]
+for e in kids:
+    if e.tag != W + "sectPr":
+        body.remove(e)
+
+
+def para_gras(modele, contenu):
+    p = copy.deepcopy(modele)
+    rs = p.findall(W + "r")
+    for r in rs[1:]:
+        p.remove(r)
+    ts = rs[0].findall(W + "t")
+    for t in ts[1:]:
+        rs[0].remove(t)
+    ts[0].text = contenu
+    ts[0].set(XMLSP, "preserve")
+    return p
+
+
+for genre, ligne in LETTRE:
+    p = para_gras(modele_gras, ligne) if genre == "gras" else para(corps, ligne)
+    if sectPr:
+        body.insert(list(body).index(sectPr[0]), p)
+    else:
+        body.append(p)
+
+sans_entete(arbre)
+arbre.write(doc, encoding="UTF-8", xml_declaration=True)
+elaguer_media(d)
+arbre = ET.parse(doc)
+refermer(d, doc, arbre, tete, OUT / "cover_letter.docx")
+print("ecrit : submission/cover_letter.docx")
