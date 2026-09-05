@@ -46,10 +46,8 @@ IDENTIFIANTS = ["Bahri", "Jemili", "Mosbah", "INSIGHT", "ISITCom", "Sousse",
 TIERCE = [
     ("of our earlier comparative study [7]",
      "of an earlier comparative study [7]"),
-    ("reproduced exactly as published in our prior comparative study [7] and "
-     "reused in the companion system paper",
-     "reproduced exactly as published in an earlier comparative study [7] and "
-     "reused in a companion system paper"),
+    ("reproduced exactly as published in our prior comparative study [7]",
+     "reproduced exactly as published in an earlier comparative study [7]"),
     ("One consequence for our own earlier work. The comparative study whose "
      "architectures we reuse [7]",
      "One consequence for the earlier work these architectures come from. The "

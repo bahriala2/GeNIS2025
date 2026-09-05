@@ -49,10 +49,6 @@ it in the first person now refer to it in the third.
 
 ## Still open
 
-- Section 5 says the neural trio was "reused in the companion system paper"
-  without citing it. A reviewer will ask which paper, and the cover letter
-  cannot disclose what the manuscript does not name. Either cite it or drop
-  the clause.
 
 - Figure 12 is 1593 pixels wide against a 1772-pixel minimum for a
   single-column bitmap, and has no vector version because the script that drew
