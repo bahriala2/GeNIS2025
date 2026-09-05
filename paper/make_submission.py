@@ -35,7 +35,8 @@ OUT.mkdir(exist_ok=True)
 
 IDENTIFIANTS = ["Bahri", "Jemili", "Mosbah", "INSIGHT", "ISITCom", "Sousse",
                 "LaBRI", "Bordeaux", "Talence", "github.com/bahriala2",
-                "zenodo.21910662", "zenodo.21910663"]
+                "zenodo.21910662", "zenodo.21910663",
+                "u-sousse.tn", "u-bordeaux.fr", "@"]
 
 # La reference [7] est une auto-citation. On ne la retire pas : supprimer une
 # reference reelle fausse la bibliographie et se voit. L'usage en double
@@ -55,9 +56,17 @@ TIERCE = [
      "comparative study reused here [7]"),
 ]
 
-COURRIEL = "arabosaiorganisation@gmail.com"
+COURRIEL = "bahri.mohamedalaeddine@isitc.u-sousse.tn"
 ADRESSE = ("INSIGHT Lab, ISITCom, University of Sousse, "
            "Hammam Sousse 4011, Tunisia")
+# Le guide n'exige que l'adresse de l'auteur correspondant, mais le formulaire
+# de soumission demande celle de chaque co-auteur : les trois sont ici pour
+# n'avoir a les chercher qu'une fois.
+COURRIELS = [
+    "Mohamed Ala Eddine Bahri: bahri.mohamedalaeddine@isitc.u-sousse.tn",
+    "Farah Jemili: Farah.JMILI@isitc.u-sousse.tn",
+    "Mohamed Mosbah: mohamed.mosbah@u-bordeaux.fr",
+]
 
 # Ce que la section 11 devient dans le fichier anonymise. La substance reste :
 # ce qui est publie, sous quelle licence, et ou chaque campagne se trouve dans
@@ -180,6 +189,9 @@ for ligne in [
         "",
         "Corresponding author",
         "Mohamed Ala Eddine Bahri, " + ADRESSE + ". Email: " + COURRIEL + ".",
+        "",
+        "Author email addresses",
+        "  ".join(COURRIELS),
         "",
         "Acknowledgements",
         "None.",

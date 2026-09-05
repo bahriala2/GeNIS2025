@@ -52,9 +52,13 @@ it in the first person now refer to it in the third.
   single-column bitmap, and has no vector version because the script that drew
   it is not in the repository. The other nineteen are either above the minimum
   or supplied as vector.
-- The corresponding author's email on the title page is a personal address. An
-  institutional one is usually preferred and is what appears in the published
-  article.
+- The affiliation on the title page gives no street address. The guide asks for
+  the full postal address of each affiliation; the Tunisian one is complete,
+  the Bordeaux one is the laboratory's standard form and may need a street.
+- Farah Jemili's address reads `Farah.JMILI@`, while the author line spells the
+  surname Jemili. The address is the address, so nothing to change there, but
+  the guide asks that names be checked carefully and this is the kind of
+  variant worth a second look.
 - Acknowledgements read "None." Change if anyone should be thanked.
 - The generative-AI declaration in Section 12 does not name the tool. The
   submission system asks for it separately; name it there.
