@@ -65,6 +65,7 @@ qu'une relecture laisse passer. Les trois premiers n'ont aucune dépendance.
 
 | Chemin | Rôle |
 |---|---|
+| `docs/poste_de_travail.md` | **Reprendre l'article en local** : la bonne branche, l'installation, et les deux points que seul le poste débloque |
 | `docs/reponse_reviewer_q1.md` | Réponse point par point à la relecture Q1, priorités 1 à 6 |
 | `docs/reponse_relecture.md` | Les 21 remarques de la relecture « overgeneralisation », toutes adoptées |
 | `docs/reponse_limites_v2.md` | Réponse au rapport de limites |
