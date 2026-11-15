@@ -30,6 +30,16 @@ memoire et qui devient faux des que la mesure change.
 
 Sortie : la liste des ecarts, et un code de retour non nul s'il y en a.
 """
+
+# Windows rend stdout en cp1252 : les caracteres que ce script ecrit -- le
+# signe superieur-ou-egal, les espaces insecables des nombres, les fleches --
+# y levent UnicodeEncodeError, et le verificateur s'arrete au milieu de sa
+# liste en laissant croire a une panne de fond. Sous Linux, ou stdout est
+# deja en UTF-8, la ligne ne change rien.
+import sys as _sys
+if hasattr(_sys.stdout, "reconfigure"):
+    _sys.stdout.reconfigure(encoding="utf-8")
+
 import json
 import pathlib
 import re

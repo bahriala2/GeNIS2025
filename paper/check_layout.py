@@ -21,6 +21,16 @@ Il faut LibreOffice Writer (soffice) et PyMuPDF. Sans eux le script le dit
 et sort sans rien affirmer : un controle qui ne peut pas tourner ne doit
 pas se lire comme un controle passe.
 """
+
+# Windows rend stdout en cp1252 : les caracteres que ce script ecrit -- le
+# signe superieur-ou-egal, les espaces insecables des nombres, les fleches --
+# y levent UnicodeEncodeError, et le verificateur s'arrete au milieu de sa
+# liste en laissant croire a une panne de fond. Sous Linux, ou stdout est
+# deja en UTF-8, la ligne ne change rien.
+import sys as _sys
+if hasattr(_sys.stdout, "reconfigure"):
+    _sys.stdout.reconfigure(encoding="utf-8")
+
 import pathlib
 import re
 import shutil
@@ -39,8 +49,20 @@ try:
     import pymupdf
 except ImportError:
     sys.exit("PyMuPDF absent : pip install pymupdf")
-if not shutil.which("soffice"):
-    sys.exit("LibreOffice Writer absent : apt-get install libreoffice-writer")
+# Sous Linux, l'installeur met soffice dans le PATH. Celui de Windows ne le
+# fait pas : sans cette recherche complementaire, le script se declarerait
+# impossible a executer sur un poste ou LibreOffice est pourtant installe --
+# et un controle qui ne tourne pas ne doit pas se lire comme un controle passe.
+SOFFICE = shutil.which("soffice")
+if not SOFFICE:
+    for candidat in (r"C:\Program Files\LibreOffice\program\soffice.exe",
+                     r"C:\Program Files (x86)\LibreOffice\program\soffice.exe"):
+        if pathlib.Path(candidat).exists():
+            SOFFICE = candidat
+            break
+if not SOFFICE:
+    sys.exit("LibreOffice Writer absent : apt-get install libreoffice-writer "
+             "(Linux), winget install TheDocumentFoundation.LibreOffice (Windows)")
 
 
 def norm(s):
@@ -56,8 +78,12 @@ def norm(s):
 
 # --- rendu ----------------------------------------------------------------
 tmp = pathlib.Path(tempfile.mkdtemp(prefix="genis_layout_"))
-subprocess.run(["soffice", "--headless", "--norestore",
-                f"-env:UserInstallation=file://{tmp}/profile",
+# as_uri() au lieu d'un f-string : sur un chemin POSIX, "file://" + "/tmp/x"
+# donnait bien file:///tmp/x, mais sur un chemin Windows le meme f-string
+# produit file://D:\...\profile, que LibreOffice rejette en sortant en
+# erreur 1 sans message. as_uri() rend la forme valide sur les deux systemes.
+subprocess.run([SOFFICE, "--headless", "--norestore",
+                f"-env:UserInstallation={(tmp / 'profile').as_uri()}",
                 "--convert-to", "pdf", "--outdir", str(tmp), str(DOCX)],
                check=True, capture_output=True, timeout=900)
 pdf = tmp / (DOCX.stem + ".pdf")

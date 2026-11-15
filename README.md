@@ -18,7 +18,7 @@ plus tenue à jour.
 
 | Chemin | Rôle |
 |---|---|
-| `paper/GeNIS_benchmark_article.docx` | **L'article** : 47 pages, 14 sections, 20 figures, 16 tableaux, 1 algorithme, 37 références. Source unique, à éditer directement dans Word |
+| `paper/GeNIS_benchmark_article.docx` | **L'article** : 48 pages, 14 sections, 20 figures, 16 tableaux, 1 algorithme, 37 références. Source unique, à éditer directement dans Word. Le manuscrit anonymisé en fait 47, le bloc auteurs et remerciements étant retiré : c'est ce compte-là que la lettre d'accompagnement annonce |
 | `paper/submission/` | **Le package déposé chez EAAI** : page de titre, manuscrit anonymisé, highlights, lettre d'accompagnement, 15 figures vectorielles, CSV supplémentaire. Son `README.md` liste les conditions du guide et ce qui reste ouvert |
 | `paper/make_submission.py` | Construit les quatre fichiers Word du package depuis le manuscrit et **revérifie l'anonymisation** à chaque passage. À relancer après toute retouche de l'article |
 | `paper/blacklist.csv` | Disposition lisible par machine des 90 colonnes, générée depuis la liste **corrigée** à treize colonnes comportementales |
@@ -127,7 +127,7 @@ v2 doit ajouter, élément par élément.
 | `check_coherence.py` | **passe.** 20 figures et 16 tableaux, tous appelés ; 37 références, ordre de première citation croissant |
 | `check_style.py` | **passe.** 279 paragraphes de prose, aucun défaut mécanique |
 | `check_claims.py` | **passe.** Aucun écart entre la prose, les tableaux et les données |
-| `check_layout.py` | **non exécuté.** Demande LibreOffice Writer, indisponible dans l'environnement de vérification. Le compte de 47 pages vient du dernier rendu local |
+| `check_layout.py` | **passe.** Exécuté sur le poste local, LibreOffice Writer 26.8 : 48 pages pour la source, 47 pour le manuscrit anonymisé, 37 légendes tenant chacune d'un bloc, 20 images dans les marges. Le compte annoncé par la lettre d'accompagnement est donc vérifié, et non plus hérité d'un rendu antérieur |
 | `make_submission.py` | **reconstruit à l'identique.** Le package versionné correspond exactement au manuscrit courant, et l'anonymisation passe : aucun identifiant dans le corps, les noms ne subsistent que dans l'auto-citation [7] |
 | Limites EAAI | résumé de 250 mots pour 250 permis, 6 mots-clés, colonne simple, 3,98 Mo, 5 puces dont la plus longue à 80 caractères |
 

@@ -119,17 +119,30 @@ not `MachineLearningCVE`: the latter has no `Timestamp` column, and every step o
 audit rests on capture order. Each file carries a data signature the notebook checks
 at load time; E2's is `2830743|69|15`.
 
-### Two points to confirm against the record's file listing
+### Two points, now confirmed against the archive itself
 
 The mapping above follows the pipeline's output layout. Two details of the hand-built
-zips were not verified and are worth checking in the Zenodo file preview:
+zips were long listed here as unverified. They were checked on the local copy of
+`article1_final.zip`, whose MD5 is `e8a9689a15b314e7978be6c52afb2a28` — the value this
+file records for the published deposit, so the listing below describes what is on
+Zenodo and not merely a working copy.
 
-1. whether `models/` also appears inside `article1_final.zip`, in which case it is
-   simply duplicated and `models.zip` is the convenient copy;
-2. whether `cache/slice60.npz` was included. That file is a derived feature matrix
-   extracted from GeNIS. Its presence is not a licensing problem, since the record is
-   CC-BY 4.0 and declares *is derived from* the corpus, but it is redundant: the
-   frozen split indices and the pipeline regenerate it in about ten minutes.
+1. **`models/` is inside `article1_final.zip`**, 37 files. It is duplicated, and
+   `models.zip` is the convenient copy. The duplication in fact goes one step further:
+   `article1_models.zip` (49.2 MB) sits at the root of `article1_final.zip` as well, so
+   the trained models ship three times over in the record.
+2. **`cache/slice60.npz` was included**, 22.2 MB, next to `cache/slice60_meta.json`.
+   That file is a derived feature matrix extracted from GeNIS. Its presence is not a
+   licensing problem, since the record is CC-BY 4.0 and declares *is derived from* the
+   corpus, but it is redundant: the frozen split indices and the pipeline regenerate it
+   in about ten minutes.
+
+`frozen_splits_60s.npz` is likewise duplicated, at the root and under `models/`, 5.59 MB
+each. The extraction step in the reproduction recipe below refers to the root copy.
+
+None of this is a defect in the deposit — Zenodo forbids changing a published file, and
+the duplication costs space rather than correctness. It is recorded here so that a v2,
+if one is ever built, drops the redundant copies deliberately rather than by accident.
 
 ## The results file
 
